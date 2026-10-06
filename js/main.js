@@ -2,13 +2,12 @@
 // Reijners Technics - JavaScript voor de hele website
 // ---------------------------------------------------------------------
 // Elk onderdeel staat in een eigen blok  (function(){ ... })();
-// Volgorde: navigatie, database (aanvragen opslaan), kleurkeuze toestellen,
+// Volgorde: navigatie, aanvragen versturen (Formspree), kleurkeuze toestellen,
 // WhatsApp-links, contactformulier, offerteformulier (calculator),
 // offerte starten, welkomstbericht, foto-carrousels, wisselende foto's,
 // filterknoppen, fotoraster met fotoviewer, AI-chat.
-// Let op: het opslaan van aanvragen en de AI-chat werken alleen in de
-// live versie bij Claude (window.claude). Op een eigen domein moet daar
-// later een formulierdienst voor in de plaats komen.
+// Let op: de AI-chat werkt alleen in de versie bij Claude (window.claude).
+// Op een eigen domein blijft de chat automatisch verborgen.
 // =====================================================================
 
 // =====================================================================
@@ -133,18 +132,35 @@
   }
 })();
 
-var __dbPromise = null;
-function getDb() {
-  if (!__dbPromise) {
-    if (window.claude && typeof window.claude.use === "function") {
-      __dbPromise = window.claude.use("db").catch(function () {
-        return null;
-      });
-    } else {
-      __dbPromise = Promise.resolve(null);
-    }
+// =====================================================================
+// AANVRAGEN VERSTUREN
+// Elke aanvraag (aanvraagformulier, aanvulling, contactformulier) gaat
+// via Formspree als e-mail naar reijnerstechnics@gmail.com.
+// Ander Formspree-formulier? Pas dan enkel FORMSPREE_URL hieronder aan.
+// =====================================================================
+var FORMSPREE_URL = "https://formspree.io/f/mdeakpaq";
+
+var SOURCE_SUBJECTS = {
+  aanvraagformulier: "Nieuwe aanvraag via de website",
+  "aanvraagformulier-aanvulling": "Aanvulling op een aanvraag",
+  "contact-form": "Nieuw bericht via het contactformulier",
+};
+
+function sendLead(data) {
+  var payload = { _subject: (SOURCE_SUBJECTS[data.source] || "Website") + (data.naam ? " - " + data.naam : "") };
+  for (var k in data) {
+    var v = data[k];
+    payload[k] = Array.isArray(v) ? v.join(", ") : v;
   }
-  return __dbPromise;
+  if (data.email) payload._replyto = data.email;
+  return fetch(FORMSPREE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(payload),
+  }).then(function (res) {
+    if (!res.ok) throw new Error("Formspree " + res.status);
+    return res.json();
+  });
 }
 
 (function () {
@@ -222,24 +238,14 @@ function getDb() {
       if (ok) form.reset();
     }
 
-    getDb().then(function (db) {
-      if (!db) {
-        done(
-          false,
-          "Het formulier kon niet verzonden worden. Stuur ons gerust een WhatsApp via de knop hiernaast.",
-        );
-        return;
-      }
-      db.collection("leads")
-        .add(data)
-        .then(function () {
-          done(true, "Bedankt, " + data.naam + "! Rim belt u binnen 24 uur terug.");
-          if (window.rtLeadDone) window.rtLeadDone(data.naam);
-        })
-        .catch(function () {
-          done(false, "Versturen lukte niet. Probeer het opnieuw of gebruik WhatsApp hiernaast.");
-        });
-    });
+    sendLead(data)
+      .then(function () {
+        done(true, "Bedankt, " + data.naam + "! Rim belt u binnen 24 uur terug.");
+        if (window.rtLeadDone) window.rtLeadDone(data.naam);
+      })
+      .catch(function () {
+        done(false, "Versturen lukte niet. Probeer het opnieuw of gebruik WhatsApp hiernaast.");
+      });
   });
 })();
 
@@ -250,7 +256,6 @@ function getDb() {
   var ORDER = ["dienst", "contact", "klaar"];
   var state = {};
   var history = ["dienst"];
-  var leadRef = null;
   var WA_NUMBER = "32491113313";
 
   var LABELS = {
@@ -433,21 +438,11 @@ function getDb() {
       a.textContent = "Stuur uw aanvraag via WhatsApp";
       statusEl.appendChild(a);
     }
-    getDb()
-      .then(function (db) {
-        if (!db) {
-          fail();
-          return;
-        }
-        db.collection("leads")
-          .add(data)
-          .then(function (ref) {
-            leadRef = ref || null;
-            sendBtn.disabled = false;
-            statusEl.textContent = "";
-            showDone();
-          })
-          .catch(fail);
+    sendLead(data)
+      .then(function () {
+        sendBtn.disabled = false;
+        statusEl.textContent = "";
+        showDone();
       })
       .catch(fail);
   });
@@ -575,27 +570,15 @@ function getDb() {
       st.textContent = "Aanvullen lukte niet. Uw aanvraag zelf is wel verstuurd.";
       st.className = "calc-status err";
     }
-    if (leadRef && typeof leadRef.update === "function") {
-      leadRef.update(extra).then(ok).catch(fail);
-    } else {
-      getDb()
-        .then(function (db) {
-          if (!db) {
-            fail();
-            return;
-          }
-          var copy = {
-            naam: state.naam,
-            telefoon: state.telefoon,
-            gemeente: state.gemeente,
-            dienst: state.dienst,
-            source: "aanvraagformulier-aanvulling",
-          };
-          for (var k in extra) copy[k] = extra[k];
-          db.collection("leads").add(copy).then(ok).catch(fail);
-        })
-        .catch(fail);
-    }
+    var copy = {
+      naam: state.naam,
+      telefoon: state.telefoon,
+      gemeente: state.gemeente,
+      dienst: state.dienst,
+      source: "aanvraagformulier-aanvulling",
+    };
+    for (var k in extra) copy[k] = extra[k];
+    sendLead(copy).then(ok).catch(fail);
   });
 
   window.rtStartOffer = function (d) {
