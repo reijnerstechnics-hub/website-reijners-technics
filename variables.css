@@ -1,0 +1,29 @@
+/* =====================================================================
+   Reijners Technics - CSS Variables & Design Tokens
+   ===================================================================== */
+
+/* Reijners Technics color palette: "Fris & licht" (Fresh & Light)
+   These colors are fixed and not dependent on user's system theme. */
+:root {
+  --ink: #16283d;
+  --body: #3d4c5a;
+  --muted: #6b7a87;
+  --paper: #f6f9fb;
+  --surface: #ffffff;
+  --surface-alt: #eef3f7;
+  --line: #dce6ed;
+  --gold: #e3a63e;
+  --gold-dark: #c98826;
+  --gold-tint: #fcf1dd;
+  --gold-text: #7a5417;
+  --sky: #3e7fb0;
+  --sky-tint: #e4eef5;
+  --focus: #3e7fb0;
+}
+
+/* Typography variables for easy customization */
+:root {
+  --font-heading: "Sora", "Work Sans", sans-serif;
+  --font-body: "Work Sans", "Segoe UI", Arial, sans-serif;
+  --font-mono: monospace;
+}
