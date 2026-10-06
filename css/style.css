@@ -1,12 +1,30 @@
 /* =====================================================================
-   Reijners Technics - Main Stylesheet
+   Reijners Technics - stijlblad voor de hele website
+   ---------------------------------------------------------------------
+   Kleuren en lettertypes staan bovenaan in :root (de "variabelen").
+   Daaronder volgt de opmaak per onderdeel, telkens met een kopje
+   zoals  ---------- header ----------  zodat je snel kunt zoeken.
+   Tip: in Visual Studio Code zoek je met Ctrl+F op zo'n kopje.
    ===================================================================== */
 
-/* Import variables first */
-@import url('variables.css');
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Work+Sans:wght@400;600;700&display=swap');
-
-
+/* Reijners Technics: "Fris & licht" huisstijl.
+     Vast, licht kleurenschema (niet afhankelijk van het systeemthema van de bezoeker). */
+:root {
+  --ink: #16283d;
+  --body: #3d4c5a;
+  --muted: #6b7a87;
+  --paper: #f6f9fb;
+  --surface: #ffffff;
+  --surface-alt: #eef3f7;
+  --line: #dce6ed;
+  --gold: #e3a63e;
+  --gold-dark: #c98826;
+  --gold-tint: #fcf1dd;
+  --gold-text: #7a5417;
+  --sky: #3e7fb0;
+  --sky-tint: #e4eef5;
+  --focus: #3e7fb0;
+}
 
 * {
   box-sizing: border-box;
