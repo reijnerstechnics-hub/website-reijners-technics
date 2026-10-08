@@ -144,6 +144,7 @@ var SOURCE_SUBJECTS = {
   aanvraagformulier: "Nieuwe aanvraag via de website",
   "aanvraagformulier-aanvulling": "Aanvulling op een aanvraag",
   "contact-form": "Nieuw bericht via het contactformulier",
+  prijscalculator: "Offerteaanvraag via de prijscalculator",
 };
 
 function sendLead(data) {

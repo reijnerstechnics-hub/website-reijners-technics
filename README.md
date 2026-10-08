@@ -35,6 +35,12 @@ var FORMSPREE_URL = "https://formspree.io/f/mdeakpaq";
 
 Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via WhatsApp te sturen.
 
+## Prijsadvies
+
+Bovenaan de pagina *Toestellen* (`#prijs`) beantwoordt de klant een paar eenvoudige vragen: hoeveel ruimtes, hoe groot, welke verdieping, hoe ver van de buitenunit, wat hij belangrijk vindt en hoe oud de woning is. Daarna kiest de calculator zelf het toestel en de voordeligste opstelling (maximaal 5 binnenunits per buitenunit, en een tweede buitenunit aan de andere kant van het huis als dat goedkoper is). Onder de vragen staat de lijst met alle toestellen.
+
+Alle prijzen staan in `js/prijzen.js` (exclusief btw), net als welk toestel bij welke wens wordt aangeraden (`pakketten`). Zolang daar `voorlopig: true` staat, ziet de klant de melding dat het om voorbeeldprijzen gaat. De werking zelf staat in `js/prijscalculator.js`. Foto's en specificaties komen van de toestelkaarten; een toestel in `prijzen.js` hoort bij de kaart met dezelfde `data-model`.
+
 ## Online zetten
 
 Upload de volledige map (behalve `.git`) naar de webhost, zodat `index.html` in de hoofdmap staat. Werkt ook met Netlify, Vercel, Cloudflare Pages of GitHub Pages zonder extra instellingen.

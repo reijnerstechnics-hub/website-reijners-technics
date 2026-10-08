@@ -555,17 +555,26 @@
 <section class="v2-phead" id="toestellen" data-page="toestellen">
   <div class="wrap">
     <div class="v2-crumb"><a href="#home">Home</a> &rsaquo; <b>Toestellen</b></div>
-    <h1>Toestellen</h1>
-    <p>Vier merken, van scherp geprijsd tot topklasse. Elk toestel hieronder kunnen we voor u bestellen en plaatsen. Welk model het best bij uw ruimte past, bekijken we samen tijdens het gratis plaatsbezoek. Heeft u al een model op het oog? Zeg het ons gerust als we u terugbellen.</p>
-    <ul class="v2-usp">
-      <li><div><b>Gratis plaatsbezoek</b>We bekijken ter plaatse welk toestel past.</div></li>
-      <li><div><b>Advies over het vermogen</b>Niet te groot, niet te klein voor uw ruimte.</div></li>
-      <li><div><b>Plaatsing en nazorg</b>Ook voor onderhoud en herstelling bij ons.</div></li>
-    </ul>
+    <h1>Welke airco past bij u, en wat kost het?</h1>
+    <p>Beantwoord een paar eenvoudige vragen over uw woning. Wij kiezen het toestel dat bij u past en u ziet meteen een prijsindicatie, plaatsing inbegrepen. Wilt u liever zelf kijken? Onderaan vindt u al onze toestellen.</p>
   </div>
 </section>
-<section class="v2-after-phead" data-page="toestellen">
+
+<!-- PRIJSADVIES: begeleide vragen, daarna een toestel en een prijsindicatie.
+     Prijzen en adviezen staan in js/prijzen.js, de werking in js/prijscalculator.js -->
+<section class="v2-after-phead pc-sec" id="prijs" data-page="toestellen">
   <div class="wrap">
+    <div class="pc-card" id="pc" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="v2-sec pc-catalog" id="alle-toestellen" data-page="toestellen">
+  <div class="wrap">
+    <div class="pc-catalog-head">
+      <div class="v3-kicker">Alle toestellen</div>
+      <h2>Liever zelf rondkijken?</h2>
+      <p>Vier merken, van scherp geprijsd tot topklasse. Elk toestel hieronder kunnen we voor u bestellen en plaatsen.</p>
+    </div>
 
     <div class="toestellen-layout">
       <aside class="toestellen-sidebar">
@@ -2162,5 +2171,7 @@
 <div class="v4-mini" id="v4-mini" aria-hidden="true"><span class="live" aria-hidden="true"></span><span class="txt">Klaar in 2 minuten &middot; Rim belt u binnen 24 uur</span><a class="btn btn-gold" href="#calculator" tabindex="-1">Start aanvraag <span class="ar">&rarr;</span></a></div>
 
 <script src="js/main.js"></script>
+<script src="js/prijzen.js"></script>
+<script src="js/prijscalculator.js"></script>
 </body>
 </html>
