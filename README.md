@@ -3,7 +3,7 @@
 Website van [Reijners Technics](mailto:reijnerstechnics@gmail.com): airco's en lucht/lucht-warmtepompen in Dilsen-Stokkem en omgeving.
 
 Het is een statische website (HTML, CSS en JavaScript) zonder build-stap: elke webhost die gewone bestanden kan tonen, werkt.
-
+wat is dit?? gekke shittt man
 ## Mappen
 
 ```
