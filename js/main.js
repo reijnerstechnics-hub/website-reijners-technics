@@ -744,7 +744,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een airco- en warmtepompinstallateur in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en lucht/lucht-warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Nuova en Mitsubishi Heavy Industries. Er staan bewust geen prijzen op de website. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een airco- en warmtepompinstallateur in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en lucht/lucht-warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries, en warmtepompboilers en lucht/water-warmtepompen. Er staan bewust geen prijzen op de website. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -1227,11 +1227,11 @@ window.rtGoToOffer = function (d, model) {
 // via het menu onder "Toestellen". Daarna verschijnen links de categorieën
 // van dat merk. Een kaart hoort bij een categorie via
 //   data-category: "single" en/of "multi" (leeg = geen split-systeem)
-//   data-type:     "wand", "vloer", "cassette", "kanaal", "monoblock",
-//                  "buiten" of "boiler"
+//   data-type:     een soort uit RT_SOORTEN hieronder ("wand", "cassette",
+//                  "monoblock", "boiler", "buiten" ...)
 // Een categorie zonder toestellen bij het gekozen merk wordt niet getoond.
 // De zoekbalk zoekt in alle merken tegelijk (naam, reeks, typecodes,
-// vermogen ...).
+// vermogen ...); een woord als "cassette" of "buitenunit" toont die soort.
 // =====================================================================
 var RT_MERKEN = {
   daikin: "Daikin",
@@ -1239,7 +1239,38 @@ var RT_MERKEN = {
   me: "Mitsubishi Electric",
   mhi: "Mitsubishi Heavy Industries",
   nuova: "Nuova",
+  toshiba: "Toshiba",
+  ariston: "Ariston",
 };
+// Logo per merk (assets/img/logo-....svg), voor de merktegels en de koppen in de lijst
+var RT_LOGOS = {
+  daikin: "logo-daikin.svg",
+  lg: "logo-lg.svg",
+  me: "logo-mitsubishi-electric.svg",
+  mhi: "logo-mhi.svg",
+  nuova: "logo-nuova.svg",
+  toshiba: "logo-toshiba.svg",
+  ariston: "logo-ariston.svg",
+};
+// Soort toestel (data-type) en de groep waartoe het hoort. Zo ziet de bezoeker
+// meteen of het een split-airco is (binnen- én buitenunit) of niet.
+var RT_SOORTEN = [
+  { type: "wand", groep: "split", titel: "Wandmodellen" },
+  { type: "vloer", groep: "split", titel: "Vloermodellen" },
+  { type: "cassette", groep: "split", titel: "Cassettes" },
+  { type: "kanaal", groep: "split", titel: "Kanaal- en inbouwunits" },
+  { type: "plafond", groep: "split", titel: "Plafondmodellen" },
+  { type: "zuil", groep: "split", titel: "Zuilmodellen" },
+  { type: "monoblock", groep: "zonder", titel: "Monoblock, zonder buitenunit" },
+  { type: "mobiel", groep: "zonder", titel: "Mobiele airco's" },
+  { type: "boiler", groep: "water", titel: "Warmtepompboilers" },
+  { type: "luchtwater", groep: "water", titel: "Lucht/water-warmtepompen" },
+  { type: "buiten", groep: "buiten", titel: "Buitenunits voor multi-split" },
+];
+function rtGroep(type) {
+  for (var i = 0; i < RT_SOORTEN.length; i++) if (RT_SOORTEN[i].type === type) return RT_SOORTEN[i].groep;
+  return "split";
+}
 (function () {
   var section = document.getElementById("alle-toestellen");
   var lijst = document.getElementById("toestellen-lijst");
@@ -1249,6 +1280,47 @@ var RT_MERKEN = {
   var zoekInfo = section.querySelector(".zoek-info");
   var leeg = lijst.querySelector(".zoek-leeg");
   var cards = Array.prototype.slice.call(section.querySelectorAll(".device-card"));
+
+  // Binnen elk merk de kaarten altijd in dezelfde volgorde zetten, per soort
+  // (zie RT_SOORTEN). Een nieuwe kaart mag dus overal in het merkblok staan.
+  section.querySelectorAll(".brand-block").forEach(function (blk) {
+    var eigen = Array.prototype.slice.call(blk.querySelectorAll(".device-card"));
+    blk.querySelectorAll(".brand-sub, .devices").forEach(function (el) {
+      el.parentNode.removeChild(el);
+    });
+    var merk = eigen.length ? eigen[0].dataset.brand : "";
+    var kop = blk.querySelector(".brand-heading");
+    if (kop && RT_LOGOS[merk]) {
+      kop.innerHTML = "";
+      var logo = document.createElement("img");
+      logo.className = "brand-logo";
+      logo.src = "assets/img/" + RT_LOGOS[merk];
+      // het logo bevat de merknaam al, dus geen aparte tekst ernaast
+      logo.alt = RT_MERKEN[merk] || "";
+      kop.appendChild(logo);
+    }
+    RT_SOORTEN.forEach(function (s) {
+      var hier = eigen.filter(function (c) {
+        return c.dataset.type === s.type;
+      });
+      if (!hier.length) return;
+      var sub = document.createElement("div");
+      sub.className = "brand-sub brand-sub-" + s.groep;
+      sub.textContent = s.titel;
+      if (s.groep === "buiten") {
+        var noot = document.createElement("small");
+        noot.textContent = "Een buitenunit koopt u altijd samen met de binnenunits. Wij kiezen de juiste voor u.";
+        sub.appendChild(noot);
+      }
+      var grid = document.createElement("div");
+      grid.className = "devices";
+      hier.forEach(function (c) {
+        grid.appendChild(c);
+      });
+      blk.appendChild(sub);
+      blk.appendChild(grid);
+    });
+  });
 
   // zoektekst per kaart: merknaam + alles wat op de kaart staat
   function norm(s) {
@@ -1271,20 +1343,28 @@ var RT_MERKEN = {
       return card.dataset.type === type;
     };
   }
+  // De linkerkolom. Losse buitenunits staan apart: ze horen niet bij
+  // "Alle toestellen" (behalve bij zoeken), want je koopt ze altijd samen
+  // met binnenunits.
   var CATS = [
-    { id: "alle", label: "Alle toestellen", test: function () { return true; } },
-    { kop: "Systeem" },
-    { id: "single", label: "Single-split", test: function (c) { return heeft(c, "single"); } },
-    { id: "multi", label: "Multi-split", test: function (c) { return heeft(c, "multi"); } },
-    { kop: "Soort toestel" },
+    { id: "alle", label: "Alle toestellen", test: function (c) { return !!state.q || c.dataset.type !== "buiten"; } },
+    { kop: "Split-airco", sub: "binnen- én buitenunit" },
     { id: "wand", label: "Wandmodellen", test: soort("wand") },
     { id: "vloer", label: "Vloermodellen", test: soort("vloer") },
     { id: "cassette", label: "Cassettes", test: soort("cassette") },
     { id: "kanaal", label: "Kanaal- en inbouwunits", test: soort("kanaal") },
-    { id: "monoblock", label: "Zonder buitenunit", test: soort("monoblock") },
-    { id: "buiten", label: "Multi-split buitenunits", test: soort("buiten") },
-    { kop: "Warm water" },
+    { id: "plafond", label: "Plafond- en zuilmodellen", test: function (c) { return c.dataset.type === "plafond" || c.dataset.type === "zuil"; } },
+    { kop: "Zonder buitenunit", sub: "alles zit in één toestel" },
+    { id: "monoblock", label: "Monoblock (vaste airco)", test: soort("monoblock") },
+    { id: "mobiel", label: "Mobiele airco's", test: soort("mobiel") },
+    { kop: "Warm water en verwarming" },
     { id: "boiler", label: "Warmtepompboilers", test: soort("boiler") },
+    { id: "luchtwater", label: "Lucht/water-warmtepompen", test: soort("luchtwater") },
+    { kop: "Voor hoeveel kamers?", sub: "multi-split: meerdere binnenunits op één buitenunit" },
+    { id: "single", label: "Eén kamer (single-split)", test: function (c) { return heeft(c, "single"); } },
+    { id: "multi", label: "Meerdere kamers (multi-split)", test: function (c) { return heeft(c, "multi") && c.dataset.type !== "buiten"; } },
+    { kop: "Losse onderdelen" },
+    { id: "buiten", label: "Multi-split buitenunits", test: soort("buiten") },
   ];
   function zoekCat(id) {
     for (var i = 0; i < CATS.length; i++) if (CATS[i].id === id) return CATS[i];
@@ -1295,17 +1375,42 @@ var RT_MERKEN = {
   function vanMerk(card) {
     return state.merk === "alle" || card.dataset.brand === state.merk;
   }
+  // Zoekwoorden die een soort toestel betekenen. Wie "buitenunit" of
+  // "cassette" typt, krijgt enkel die toestellen, niet elk toestel waar
+  // het woord ergens in de tekst staat.
+  var SOORT_WOORDEN = {
+    buitenunit: ["buiten"], buitenunits: ["buiten"], buitendeel: ["buiten"],
+    wandmodel: ["wand"], wandmodellen: ["wand"], wandunit: ["wand"],
+    vloermodel: ["vloer"], vloermodellen: ["vloer"], console: ["vloer"],
+    cassette: ["cassette"], cassettes: ["cassette"],
+    kanaal: ["kanaal"], kanaalunit: ["kanaal"], kanaalunits: ["kanaal"], inbouw: ["kanaal"], inbouwunit: ["kanaal"], duct: ["kanaal"],
+    plafond: ["plafond", "cassette"], plafondmodel: ["plafond"], plafondmodellen: ["plafond"],
+    zuil: ["zuil"], zuilmodel: ["zuil"],
+    monoblock: ["monoblock"], monoblok: ["monoblock"],
+    mobiel: ["mobiel"], mobiele: ["mobiel"],
+    boiler: ["boiler"], boilers: ["boiler"], warmtepompboiler: ["boiler"], warmtepompboilers: ["boiler"],
+    "lucht/water": ["luchtwater"], luchtwater: ["luchtwater"], "lucht-water": ["luchtwater"],
+  };
   function past(card) {
     if (!state.q) return true;
     var woorden = norm(state.q).trim().split(" ");
-    for (var i = 0; i < woorden.length; i++) if (card._zoek.indexOf(woorden[i]) === -1) return false;
+    for (var i = 0; i < woorden.length; i++) {
+      var w = woorden[i];
+      if (SOORT_WOORDEN.hasOwnProperty(w)) {
+        if (SOORT_WOORDEN[w].indexOf(card.dataset.type) === -1) return false;
+      } else if (w === "multi" || w === "multisplit" || w === "multi-split") {
+        if (!heeft(card, "multi")) return false;
+      } else if (w === "single" || w === "singlesplit" || w === "single-split") {
+        if (!heeft(card, "single")) return false;
+      } else if (card._zoek.indexOf(w) === -1) return false;
+    }
     return true;
   }
 
-  // aantal modellen op elke merktegel
+  // aantal modellen op elke merktegel (zonder losse buitenunits)
   section.querySelectorAll(".merk-tegel").forEach(function (t) {
     var n = cards.filter(function (c) {
-      return c.dataset.brand === t.dataset.merk;
+      return c.dataset.brand === t.dataset.merk && c.dataset.type !== "buiten";
     }).length;
     t.querySelector(".merk-n").textContent = n + (n === 1 ? " model" : " modellen");
   });
@@ -1318,6 +1423,14 @@ var RT_MERKEN = {
     });
     section.classList.toggle("merk-gekozen", !!state.merk);
     lijst.hidden = !state.merk;
+    // op de gsm staan de tegels dan in één schuifrij: het gekozen merk in het midden
+    var rij = section.querySelector(".merk-keuze");
+    var aan = rij && rij.querySelector(".merk-tegel.on");
+    if (aan && rij.scrollWidth > rij.clientWidth) {
+      var a = aan.getBoundingClientRect();
+      var r = rij.getBoundingClientRect();
+      rij.scrollLeft += a.left - r.left - (r.width - a.width) / 2;
+    }
     if (zoekInfo) zoekInfo.textContent = "";
     if (!state.merk) return;
 
@@ -1332,6 +1445,11 @@ var RT_MERKEN = {
       if (cat.kop) {
         kop = document.createElement("h4");
         kop.textContent = cat.kop;
+        if (cat.sub) {
+          var uitleg = document.createElement("small");
+          uitleg.textContent = cat.sub;
+          kop.appendChild(uitleg);
+        }
         return;
       }
       var n = mijn.filter(cat.test).length;
@@ -1400,7 +1518,7 @@ var RT_MERKEN = {
   window.rtKiesMerk = function (merk, houdCat) {
     if (state.merk !== merk || !houdCat) state.cat = "alle";
     state.merk = merk;
-    merkVoorZoeken = null;
+    merkVoorZoeken = undefined;
     render();
   };
 
@@ -1429,7 +1547,7 @@ var RT_MERKEN = {
 
   // zoeken: zoekt altijd in alle merken. Wordt de zoekterm gewist, dan
   // komt het merk terug dat voordien gekozen was.
-  var merkVoorZoeken = null;
+  var merkVoorZoeken; // undefined: niets om terug te zetten (null: geen merk gekozen)
   function zoekNaar(q) {
     if (q && !state.q) {
       merkVoorZoeken = state.merk;
@@ -1437,9 +1555,9 @@ var RT_MERKEN = {
     }
     state.q = q;
     if (q) state.merk = "alle";
-    else if (merkVoorZoeken !== null) {
+    else if (merkVoorZoeken !== undefined) {
       state.merk = merkVoorZoeken;
-      merkVoorZoeken = null;
+      merkVoorZoeken = undefined;
     }
     render();
   }
@@ -1466,7 +1584,7 @@ var RT_MERKEN = {
   if (wis)
     wis.addEventListener("click", function () {
       if (zoek) zoek.value = "";
-      merkVoorZoeken = null;
+      merkVoorZoeken = undefined;
       state.q = "";
       state.merk = "alle";
       render();
@@ -1515,10 +1633,36 @@ var RT_MERKEN = {
     vloer: "Vloermodel",
     cassette: "Cassette",
     kanaal: "Kanaal- of inbouwunit",
+    plafond: "Plafondmodel",
+    zuil: "Zuilmodel",
     monoblock: "Zonder buitenunit",
+    mobiel: "Mobiele airco",
     buiten: "Buitenunit",
     boiler: "Warmtepompboiler",
+    luchtwater: "Lucht/water-warmtepomp",
   };
+  // Label op de foto: is het een split-airco of niet?
+  var BADGES = {
+    split: "Binnen- + buitenunit",
+    zonder: "Zonder buitenunit",
+    buiten: "Buitenunit",
+    water: "Warm water",
+  };
+  // Eén zin in gewone taal onder het label van de kaart
+  function voorWie(card) {
+    var t = card.dataset.type,
+      s = heeft(card, "single"),
+      m = heeft(card, "multi");
+    if (t === "buiten") return "Wordt gecombineerd met meerdere binnenunits";
+    if (t === "monoblock") return "Alles in één toestel, geen buitenunit aan de gevel";
+    if (t === "mobiel") return "Verplaatsbaar, met een afvoerslang naar buiten";
+    if (t === "boiler") return "Voor warm water in keuken en badkamer";
+    if (t === "luchtwater") return "Voor uw centrale verwarming en warm water";
+    if (s && m) return "Voor 1 kamer, of meerdere kamers op 1 buitenunit";
+    if (s) return "Voor 1 kamer, met een eigen buitenunit";
+    if (m) return "Binnenunit voor multi-split (meerdere kamers)";
+    return "";
+  }
   var UITLEG = {
     wand:
       "Een wandmodel hangt hoog aan de muur. Via een kleine doorvoer in de muur is het met leidingen verbonden met de buitenunit. Het is de meest gekozen oplossing: snel geplaatst en met een goede luchtverdeling.",
@@ -1534,6 +1678,14 @@ var RT_MERKEN = {
       "Op deze buitenunit sluit u meerdere binnenunits aan: één per kamer. Zo hebt u maar één toestel aan de gevel voor het hele huis. Het totale vermogen van de binnenunits moet passen bij de buitenunit; dat rekenen we voor u uit.",
     boiler:
       "Een warmtepompboiler verwarmt uw tapwater met warmte uit de lucht, in plaats van alleen met een elektrische weerstand. Hij staat meestal in een berging, garage of technische ruimte en vervangt een klassieke elektrische boiler.",
+    plafond:
+      "Een plafondmodel hangt zichtbaar onder het plafond en blaast de lucht ver de ruimte in. Een goede keuze voor grote ruimtes zonder verlaagd plafond, zoals een zaak, kantoor of grote leefruimte.",
+    zuil:
+      "Een zuilmodel staat als een smalle kast op de vloer en blaast de lucht krachtig en ver de ruimte in. Bedoeld voor grote ruimtes zoals een winkel, zaal of showroom.",
+    mobiel:
+      "Een mobiele airco staat op wieltjes en gaat gewoon in het stopcontact. De warme lucht gaat via een slang naar buiten, bijvoorbeeld door een raam. Handig als tijdelijke oplossing, maar luider en minder zuinig dan een vaste airco.",
+    luchtwater:
+      "Een lucht/water-warmtepomp haalt warmte uit de buitenlucht en geeft die af aan het water van uw centrale verwarming en uw warm water. Ze kan een gas- of stookolieketel vervangen. Of ze bij uw woning en radiatoren past, bekijken we tijdens het plaatsbezoek.",
   };
 
   function slug(s) {
@@ -1611,9 +1763,13 @@ var RT_MERKEN = {
     card.dataset.slug = id;
     bySlug[id] = card;
 
-    var sys = [];
-    if (heeft(card, "single")) sys.push("Single-split");
-    if (heeft(card, "multi")) sys.push(card.dataset.type === "buiten" ? "Multi-split buitenunit" : "Multi-split");
+    // label (split of niet): op de computer over de foto, op de gsm naast de foto
+    var groep = rtGroep(card.dataset.type);
+    var foto = card.querySelector(".device-photo");
+    var badge = el("span", "device-badge badge-" + groep, card.dataset.type === "luchtwater" ? "Verwarming + warm water" : BADGES[groep]);
+    card.insertBefore(badge, foto ? foto.nextSibling : card.firstChild);
+    // en een zin in gewone taal onder de naam
+    var wie = voorWie(card);
     var k = kernen(card);
     var keys = el("div", "device-keys");
     k.forEach(function (t) {
@@ -1622,7 +1778,7 @@ var RT_MERKEN = {
     var meer = el("a", "device-more", "Bekijk details");
     meer.href = "#toestel-" + id;
     meer.appendChild(el("span", "ar", " →"));
-    if (sys.length) card.insertBefore(el("div", "device-sys", sys.join(" · ")), h3);
+    if (wie) card.insertBefore(el("div", "device-sys", wie), h3.nextSibling);
     card.insertBefore(keys, cta);
     card.insertBefore(meer, cta);
   });
@@ -1637,7 +1793,7 @@ var RT_MERKEN = {
 
   // ---------- detailpagina ----------
   function vermogenTabel(card) {
-    if (["wand", "vloer", "cassette", "kanaal", "monoblock"].indexOf(card.dataset.type) === -1) return null;
+    if (["wand", "vloer", "cassette", "kanaal", "plafond", "zuil", "monoblock"].indexOf(card.dataset.type) === -1) return null;
     var kw = spec(card, ["Koelvermogen"]);
     var nums = (kw.match(/\d+,\d/g) || [])
       .map(function (n) {
@@ -1717,11 +1873,15 @@ var RT_MERKEN = {
     var h1 = el("h1", null, naam);
     if (sub) h1.appendChild(el("span", "device-sub", " " + sub.textContent));
     info.appendChild(h1);
+    var groep = rtGroep(card.dataset.type);
     var tags = el("div", "td-tags");
+    tags.appendChild(el("span", "td-tag-" + groep, card.dataset.type === "luchtwater" ? "Verwarming + warm water" : BADGES[groep]));
+    if (card.dataset.type !== "buiten") tags.appendChild(el("span", null, TYPES[card.dataset.type] || ""));
     if (heeft(card, "single")) tags.appendChild(el("span", null, "Single-split"));
-    if (heeft(card, "multi")) tags.appendChild(el("span", null, "Multi-split"));
-    tags.appendChild(el("span", null, TYPES[card.dataset.type] || ""));
+    if (heeft(card, "multi")) tags.appendChild(el("span", null, card.dataset.type === "buiten" ? "Voor multi-split" : "Multi-split"));
     info.appendChild(tags);
+    var wie = voorWie(card);
+    if (wie) info.appendChild(el("p", "td-wie", wie));
     info.appendChild(el("p", "td-desc", card.querySelector(".device-desc").textContent));
     var keys = el("div", "td-keys");
     kernen(card).forEach(function (t) {
@@ -1738,8 +1898,8 @@ var RT_MERKEN = {
     var bel = el("a", "btn v3-btn-line", "Bel Rim");
     bel.href = "tel:+32491113313";
     acts.appendChild(offerte);
-    // prijsadvies bovenaan de pagina Toestellen (niet voor warm water)
-    if (card.dataset.type !== "boiler") {
+    // prijsadvies bovenaan de pagina Toestellen (enkel voor vaste airco's)
+    if (["boiler", "luchtwater", "mobiel"].indexOf(card.dataset.type) === -1) {
       var richt = el("a", "btn v3-btn-line", "Richtprijs berekenen");
       richt.href = "#prijs";
       acts.appendChild(richt);

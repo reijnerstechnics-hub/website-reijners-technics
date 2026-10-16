@@ -6729,26 +6729,6 @@ section.pc-catalog {
   background: var(--gold-tint);
   box-shadow: 0 0 0 2px var(--gold);
 }
-.merk-foto {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 4 / 3;
-  margin-bottom: 8px;
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-}
-.merk-foto img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.merk-tegel b {
-  font-family: "Sora", "Work Sans", sans-serif;
-  font-size: 1rem;
-  line-height: 1.25;
-}
 .merk-tag {
   font-size: 0.82rem;
   color: var(--body);
@@ -6782,7 +6762,6 @@ section.pc-catalog {
   font-weight: 700;
 }
 /* na de keuze worden de tegels een compacte rij, zodat de toestellen hoger staan */
-.merk-gekozen .merk-foto,
 .merk-gekozen .merk-tag {
   display: none;
 }
@@ -7440,5 +7419,293 @@ section.pc-catalog {
 @media (max-width: 480px) {
   .pc-vs {
     grid-template-columns: 90px minmax(0, 1fr);
+  }
+}
+
+/* ---------- merktegels met logo ---------- */
+.merk-keuze {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+.merk-tegel {
+  align-items: center;
+  text-align: center;
+  padding: 18px 14px 16px;
+}
+.merk-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 54px;
+  margin-bottom: 8px;
+}
+.merk-logo img {
+  max-width: 100%;
+  max-height: 40px;
+  object-fit: contain;
+}
+.merk-tegel .merk-tag {
+  min-height: 2.8em;
+}
+.merk-gekozen .merk-logo {
+  height: 34px;
+  margin-bottom: 2px;
+}
+.merk-gekozen .merk-logo img {
+  max-height: 26px;
+}
+@media (max-width: 640px) {
+  .merk-keuze {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .merk-tegel {
+    padding: 12px 10px 10px;
+  }
+  .merk-logo {
+    height: 40px;
+    margin-bottom: 2px;
+  }
+  .merk-logo img {
+    max-height: 30px;
+  }
+  /* na de keuze: één rij om opzij te schuiven, zodat de toestellen meteen zichtbaar zijn */
+  .merk-gekozen .merk-keuze {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    margin-left: -4px;
+    margin-right: -4px;
+    padding: 4px 4px 8px;
+    scrollbar-width: none;
+  }
+  .merk-gekozen .merk-keuze::-webkit-scrollbar {
+    display: none;
+  }
+  .merk-gekozen .merk-tegel {
+    flex: 0 0 116px;
+    scroll-snap-align: start;
+    padding: 8px 8px 6px;
+  }
+  .merk-gekozen .merk-tegel:hover {
+    transform: none;
+  }
+  .merk-gekozen .merk-logo {
+    height: 30px;
+  }
+  .merk-gekozen .merk-logo img {
+    max-height: 22px;
+  }
+  .merk-gekozen .merk-n {
+    padding-top: 2px;
+    font-size: 0.66rem;
+  }
+}
+
+/* ---------- merkkop in de lijst, met logo ---------- */
+.brand-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.brand-logo {
+  height: 26px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+}
+
+/* ---------- soorten toestellen duidelijk gescheiden ---------- */
+.brand-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.brand-sub small {
+  font-size: 0.82rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.brand-sub-buiten {
+  margin-top: 34px;
+  padding-top: 18px;
+  border-top: 2px dashed var(--line);
+}
+.toestellen-sidebar h4 small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.72rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.cat-list h4 {
+  margin-top: 16px;
+}
+
+/* ---------- label op de foto: split of niet ---------- */
+.device-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+  box-shadow: 0 1px 4px rgba(22, 40, 61, 0.12);
+}
+.badge-split,
+.td-tag-split {
+  background: var(--sky-tint);
+  color: var(--sky);
+}
+.badge-zonder,
+.td-tag-zonder {
+  background: #e3f3e8;
+  color: #1d6b38;
+}
+.badge-buiten,
+.td-tag-buiten {
+  background: #eceff3;
+  color: #46535f;
+}
+.badge-water,
+.td-tag-water {
+  background: var(--gold-tint);
+  color: var(--gold-text);
+}
+.device-sys {
+  margin-top: -4px;
+  font-size: 0.8rem;
+  color: var(--body);
+}
+.td-tags .td-tag-split,
+.td-tags .td-tag-zonder,
+.td-tags .td-tag-buiten,
+.td-tags .td-tag-water {
+  font-weight: 700;
+}
+.td-wie {
+  margin: 10px 0 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+/* in de lijst staat het label naast de foto in de kaart; op de computer over de foto */
+.toestellen-main .device-card {
+  position: relative;
+}
+.toestellen-main .device-card > .device-badge {
+  top: 34px;
+  left: 34px;
+}
+
+/* ---------- gsm: kaarten in de lijst als compacte rij (foto links) ---------- */
+@media (max-width: 640px) {
+  .v2-toestellen .toestellen-main .devices,
+  .toestellen-main .devices {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .toestellen-main .device-card {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    column-gap: 14px;
+    row-gap: 6px;
+    align-content: start;
+    padding: 14px;
+    border-radius: 18px;
+  }
+  .toestellen-main .device-card > * {
+    grid-column: 2;
+    min-width: 0;
+  }
+  .toestellen-main .device-card > .device-photo {
+    grid-column: 1;
+    grid-row: 1 / span 5;
+    align-self: start;
+    aspect-ratio: 1;
+    margin: 0;
+  }
+  .toestellen-main .device-card > .device-badge {
+    position: static;
+    justify-self: start;
+    box-shadow: none;
+  }
+  .toestellen-main .device-card .device-brand,
+  .toestellen-main .device-card .device-desc,
+  .toestellen-main .device-card .color-swatches {
+    display: none;
+  }
+  .toestellen-main .device-card h3 {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+  .toestellen-main .device-sys {
+    margin-top: 0;
+  }
+  .toestellen-main .device-keys {
+    margin-top: 2px;
+    padding-top: 8px;
+    gap: 4px;
+  }
+  .toestellen-main .device-keys span {
+    padding: 2px 8px;
+    font-size: 0.7rem;
+  }
+  .toestellen-main .device-more {
+    font-size: 0.84rem;
+  }
+}
+
+/* ---------- categorieën: bredere kolom die zelf scrolt als ze te hoog is ---------- */
+@media (min-width: 901px) {
+  .toestellen-layout {
+    grid-template-columns: 290px minmax(0, 1fr);
+    gap: 28px;
+  }
+  .toestellen-sidebar {
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 20px 18px;
+    scrollbar-width: thin;
+  }
+}
+@media (min-width: 901px) {
+  .toestellen-sidebar .cat-btn {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+}
+/* tot 1440px breed staat de zwevende bel/WhatsApp-knop links onderaan over de kolom:
+   de kolom stopt daarboven en scrolt zelf */
+@media (min-width: 901px) and (max-width: 1440px) {
+  .toestellen-sidebar {
+    max-height: calc(100vh - 250px);
+  }
+}
+
+/* ---------- home: tegel met de merken (6 merken passen zonder af te knippen) ---------- */
+.v3-bento {
+  grid-template-rows: minmax(240px, auto) minmax(240px, auto);
+}
+.v3-tile.dark .brands {
+  gap: 6px;
+}
+.v3-tile.dark .brands span {
+  padding: 4px 10px;
+  font-size: 0.78rem;
+}
+@media (max-width: 860px) {
+  .v3-bento {
+    grid-template-rows: 280px auto auto;
   }
 }
