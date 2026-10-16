@@ -1360,7 +1360,7 @@ section.alt {
   cursor: pointer;
 }
 .toestellen-main .devices {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 @media (max-width: 900px) {
   .toestellen-layout {
@@ -6559,5 +6559,37 @@ section.pc-catalog {
   }
   .pc-screen {
     min-height: 0;
+  }
+}
+
+/* ---------- foto van Rim (en later andere teamfoto's): 200% bij hover ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .v3-avatar:has(> img) {
+    position: relative;
+    transition:
+      transform 0.25s var(--ease),
+      box-shadow 0.25s var(--ease);
+  }
+  .v3-avatar:has(> img):hover {
+    transform: scale(2);
+    z-index: 20;
+    box-shadow:
+      0 0 0 2px var(--gold),
+      0 10px 28px rgba(22, 40, 61, 0.35);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v3-avatar:has(> img) {
+    transition: none;
+  }
+}
+
+/* ---------- toestellen: 3 kaarten naast elkaar ---------- */
+.pc-catalog .wrap {
+  max-width: 1320px;
+}
+@media (min-width: 1240px) {
+  .toestellen-main .devices {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
