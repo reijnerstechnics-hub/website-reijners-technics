@@ -588,12 +588,18 @@
 
     <!-- MERKKEUZE: eerst een merk kiezen, daarna verschijnen de toestellen.
          De werking staat in js/main.js (blok TOESTELLEN: MERK EN CATEGORIE). -->
+    <div class="toestel-zoek" role="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <label class="sr-only" for="toestel-zoek">Zoek een toestel</label>
+      <input type="search" id="toestel-zoek" placeholder="Zoek een toestel, bv. Perfera, MSZ-LN, cassette of 3,5 kW" autocomplete="off" enterkeyhint="search">
+      <span class="zoek-info" aria-live="polite"></span>
+    </div>
     <div class="merk-keuze" role="group" aria-label="Kies een merk">
       <button type="button" class="merk-tegel" data-merk="daikin" aria-pressed="false"><span class="merk-foto"><img src="assets/img/daikin-stylish-wit.png" alt="" loading="lazy"></span><b>Daikin</b><span class="merk-tag">Van instapmodel tot designicoon</span><span class="merk-n"></span></button>
       <button type="button" class="merk-tegel" data-merk="lg" aria-pressed="false"><span class="merk-foto"><img src="assets/img/s-11dc8f97ffe3.webp" alt="" loading="lazy"></span><b>LG</b><span class="merk-tag">Slimme AI-toestellen en Artcool-design</span><span class="merk-n"></span></button>
       <button type="button" class="merk-tegel" data-merk="me" aria-pressed="false"><span class="merk-foto"><img src="assets/img/s-c0483f72444e.webp" alt="" loading="lazy"></span><b>Mitsubishi Electric</b><span class="merk-tag">Erg stil, met Zubadan voor strenge winters</span><span class="merk-n"></span></button>
       <button type="button" class="merk-tegel" data-merk="mhi" aria-pressed="false"><span class="merk-foto"><img src="assets/img/s-d82dc1735822.webp" alt="" loading="lazy"></span><b>Mitsubishi Heavy Industries</b><span class="merk-tag">Zuinig en robuust, tot 10 kW</span><span class="merk-n"></span></button>
-      <button type="button" class="merk-tegel" data-merk="nuova" aria-pressed="false"><span class="merk-foto"><img src="assets/img/s-49df2d380b3d.webp" alt="" loading="lazy"></span><b>Nuova</b><span class="merk-tag">Scherp geprijsd, ook cassette en kanaal</span><span class="merk-n"></span></button>
+      <button type="button" class="merk-tegel" data-merk="nuova" aria-pressed="false"><span class="merk-foto"><img src="assets/img/s-49df2d380b3d.webp" alt="" loading="lazy"></span><b>Nuova</b><span class="merk-tag">Scherp geprijsd, ook monoblock en warm water</span><span class="merk-n"></span></button>
     </div>
     <p class="merk-alle"><button type="button" data-merk="alle">Of bekijk de toestellen van alle merken samen</button></p>
 
@@ -603,31 +609,38 @@
       </aside>
 
       <div class="toestellen-main">
+    <div class="zoek-leeg" hidden>
+      <b>Geen toestellen gevonden.</b>
+      <p>Probeer een andere zoekterm, of vraag het gewoon aan Rim: hij kent ook modellen die hier niet staan.</p>
+      <button type="button" class="btn btn-sm v3-btn-line zoek-wis">Toon alle toestellen</button>
+    </div>
 
     <div class="brand-block" id="toestellen-nuova">
   <h3 class="brand-heading">Nuova</h3>
   <div class="brand-sub">Wandmodellen</div>
   <div class="devices">
-    <div class="device-card" data-brand="nuova" data-category="single" data-type="wand">
+    <div class="device-card" data-brand="nuova" data-category="single multi" data-type="wand">
           <div class="device-photo"><img src="assets/img/s-49df2d380b3d.webp" alt="Nuova Infinity AI Smart binnen- en buitenunit" loading="lazy"><div class="color-swatches"><button type="button" class="color-swatch active" style="background:#b8bcc0" data-src="assets/img/s-6d568571ab52.webp" aria-label="Zilver" title="Zilver"></button><button type="button" class="color-swatch" style="background:#ffffff" data-src="assets/img/s-293ec8b329f4.webp" aria-label="Wit" title="Wit"></button><button type="button" class="color-swatch" style="background:#1c1c1c" data-src="assets/img/s-094d0549837c.webp" aria-label="Zwart" title="Zwart"></button></div></div>
-      <div class="device-brand">Airco · wandmodel</div>
+      <div class="device-brand">Airco · wandmodel</div><div class="dual-badge">Ook leverbaar als multi-split binnenunit</div>
       <h3>Infinity AI Smart</h3>
-      <p class="device-desc">Wandmodel met wifi-bediening. Een scherp geprijsd alternatief voor de grotere merken.</p>
+      <p class="device-desc">Wandmodel met wifi-bediening, in mat zilver, wit of zwart. Een scherp geprijsd alternatief voor de grotere merken.</p>
       <div class="device-specs">
         <div><span>Koelvermogen</span><span>2,5 - 7,1 kW (modellen 2,5 / 3,5 / 5,0 / 7,1 kW)</span></div>
+        <div><span>Kleuren</span><span>mat zilver, mat wit, mat zwart</span></div>
         <div><span>Koudemiddel</span><span>R32</span></div>
+        <div><span>Multi-split</span><span>op een Infinity AI Smart-buitenunit (CINF, 2 tot 5 poorten)</span></div>
         <div><span>Technologie &amp; functies</span><span>AI inverter, wifi + spraakbediening, 4D-luchtverdeling, turbofunctie, zelfreiniging op 56°C, ionisatie, ontvochtigingsfunctie</span></div>
       </div>
       <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Infinity AI Smart">Offerte voor dit model <span class="ar">&rarr;</span></a>
     </div>
-    <div class="device-card" data-brand="nuova" data-category="single" data-type="wand">
+    <div class="device-card" data-brand="nuova" data-category="single multi" data-type="wand">
           <div class="device-photo"><img src="assets/img/s-b39f695ce8f9.webp" alt="Nuova Premium Inverter binnen- en buitenunit" loading="lazy"></div>
-      <div class="device-brand">Airco · wandmodel</div>
+      <div class="device-brand">Airco · wandmodel</div><div class="dual-badge">Ook leverbaar als multi-split binnenunit</div>
       <h3>Premium Inverter</h3>
       <p class="device-desc">Middenklasser met dubbele filtering, zelfreinigende functie (i-Clean) en wifi-bediening.</p>
       <div class="device-specs">
-        <div><span>Koelvermogen</span><span>3,5 - 5,0 kW</span></div>
-        <div><span>Verwarmingsvermogen</span><span>3,81 - 5,57 kW</span></div>
+        <div><span>Koelvermogen</span><span>3,5 - 7,1 kW (modellen 3,5 / 5,0 / 7,1 kW)</span></div>
+        <div><span>Verwarmingsvermogen</span><span>3,81 - 5,57 kW (modellen 3,5 en 5,0 kW)</span></div>
         <div><span>Energielabel</span><span>koelen A++ / verwarmen A+</span></div>
         <div><span>SEER / SCOP</span><span>7,0 / 4,2 (3,5 kW) of 4,0 (5,0 kW)</span></div>
         <div><span>Geluidsniveau binnen</span><span>20 - 21 dB(A)</span></div>
@@ -636,13 +649,14 @@
         <div><span>Afmetingen buitenunit</span><span>720 × 495 × 270 mm (3,5 kW) / 805 × 554 × 330 mm (5,0 kW)</span></div>
         <div><span>Gewicht buitenunit</span><span>26,6 kg (3,5 kW) / 30,6 kg (5,0 kW)</span></div>
         <div><span>Koudemiddel</span><span>R32 (GWP 675)</span></div>
+        <div><span>Multi-split</span><span>op een MSO-buitenunit (2 tot 5 poorten)</span></div>
         <div><span>Technologie &amp; functies</span><span>dubbel filtersysteem, i-Clean, Air Magic, wifi, afstandsbediening met timer</span></div>
       </div>
       <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Premium Inverter">Offerte voor dit model <span class="ar">&rarr;</span></a>
     </div>
-    <div class="device-card" data-brand="nuova" data-category="single" data-type="wand">
+    <div class="device-card" data-brand="nuova" data-category="single multi" data-type="wand">
           <div class="device-photo"><img src="assets/img/s-9c149d262e8a.webp" alt="Nuova Stellar Inverter binnen- en buitenunit, wit" loading="lazy"><div class="color-swatches"><button type="button" class="color-swatch active" style="background:#ffffff" data-src="assets/img/s-3f1bc153772c.webp" aria-label="Wit" title="Wit"></button><button type="button" class="color-swatch" style="background:#1c1c1c" data-src="assets/img/s-813a0b661a16.webp" aria-label="Zwart mirror" title="Zwart mirror"></button></div></div>
-      <div class="device-brand">Airco · wandmodel</div>
+      <div class="device-brand">Airco · wandmodel</div><div class="dual-badge">Ook leverbaar als multi-split binnenunit</div>
       <h3>Stellar Inverter</h3>
       <p class="device-desc">Topmodel met A+++ energielabel, erg stil (vanaf 18,4 dB) en met een magnetisch wisselbaar kleurpaneel.</p>
       <div class="device-specs">
@@ -656,13 +670,17 @@
         <div><span>Afmetingen buitenunit</span><span>765 × 555 × 303 mm</span></div>
         <div><span>Gewicht buitenunit</span><span>26,4 kg (3,5 kW) / 26,6 kg (5,0 kW)</span></div>
         <div><span>Koudemiddel</span><span>R32 (GWP 675)</span></div>
+        <div><span>Multi-split</span><span>op een MSO-buitenunit (2 tot 5 poorten)</span></div>
         <div><span>Technologie &amp; functies</span><span>180° draaiende luchtuitlaat, dubbele filtratie met i-Clean, Air Magic-ionisatie, wifi en spraakbediening, Flash Cooling, zelfreinigende buitenunit, 1 W stand-byverbruik</span></div>
       </div>
       <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Stellar Inverter">Offerte voor dit model <span class="ar">&rarr;</span></a>
     </div>
-    <div class="device-card" data-brand="nuova" data-category="single" data-type="vloer">
+  </div>
+  <div class="brand-sub">Vloermodellen</div>
+  <div class="devices">
+    <div class="device-card" data-brand="nuova" data-category="single multi" data-type="vloer">
           <div class="device-photo"><img src="assets/img/s-377bd0f23fc7.webp" alt="Nuova vloermodel airco set" loading="lazy"></div>
-      <div class="device-brand">Airco · vloermodel</div>
+      <div class="device-brand">Airco · vloermodel</div><div class="dual-badge">Ook leverbaar als multi-split binnenunit</div>
       <h3>Vloermodel</h3>
       <p class="device-desc">Consolemodel dat laag op de vloer tegen de muur staat. Handig onder een raam of in een kamer waar u geen toestel hoog aan de muur wilt.</p>
       <div class="device-specs">
@@ -670,13 +688,29 @@
         <div><span>Verwarmingsvermogen</span><span>4,1 kW (model 3,5 kW) / 6,0 kW (model 5,0 kW)</span></div>
         <div><span>Geluidsniveau binnen</span><span>19 dB(A)</span></div>
         <div><span>Koudemiddel</span><span>R32</span></div>
+        <div><span>Multi-split</span><span>als Infinity-vloermodel (2,5 / 3,5 / 5,0 kW) op een Infinity AI Smart-buitenunit (CINF)</span></div>
         <div><span>Technologie &amp; functies</span><span>vloermontage, directe luchtuitblaas, wifi-bediening</span></div>
       </div>
       <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Vloermodel">Offerte voor dit model <span class="ar">&rarr;</span></a>
     </div>
   </div>
-  <div class="brand-sub">Kanaalunits</div>
+  <div class="brand-sub">Cassette- en kanaalunits</div>
   <div class="devices">
+    <div class="device-card" data-brand="nuova" data-category="single" data-type="cassette">
+      <div class="device-photo"><img src="assets/img/s-705b7360a3ce.webp" alt="Nuova cassette-binnenunit" loading="lazy"></div>
+      <div class="device-brand">Airco · cassette (plafondmodel)</div>
+      <h3>Cassette <span class="device-sub">NCT-serie</span></h3>
+      <p class="device-desc">Plafondcassette met 360° luchtverdeling voor montage in een verlaagd plafond. Alleen het rooster blijft zichtbaar.</p>
+      <div class="device-specs">
+        <div><span>Koelvermogen</span><span>5,0 - 14,0 kW (modellen 5,0 / 7,1 / 10,5 / 14,0 kW)</span></div>
+        <div><span>Verwarmingsvermogen</span><span>5,0 / 7,1 / 10,5 / 14,0 kW</span></div>
+        <div><span>Geluidsniveau binnen</span><span>19 dB(A)</span></div>
+        <div><span>Systeem</span><span>single-split, met NCOF-buitenunit en afdekpaneel</span></div>
+        <div><span>Koudemiddel</span><span>R32</span></div>
+        <div><span>Technologie &amp; functies</span><span>360°- en 4D-luchtverdeling, wifi, spraakbediening, AI Inverter, zelfreiniging op 56°C, ionisator, ontvochtiging, schimmelpreventie</span></div>
+      </div>
+      <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Cassette NCT-serie">Offerte voor dit model <span class="ar">&rarr;</span></a>
+    </div>
     <div class="device-card" data-brand="nuova" data-category="single" data-type="kanaal">
           <div class="device-photo"><img src="assets/img/nuova-kanaal.jpg" alt="Nuova kanaalunit met buitenunit" loading="lazy"></div>
       <div class="device-brand">Airco · kanaalunit (inbouw)</div>
@@ -691,54 +725,91 @@
       <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Kanaalunit NDUCT-serie">Offerte voor dit model <span class="ar">&rarr;</span></a>
     </div>
   </div>
-    <div class="brand-sub">Multi-split binnenunits</div>
+  <div class="brand-sub">Zonder buitenunit</div>
   <div class="devices">
-    
-    <div class="device-card" data-brand="nuova" data-category="multi" data-type="cassette">
-      <div class="device-photo"><img src="assets/img/s-705b7360a3ce.webp"></div>
-      <div class="device-brand">Airco · binnenunit (multi-split, plafondmodel)</div>
-      <h3>Cassette <span class="device-sub">plafondmodel, multi-split binnenunit</span></h3>
-      <p class="device-desc">Plafondcassette met 360° luchtverdeling voor montage in een verlaagd plafond, te combineren met een Nuova multi-split buitenunit.</p>
+    <div class="device-card" data-brand="nuova" data-category="" data-type="monoblock">
+          <div class="device-photo"><img src="assets/img/nuova-polar.jpg" alt="Nuova Polar monoblock-airco" loading="lazy"></div>
+      <div class="device-brand">Airco · monoblock (zonder buitenunit)</div>
+      <h3>Polar <span class="device-sub">2,5 kW</span></h3>
+      <p class="device-desc">Airco zonder buitenunit: alles zit in één toestel binnen, met twee ronde doorvoeren door de muur. Ideaal waar een buitenunit niet mag of niet kan.</p>
       <div class="device-specs">
-        <div><span>Koelvermogen</span><span>5,0 / 7,1 / 10,5 / 14,0 kW</span></div>
-        <div><span>Verwarmingsvermogen</span><span>5,0 / 7,1 / 10,5 / 14,0 kW</span></div>
-        <div><span>Geluidsniveau binnen</span><span>19 dB(A)</span></div>
+        <div><span>Koelvermogen</span><span>2,5 kW</span></div>
+        <div><span>Verwarmingsvermogen</span><span>2,5 kW (bijverwarmen)</span></div>
+        <div><span>Energielabel</span><span>koelen A+ / verwarmen A+</span></div>
+        <div><span>EER / COP</span><span>3,29 / 3,98</span></div>
+        <div><span>Geluidsniveau binnen</span><span>43 dB(A) (koelen, hoog)</span></div>
+        <div><span>Afmetingen</span><span>935 × 543 × 198 mm, 35 kg</span></div>
+        <div><span>Muurdoorvoeren</span><span>2 × Ø 162 mm</span></div>
         <div><span>Koudemiddel</span><span>R32</span></div>
-        <div><span>Technologie &amp; functies</span><span>360°- en 4D-luchtverdeling, wifi, spraakbediening, AI Inverter, zelfreiniging op 56°C, ionisator, ontvochtiging, schimmelpreventie</span></div>
+        <div><span>Technologie &amp; functies</span><span>koelen, bijverwarmen en ontvochtigen, met afstandsbediening</span></div>
       </div>
-      <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Cassette plafondmodel, multi-split binnenunit">Offerte voor dit model <span class="ar">&rarr;</span></a>
+      <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Polar monoblock 2,5 kW">Offerte voor dit model <span class="ar">&rarr;</span></a>
+    </div>
+    <div class="device-card" data-brand="nuova" data-category="" data-type="monoblock">
+          <div class="device-photo"><img src="assets/img/nuova-polar-pro.jpg" alt="Nuova Polar Pro monoblock-airco" loading="lazy"></div>
+      <div class="device-brand">Airco · monoblock (zonder buitenunit)</div>
+      <h3>Polar Pro <span class="device-sub">4,0 kW</span></h3>
+      <p class="device-desc">De krachtigere monoblock, met wifi en een extra elektrisch verwarmingselement van 2 kW voor koude dagen.</p>
+      <div class="device-specs">
+        <div><span>Koelvermogen</span><span>4,0 kW</span></div>
+        <div><span>Verwarmingsvermogen</span><span>3,8 kW (+ 2 kW elektrisch)</span></div>
+        <div><span>Energielabel</span><span>koelen A+ / verwarmen A+</span></div>
+        <div><span>Muurdoorvoeren</span><span>2 × Ø 202 mm</span></div>
+        <div><span>Koudemiddel</span><span>R32</span></div>
+        <div><span>Technologie &amp; functies</span><span>wifi, afstandsbediening, extra elektrisch verwarmingselement</span></div>
+      </div>
+      <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Polar Pro monoblock 4,0 kW">Offerte voor dit model <span class="ar">&rarr;</span></a>
     </div>
   </div>
   <div class="brand-sub">Multi-split buitenunits</div>
   <div class="devices">
     <div class="device-card" data-brand="nuova" data-category="multi" data-type="buiten">
-          <div class="device-photo"><img src="assets/img/s-26a8fbe66948.webp"></div>
+          <div class="device-photo"><img src="assets/img/s-26a8fbe66948.webp" alt="Nuova MSO multi-split buitenunit" loading="lazy"></div>
       <div class="device-brand">Airco · buitenunit (multi-split)</div>
       <h3>MSO-serie <span class="device-sub">2 tot 5 poorten</span></h3>
-      <p class="device-desc">Standaard multi-split buitenunit van Nuova, aan te sluiten op 2 tot 5 binnenunits naar keuze uit het gamma hierboven.</p>
+      <p class="device-desc">Multi-split buitenunit voor 2 tot 5 binnenunits uit de Premium- en Stellar-reeks.</p>
       <div class="device-specs">
-        <div><span>Vermogen</span><span>2P: 5,28 · 3P: 8,0 · 4P: 10,5 · 5P: 13,5 kW (totaal)</span></div>
+        <div><span>Modellen</span><span>2P-MSO50 · 3P-MSO80 · 4P-MSO100 · 5P-MSO140</span></div>
+        <div><span>Vermogen</span><span>2P: 5,0 · 3P: 8,0 · 4P: 10,5 · 5P: 13,5 kW (totaal)</span></div>
         <div><span>Koudemiddel</span><span>R32 (GWP 675)</span></div>
-        <div><span>Combineerbaar met</span><span>Infinity AI Smart, Premium Inverter, Stellar Inverter (wandmodellen) en de Cassette-binnenunit</span></div>
+        <div><span>Combineerbaar met</span><span>Premium Inverter en Stellar Inverter (wandmodellen)</span></div>
       </div>
       <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova MSO-serie 2 tot 5 poorten">Offerte voor dit model <span class="ar">&rarr;</span></a>
     </div>
     <div class="device-card" data-brand="nuova" data-category="multi" data-type="buiten">
-          <div class="device-photo"><img src="assets/img/s-28132f3d68dd.webp"></div>
+          <div class="device-photo"><img src="assets/img/s-28132f3d68dd.webp" alt="Nuova Infinity AI Smart multi-split buitenunit" loading="lazy"></div>
       <div class="device-brand">Airco · buitenunit (multi-split)</div>
       <h3>Infinity AI Smart <span class="device-sub">multi-split buitenunit, 2 tot 5 poorten</span></h3>
-      <p class="device-desc">Multi-split buitenunit uit de slimme Infinity-lijn, te combineren met 2 tot 5 Infinity-binnenunits voor een compleet wifi-bediend systeem.</p>
+      <p class="device-desc">Multi-split buitenunit uit de slimme Infinity-lijn, voor 2 tot 5 Infinity-binnenunits: een compleet wifi-bediend systeem.</p>
       <div class="device-specs">
+        <div><span>Modellen</span><span>CINF-MS050 · MS068 · MS080 · MS0100 · MS125</span></div>
         <div><span>Vermogen</span><span>2P: 5,0 · 3P: 6,8 / 8,0 · 4P: 10,0 · 5P: 12,5 kW (totaal, nominaal)</span></div>
         <div><span>Geluidsniveau</span><span>52 - 59 dB(A)</span></div>
         <div><span>Koudemiddel</span><span>R32</span></div>
-        <div><span>Combineerbaar met</span><span>alleen Infinity AI Smart-binnenunits (zelfde reeks)</span></div>
+        <div><span>Combineerbaar met</span><span>Infinity AI Smart-wandmodellen en het Infinity-vloermodel</span></div>
       </div>
       <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Infinity AI Smart multi-split buitenunit, 2 tot 5 poorten">Offerte voor dit model <span class="ar">&rarr;</span></a>
     </div>
   </div>
-  
-  
+  <div class="brand-sub">Warm water</div>
+  <div class="devices">
+    <div class="device-card" data-brand="nuova" data-category="" data-type="boiler">
+          <div class="device-photo"><img src="assets/img/nuova-boiler-muur.jpg" alt="Nuova warmtepompboiler" loading="lazy"></div>
+      <div class="device-brand">Warmtepompboiler · warm water</div>
+      <h3>Warmtepompboiler <span class="device-sub">R290, 100 / 150 / 190 liter</span></h3>
+      <p class="device-desc">Verwarmt uw tapwater met warmte uit de lucht in plaats van met een gewone elektrische weerstand. Volgens Nuova tot 70% zuiniger dan een klassieke elektrische boiler.</p>
+      <div class="device-specs">
+        <div><span>Inhoud</span><span>100 l (muur, 2-3 personen) · 150 l (muur) · 190 l (vrijstaand, 4-5 personen)</span></div>
+        <div><span>Energielabel</span><span>A+</span></div>
+        <div><span>COP</span><span>tot 3,0</span></div>
+        <div><span>Geluidsniveau</span><span>ongeveer 35 - 40 dB(A)</span></div>
+        <div><span>Maximale watertemperatuur</span><span>62 °C (190 l)</span></div>
+        <div><span>Koudemiddel</span><span>R290 (natuurlijk, GWP 3)</span></div>
+        <div><span>Technologie &amp; functies</span><span>hermetisch gesloten monoblock, elektrisch element van 1,5 kW voor snel opwarmen en legionellabescherming (190 l), app-bediening</span></div>
+      </div>
+      <a class="device-cta" href="#calculator" data-start-dienst="nieuw" data-model="Nuova Warmtepompboiler R290">Offerte voor dit model <span class="ar">&rarr;</span></a>
+    </div>
+  </div>
 </div>
 
 
@@ -2297,6 +2368,13 @@
       </div>
       <p class="v4-faq-go"><a href="#vragen">Alle veelgestelde vragen <span class="ar">&rarr;</span></a></p>
     </div>
+  </div>
+</section>
+
+<!-- TOESTEL: detailpagina van één toestel, opgebouwd uit de kaart in de lijst (js/main.js) -->
+<section class="v2-sec toestel-sec" id="toestel" data-page="toestel">
+  <div class="wrap">
+    <div id="toestel-detail"></div>
   </div>
 </section>
 

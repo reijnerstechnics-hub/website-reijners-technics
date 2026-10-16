@@ -39,7 +39,7 @@
       });
     }
     document.querySelectorAll("#site-nav a[data-page]").forEach(function (a) {
-      a.classList.toggle("active", a.dataset.page === pageId);
+      a.classList.toggle("active", a.dataset.page === (pageId === "toestel" ? "toestellen" : pageId));
     });
   }
 
@@ -55,6 +55,8 @@
     if (!hash) return null;
     hash = hash.replace("#", "");
     if (!hash) return null;
+    // detailpagina van een toestel (#toestel-...), zie het blok TOESTELLEN: COMPACTE KAARTEN
+    if (hash.indexOf("toestel-") === 0) return window.rtToestelInfo ? window.rtToestelInfo(hash.slice(8)) : null;
     if (pageNames.indexOf(hash) !== -1) return { page: hash, scrollTo: null };
     var el = document.getElementById(hash);
     if (el) {
@@ -65,7 +67,8 @@
   }
 
   // Ga naar een pagina. Bij losse pagina's opent dit het juiste bestand.
-  window.goToPage = function (pageId, doScrollTop) {
+  // hash: optioneel een ander adres dan de paginanaam (bv. "toestel-daikin-perfera").
+  window.goToPage = function (pageId, doScrollTop, hash) {
     closeMenu();
     if (isMultiPage) {
       if (pageId !== currentPage) {
@@ -76,8 +79,9 @@
       return;
     }
     setActivePage(pageId);
-    if (location.hash !== "#" + pageId) {
-      history.pushState(null, "", "#" + pageId);
+    var adres = "#" + (hash || pageId);
+    if (location.hash !== adres) {
+      history.pushState(null, "", adres);
     }
     if (doScrollTop) window.scrollTo(0, 0);
   };
@@ -99,7 +103,7 @@
         });
       });
     } else {
-      goToPage(info.page, true);
+      goToPage(info.page, true, info.hash);
     }
   });
 
@@ -1218,20 +1222,46 @@ window.rtGoToOffer = function (d, model) {
 })();
 
 // =====================================================================
-// TOESTELLEN: MERK EN CATEGORIE
+// TOESTELLEN: MERK, CATEGORIE EN ZOEKEN
 // Eerst kiest de bezoeker een merk: met de tegels bovenaan de lijst of
 // via het menu onder "Toestellen". Daarna verschijnen links de categorieën
 // van dat merk. Een kaart hoort bij een categorie via
-//   data-category: "single" en/of "multi"
-//   data-type:     "wand", "vloer", "cassette", "kanaal" of "buiten"
+//   data-category: "single" en/of "multi" (leeg = geen split-systeem)
+//   data-type:     "wand", "vloer", "cassette", "kanaal", "monoblock",
+//                  "buiten" of "boiler"
 // Een categorie zonder toestellen bij het gekozen merk wordt niet getoond.
+// De zoekbalk zoekt in alle merken tegelijk (naam, reeks, typecodes,
+// vermogen ...).
 // =====================================================================
+var RT_MERKEN = {
+  daikin: "Daikin",
+  lg: "LG",
+  me: "Mitsubishi Electric",
+  mhi: "Mitsubishi Heavy Industries",
+  nuova: "Nuova",
+};
 (function () {
   var section = document.getElementById("alle-toestellen");
   var lijst = document.getElementById("toestellen-lijst");
   if (!section || !lijst) return;
   var catBox = lijst.querySelector(".cat-list");
+  var zoek = document.getElementById("toestel-zoek");
+  var zoekInfo = section.querySelector(".zoek-info");
+  var leeg = lijst.querySelector(".zoek-leeg");
   var cards = Array.prototype.slice.call(section.querySelectorAll(".device-card"));
+
+  // zoektekst per kaart: merknaam + alles wat op de kaart staat
+  function norm(s) {
+    return (s || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/(\d)[.,](\d)/g, "$1,$2")
+      .replace(/\s+/g, " ");
+  }
+  cards.forEach(function (c) {
+    c._zoek = norm((RT_MERKEN[c.dataset.brand] || "") + " " + (c.dataset.brand === "mhi" ? "mhi " : "") + c.textContent);
+  });
 
   function heeft(card, cat) {
     return (card.dataset.category || "").split(" ").indexOf(cat) !== -1;
@@ -1251,16 +1281,25 @@ window.rtGoToOffer = function (d, model) {
     { id: "vloer", label: "Vloermodellen", test: soort("vloer") },
     { id: "cassette", label: "Cassettes", test: soort("cassette") },
     { id: "kanaal", label: "Kanaal- en inbouwunits", test: soort("kanaal") },
+    { id: "monoblock", label: "Zonder buitenunit", test: soort("monoblock") },
     { id: "buiten", label: "Multi-split buitenunits", test: soort("buiten") },
+    { kop: "Warm water" },
+    { id: "boiler", label: "Warmtepompboilers", test: soort("boiler") },
   ];
   function zoekCat(id) {
     for (var i = 0; i < CATS.length; i++) if (CATS[i].id === id) return CATS[i];
     return CATS[0];
   }
 
-  var state = { merk: null, cat: "alle" };
+  var state = { merk: null, cat: "alle", q: "" };
   function vanMerk(card) {
     return state.merk === "alle" || card.dataset.brand === state.merk;
+  }
+  function past(card) {
+    if (!state.q) return true;
+    var woorden = norm(state.q).trim().split(" ");
+    for (var i = 0; i < woorden.length; i++) if (card._zoek.indexOf(woorden[i]) === -1) return false;
+    return true;
   }
 
   // aantal modellen op elke merktegel
@@ -1279,10 +1318,13 @@ window.rtGoToOffer = function (d, model) {
     });
     section.classList.toggle("merk-gekozen", !!state.merk);
     lijst.hidden = !state.merk;
+    if (zoekInfo) zoekInfo.textContent = "";
     if (!state.merk) return;
 
-    // categorieën van dit merk, met het aantal toestellen
-    var mijn = cards.filter(vanMerk);
+    // categorieën van dit merk (en deze zoekopdracht), met het aantal toestellen
+    var mijn = cards.filter(function (c) {
+      return vanMerk(c) && past(c);
+    });
     catBox.innerHTML = "";
     var kop = null;
     var gevonden = false;
@@ -1293,7 +1335,7 @@ window.rtGoToOffer = function (d, model) {
         return;
       }
       var n = mijn.filter(cat.test).length;
-      if (!n) return;
+      if (!n && cat.id !== "alle") return;
       if (kop) {
         catBox.appendChild(kop);
         kop = null;
@@ -1320,20 +1362,29 @@ window.rtGoToOffer = function (d, model) {
 
     // kaarten tonen of verbergen, lege groepen ook verbergen
     var test = zoekCat(state.cat).test;
+    var zichtbaar = 0;
     cards.forEach(function (c) {
-      c.hidden = !(vanMerk(c) && test(c));
+      c.hidden = !(vanMerk(c) && past(c) && test(c));
+      if (!c.hidden) zichtbaar++;
     });
     section.querySelectorAll(".brand-sub").forEach(function (sub) {
       var devices = sub.nextElementSibling;
       if (devices && devices.classList.contains("devices")) {
-        var zichtbaar = !!devices.querySelector(".device-card:not([hidden])");
-        sub.hidden = !zichtbaar;
-        devices.hidden = !zichtbaar;
+        var iets = !!devices.querySelector(".device-card:not([hidden])");
+        sub.hidden = !iets;
+        devices.hidden = !iets;
       }
     });
     section.querySelectorAll(".brand-block").forEach(function (blk) {
       blk.hidden = !blk.querySelector(".device-card:not([hidden])");
     });
+
+    if (state.q && zoekInfo) {
+      zoekInfo.textContent = zichtbaar
+        ? zichtbaar + (zichtbaar === 1 ? " toestel gevonden" : " toestellen gevonden")
+        : "Geen toestellen gevonden";
+    }
+    if (leeg) leeg.hidden = zichtbaar > 0;
 
     // knop op de gsm toont de gekozen categorie
     var fb = section.querySelector(".v4-filterbtn");
@@ -1345,9 +1396,11 @@ window.rtGoToOffer = function (d, model) {
     window.scrollTo({ top: y, behavior: "smooth" });
   }
 
-  window.rtKiesMerk = function (merk) {
+  // merk kiezen. houdCat: de gekozen categorie bewaren (bv. terug vanuit een toestel)
+  window.rtKiesMerk = function (merk, houdCat) {
+    if (state.merk !== merk || !houdCat) state.cat = "alle";
     state.merk = merk;
-    state.cat = "alle";
+    merkVoorZoeken = null;
     render();
   };
 
@@ -1374,16 +1427,66 @@ window.rtGoToOffer = function (d, model) {
     if (lijst.getBoundingClientRect().top < 0) naarLijst();
   });
 
-  // menu "Toestellen" > merk. De algemene navigatie opent daarna zelf de
-  // pagina Toestellen en scrolt naar de lijst (#toestellen-lijst).
-  document.querySelectorAll(".nav-dd-menu [data-merk]").forEach(function (a) {
-    a.addEventListener("click", function () {
-      window.rtKiesMerk(a.dataset.merk);
+  // zoeken: zoekt altijd in alle merken. Wordt de zoekterm gewist, dan
+  // komt het merk terug dat voordien gekozen was.
+  var merkVoorZoeken = null;
+  function zoekNaar(q) {
+    if (q && !state.q) {
+      merkVoorZoeken = state.merk;
+      state.cat = "alle";
+    }
+    state.q = q;
+    if (q) state.merk = "alle";
+    else if (merkVoorZoeken !== null) {
+      state.merk = merkVoorZoeken;
+      merkVoorZoeken = null;
+    }
+    render();
+  }
+  if (zoek) {
+    var wacht = null;
+    zoek.addEventListener("input", function () {
+      clearTimeout(wacht);
+      wacht = setTimeout(function () {
+        zoekNaar(zoek.value.trim());
+      }, 150);
+    });
+    zoek.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        naarLijst();
+      }
+      if (e.key === "Escape") {
+        zoek.value = "";
+        zoekNaar("");
+      }
+    });
+  }
+  var wis = lijst.querySelector(".zoek-wis");
+  if (wis)
+    wis.addEventListener("click", function () {
+      if (zoek) zoek.value = "";
+      merkVoorZoeken = null;
+      state.q = "";
+      state.merk = "alle";
+      render();
+    });
+
+  // links met data-merk elders op de site (menu onder "Toestellen", detailpagina).
+  // De algemene navigatie opent daarna zelf de pagina Toestellen en scrolt
+  // naar de lijst (#toestellen-lijst).
+  document.addEventListener(
+    "click",
+    function (e) {
+      var a = e.target.closest("a[data-merk]");
+      if (!a) return;
+      window.rtKiesMerk(a.dataset.merk, a.hasAttribute("data-houd"));
       var dd = a.closest(".nav-dd");
       if (dd) dd.classList.add("dicht");
       a.blur();
-    });
-  });
+    },
+    true
+  );
   document.querySelectorAll(".nav-dd").forEach(function (dd) {
     dd.addEventListener("mouseleave", function () {
       dd.classList.remove("dicht");
@@ -1391,6 +1494,357 @@ window.rtGoToOffer = function (d, model) {
   });
 
   render();
+})();
+
+// =====================================================================
+// TOESTELLEN: COMPACTE KAARTEN EN EEN DETAILPAGINA PER TOESTEL
+// In de lijst toont een kaart enkel de foto, de naam, een korte uitleg en
+// drie kerngegevens. Alle specificaties staan op de detailpagina
+// (#toestel-<naam>), die opgebouwd wordt uit dezelfde kaart. Zo hoeft een
+// toestel maar op één plaats in index.html te staan.
+// =====================================================================
+(function () {
+  var section = document.getElementById("alle-toestellen");
+  var detail = document.getElementById("toestel-detail");
+  if (!section || !detail) return;
+  var cards = Array.prototype.slice.call(section.querySelectorAll(".device-card"));
+  var bySlug = {};
+
+  var TYPES = {
+    wand: "Wandmodel",
+    vloer: "Vloermodel",
+    cassette: "Cassette",
+    kanaal: "Kanaal- of inbouwunit",
+    monoblock: "Zonder buitenunit",
+    buiten: "Buitenunit",
+    boiler: "Warmtepompboiler",
+  };
+  var UITLEG = {
+    wand:
+      "Een wandmodel hangt hoog aan de muur. Via een kleine doorvoer in de muur is het met leidingen verbonden met de buitenunit. Het is de meest gekozen oplossing: snel geplaatst en met een goede luchtverdeling.",
+    vloer:
+      "Een vloermodel staat laag tegen de muur, bijvoorbeeld onder een raam. Handig als er boven geen plaats is, of in een slaapkamer onder een schuin dak. Bij verwarmen komt de warme lucht dicht bij de vloer, waar u ze het meest voelt.",
+    cassette:
+      "Een cassette wordt ingebouwd in een verlaagd plafond. Alleen het rooster blijft zichtbaar en de lucht gaat naar meerdere kanten tegelijk. Geschikt voor grotere ruimtes zoals een leefruimte, winkel of kantoor.",
+    kanaal:
+      "Een kanaal- of inbouwunit zit volledig uit het zicht, in een verlaagd plafond, een kast of een technische ruimte. De lucht komt via roosters de kamer in. Dit vraagt wat meer voorbereiding, die we tijdens het plaatsbezoek samen bekijken.",
+    monoblock:
+      "Bij een monoblock zit alles in één toestel binnen. Er komt geen buitenunit aan de gevel, wel twee ronde doorvoeren door de buitenmuur. Een oplossing voor appartementen of gevels waar een buitenunit niet mag of niet kan.",
+    buiten:
+      "Op deze buitenunit sluit u meerdere binnenunits aan: één per kamer. Zo hebt u maar één toestel aan de gevel voor het hele huis. Het totale vermogen van de binnenunits moet passen bij de buitenunit; dat rekenen we voor u uit.",
+    boiler:
+      "Een warmtepompboiler verwarmt uw tapwater met warmte uit de lucht, in plaats van alleen met een elektrische weerstand. Hij staat meestal in een berging, garage of technische ruimte en vervangt een klassieke elektrische boiler.",
+  };
+
+  function slug(s) {
+    return (s || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+  function heeft(card, cat) {
+    return (card.dataset.category || "").split(" ").indexOf(cat) !== -1;
+  }
+  function spec(card, labels) {
+    var rows = card.querySelectorAll(".device-specs > div");
+    for (var i = 0; i < rows.length; i++) {
+      var s = rows[i].querySelectorAll("span");
+      if (s.length < 2) continue;
+      var lab = s[0].textContent.trim();
+      if (labels.indexOf(lab) !== -1) return s[s.length - 1].textContent.trim();
+    }
+    return "";
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // drie kerngegevens voor de kaart in de lijst
+  function kernen(card) {
+    var out = [];
+    // vermogen: van het kleinste tot het grootste model
+    var kw = spec(card, ["Koelvermogen", "Totaalvermogen", "Vermogen"]).replace(/\(bereik[^)]*\)/g, "");
+    var nums = (kw.match(/\d+,\d/g) || []).map(function (n) {
+      return parseFloat(n.replace(",", "."));
+    });
+    if (nums.length) {
+      var lo = Math.min.apply(null, nums),
+        hi = Math.max.apply(null, nums);
+      var f = function (n) {
+        return n.toFixed(1).replace(".", ",");
+      };
+      out.push(lo === hi ? f(lo) + " kW" : f(lo) + " - " + f(hi) + " kW");
+    }
+    var inhoud = spec(card, ["Inhoud"]);
+    if (inhoud) out.push((inhoud.match(/\d+ l/g) || []).join(" / "));
+    // energielabel voor koelen (bij een bereik: "tot" het beste label)
+    var labels = (spec(card, ["Energielabel"]).split("/")[0].match(/A\+*/g) || []).filter(function (l, i, a) {
+      return a.indexOf(l) === i;
+    });
+    if (labels.length) {
+      var best = labels.sort(function (a, b) {
+        return b.length - a.length;
+      })[0];
+      out.push(labels.length > 1 ? "tot " + best : "label " + best);
+    }
+    // aantal binnenunits bij een multi-split buitenunit
+    var pt = spec(card, ["Aantal binnenunits"]) + " " + card.querySelector("h3").textContent;
+    var p = pt.match(/(\d) tot (\d)/) || pt.match(/(\d) poorten/);
+    if (card.dataset.type === "buiten" && p) out.push(p[2] ? p[1] + " tot " + p[2] + " binnenunits" : p[1] + " binnenunits");
+    // geluid: alleen als er een bereik vermeld is
+    var dB = spec(card, ["Geluidsniveau binnen"]);
+    var d = dB.match(/\d+(,\d+)?/);
+    if (d && /[-\/]|vanaf/.test(dB) && !/^tot/.test(dB)) out.push("vanaf " + d[0] + " dB");
+    return out.filter(Boolean).slice(0, 3);
+  }
+
+  // ---------- kaarten in de lijst compact maken ----------
+  cards.forEach(function (card) {
+    var cta = card.querySelector(".device-cta");
+    var h3 = card.querySelector("h3");
+    var id = slug(cta ? cta.dataset.model : h3.textContent);
+    card.dataset.slug = id;
+    bySlug[id] = card;
+
+    var sys = [];
+    if (heeft(card, "single")) sys.push("Single-split");
+    if (heeft(card, "multi")) sys.push(card.dataset.type === "buiten" ? "Multi-split buitenunit" : "Multi-split");
+    var k = kernen(card);
+    var keys = el("div", "device-keys");
+    k.forEach(function (t) {
+      keys.appendChild(el("span", null, t));
+    });
+    var meer = el("a", "device-more", "Bekijk details");
+    meer.href = "#toestel-" + id;
+    meer.appendChild(el("span", "ar", " →"));
+    if (sys.length) card.insertBefore(el("div", "device-sys", sys.join(" · ")), h3);
+    card.insertBefore(keys, cta);
+    card.insertBefore(meer, cta);
+  });
+
+  // ganse kaart klikbaar (behalve kleurknoppen en links)
+  section.addEventListener("click", function (e) {
+    var card = e.target.closest(".device-card");
+    if (!card || e.target.closest("a, button")) return;
+    var a = card.querySelector(".device-more");
+    if (a) a.click();
+  });
+
+  // ---------- detailpagina ----------
+  function vermogenTabel(card) {
+    if (["wand", "vloer", "cassette", "kanaal", "monoblock"].indexOf(card.dataset.type) === -1) return null;
+    var kw = spec(card, ["Koelvermogen"]);
+    var nums = (kw.match(/\d+,\d/g) || [])
+      .map(function (n) {
+        return parseFloat(n.replace(",", "."));
+      })
+      .filter(function (n, i, a) {
+        return n >= 1.4 && n <= 16 && a.indexOf(n) === i;
+      })
+      .sort(function (a, b) {
+        return a - b;
+      });
+    if (!nums.length) return null;
+    var box = el("div", "td-box");
+    box.appendChild(el("h3", null, "Welk vermogen heb ik nodig?"));
+    box.appendChild(
+      el(
+        "p",
+        null,
+        "Als vuistregel rekenen we 90 tot 120 watt per m², afhankelijk van de isolatie, de hoogte van het plafond en de ramen. Het exacte vermogen bepalen we samen tijdens het gratis plaatsbezoek."
+      )
+    );
+    var t = el("table", "td-kw");
+    var head = el("tr");
+    head.appendChild(el("th", null, "Vermogen"));
+    head.appendChild(el("th", null, "Richtwaarde ruimte"));
+    t.appendChild(head);
+    nums.forEach(function (n) {
+      var tr = el("tr");
+      tr.appendChild(el("td", null, n.toFixed(1).replace(".", ",") + " kW"));
+      tr.appendChild(el("td", null, "ca. " + Math.round(n / 0.12) + " - " + Math.round(n / 0.09) + " m²"));
+      t.appendChild(tr);
+    });
+    box.appendChild(t);
+    return box;
+  }
+
+  function bouw(card) {
+    var merk = card.dataset.brand;
+    var merkNaam = RT_MERKEN[merk] || "";
+    var h3 = card.querySelector("h3");
+    var naam = h3.firstChild ? h3.firstChild.textContent.trim() : h3.textContent.trim();
+    var sub = h3.querySelector(".device-sub");
+    var cta = card.querySelector(".device-cta");
+    var model = cta ? cta.dataset.model : merkNaam + " " + naam;
+    detail.innerHTML = "";
+
+    // kruimelpad en terug
+    var crumb = el("nav", "v2-crumb td-crumb");
+    crumb.setAttribute("aria-label", "Kruimelpad");
+    var a1 = el("a", null, "Toestellen");
+    a1.href = "#toestellen";
+    var a2 = el("a", null, merkNaam);
+    a2.href = "#toestellen-lijst";
+    a2.dataset.merk = merk;
+    a2.setAttribute("data-houd", "");
+    crumb.appendChild(a1);
+    crumb.appendChild(document.createTextNode(" › "));
+    crumb.appendChild(a2);
+    crumb.appendChild(document.createTextNode(" › "));
+    crumb.appendChild(el("b", null, naam));
+    detail.appendChild(crumb);
+
+    // bovenaan: foto en de belangrijkste info
+    var top = el("div", "td-top");
+    var media = el("div", "td-media");
+    var foto = card.querySelector(".device-photo").cloneNode(true);
+    var img = foto.querySelector("img");
+    if (img) {
+      img.removeAttribute("loading");
+      img.alt = merkNaam + " " + naam;
+    }
+    media.appendChild(foto);
+    top.appendChild(media);
+
+    var info = el("div", "td-info");
+    info.appendChild(el("div", "device-brand", merkNaam + " · " + card.querySelector(".device-brand").textContent.replace(/^Airco · /, "")));
+    var h1 = el("h1", null, naam);
+    if (sub) h1.appendChild(el("span", "device-sub", " " + sub.textContent));
+    info.appendChild(h1);
+    var tags = el("div", "td-tags");
+    if (heeft(card, "single")) tags.appendChild(el("span", null, "Single-split"));
+    if (heeft(card, "multi")) tags.appendChild(el("span", null, "Multi-split"));
+    tags.appendChild(el("span", null, TYPES[card.dataset.type] || ""));
+    info.appendChild(tags);
+    info.appendChild(el("p", "td-desc", card.querySelector(".device-desc").textContent));
+    var keys = el("div", "td-keys");
+    kernen(card).forEach(function (t) {
+      keys.appendChild(el("span", null, t));
+    });
+    info.appendChild(keys);
+    var acts = el("div", "td-acts");
+    var offerte = el("button", "btn btn-gold", "Offerte voor dit model ");
+    offerte.type = "button";
+    offerte.appendChild(el("span", "ar", "→"));
+    offerte.addEventListener("click", function () {
+      window.rtGoToOffer("nieuw", model);
+    });
+    var bel = el("a", "btn v3-btn-line", "Bel Rim");
+    bel.href = "tel:+32491113313";
+    acts.appendChild(offerte);
+    acts.appendChild(bel);
+    info.appendChild(acts);
+    info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Rim belt u binnen 24 uur terug · U beslist pas na de offerte"));
+    top.appendChild(info);
+    detail.appendChild(top);
+
+    // specificaties en meer uitleg
+    var body = el("div", "td-body");
+    var specs = el("div", "td-specs");
+    specs.appendChild(el("h2", null, "Specificaties"));
+    var dl = el("dl");
+    card.querySelectorAll(".device-specs > div").forEach(function (row) {
+      var s = row.querySelectorAll("span");
+      if (s.length < 2) return;
+      var dt = el("dt");
+      dt.appendChild(s[0].cloneNode(true));
+      dl.appendChild(dt);
+      dl.appendChild(el("dd", null, s[s.length - 1].textContent));
+    });
+    specs.appendChild(dl);
+    body.appendChild(specs);
+
+    var side = el("div", "td-side");
+    var kw = vermogenTabel(card);
+    if (kw) side.appendChild(kw);
+    var weet = el("div", "td-box");
+    weet.appendChild(el("h3", null, "Goed om te weten"));
+    if (UITLEG[card.dataset.type]) weet.appendChild(el("p", null, UITLEG[card.dataset.type]));
+    if (heeft(card, "single") && heeft(card, "multi"))
+      weet.appendChild(
+        el(
+          "p",
+          null,
+          "Dit toestel kan als single-split (één binnenunit op een eigen buitenunit) of als multi-split (meerdere binnenunits op één buitenunit). Wat het best past, hangt af van het aantal kamers en waar de buitenunit kan komen."
+        )
+      );
+    side.appendChild(weet);
+    body.appendChild(side);
+    detail.appendChild(body);
+
+    // andere toestellen van hetzelfde merk
+    var andere = cards.filter(function (c) {
+      return c !== card && c.dataset.brand === merk;
+    });
+    var zelfde = andere.filter(function (c) {
+      return c.dataset.type === card.dataset.type;
+    });
+    var rest = andere.filter(function (c) {
+      return c.dataset.type !== card.dataset.type;
+    });
+    var toon = zelfde.concat(rest).slice(0, 3);
+    if (toon.length) {
+      var meer = el("div", "td-meer");
+      meer.appendChild(el("h2", null, "Meer van " + merkNaam));
+      var grid = el("div", "td-meer-grid");
+      toon.forEach(function (c) {
+        var a = el("a", "td-mini");
+        a.href = "#toestel-" + c.dataset.slug;
+        var fi = c.querySelector(".device-photo img");
+        if (fi) {
+          var i = el("img");
+          i.src = fi.getAttribute("src");
+          i.alt = "";
+          i.loading = "lazy";
+          a.appendChild(i);
+        }
+        var ch3 = c.querySelector("h3");
+        a.appendChild(el("b", null, ch3.firstChild ? ch3.firstChild.textContent.trim() : ch3.textContent.trim()));
+        a.appendChild(el("span", null, kernen(c).join(" · ")));
+        grid.appendChild(a);
+      });
+      meer.appendChild(grid);
+      var alle = el("a", "td-alle", "Alle toestellen van " + merkNaam + " ");
+      alle.href = "#toestellen-lijst";
+      alle.dataset.merk = merk;
+      alle.appendChild(el("span", "ar", "→"));
+      meer.appendChild(alle);
+      detail.appendChild(meer);
+    }
+  }
+
+  // kleurknoppen op de detailpagina
+  detail.addEventListener("click", function (e) {
+    var sw = e.target.closest(".color-swatch");
+    if (!sw) return;
+    e.preventDefault();
+    var img = detail.querySelector(".td-media img");
+    if (img) img.setAttribute("src", sw.dataset.src);
+    detail.querySelectorAll(".color-swatch").forEach(function (s) {
+      s.classList.toggle("active", s === sw);
+    });
+  });
+
+  // De navigatie (bovenaan dit bestand) vraagt via deze functie of een
+  // #toestel-... link bestaat, en laat de detailpagina dan opbouwen.
+  window.rtToestelInfo = function (id) {
+    var card = bySlug[id];
+    if (!card) return null;
+    bouw(card);
+    return { page: "toestel", scrollTo: null, hash: "toestel-" + id };
+  };
+
+  // rechtstreeks openen of vernieuwen op een #toestel-... adres
+  var h = location.hash.replace("#", "");
+  if (h.indexOf("toestel-") === 0 && window.rtToestelInfo(h.slice(8)) && window.goToPage) {
+    window.goToPage("toestel", true, h);
+  }
 })();
 
 // =====================================================================
