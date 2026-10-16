@@ -48,6 +48,7 @@
     return euro.format(Math.round(v));
   }
   function kwTxt(k) {
+    if (typeof k === "number") return k.toFixed(1).replace(".", ",") + " kW";
     return String(k).replace(".", ",") + " kW";
   }
   function esc(s) {
@@ -71,13 +72,39 @@
     var card = cta ? cta.closest(".device-card") : null;
     var img = card ? card.querySelector(".device-photo img") : null;
     var specs = card ? card.querySelector(".device-specs") : null;
+    var kleuren = card
+      ? Array.prototype.map.call(card.querySelectorAll(".color-swatch"), function (s) {
+          return { naam: s.getAttribute("aria-label"), src: s.getAttribute("data-src"), kleur: s.style.background };
+        })
+      : [];
     return {
       cfg: t,
       sizes: sizes,
       img: img ? img.getAttribute("src") || img.getAttribute("data-src") : "",
       specs: specs ? specs.innerHTML : "",
+      kleuren: kleuren,
+      slug: card ? card.dataset.slug || "" : "",
     };
   });
+  // merken in de volgorde van de prijslijst
+  var MERKEN = [];
+  MODELS.forEach(function (m) {
+    if (MERKEN.indexOf(m.cfg.merk) === -1) MERKEN.push(m.cfg.merk);
+  });
+  function modelsVan(merk) {
+    return MODELS.filter(function (m) {
+      return m.cfg.merk === merk;
+    });
+  }
+  // alle vermogens waarin een toestel bestaat (als set of als losse binnenunit)
+  function sizesOf(m) {
+    return m.sizes.filter(function (s) {
+      return price(m, s, 0) != null || price(m, s, 1) != null;
+    });
+  }
+  function kleurVan(m, naam) {
+    return find(m.kleuren, "naam", naam) || m.kleuren[0] || null;
+  }
   function modelByName(name) {
     for (var i = 0; i < MODELS.length; i++) if (MODELS[i].cfg.model === name) return MODELS[i];
     return null;
@@ -106,34 +133,56 @@
     return Math.max(0, meters - INST.leidingInbegrepen);
   }
 
+  // Bij "zelf samenstellen" heeft elke ruimte een eigen toestel (item.model)
+  // en soms een zelf gekozen vermogen (item.fixKw). Bij het advies niet:
+  // dan geldt voor alle ruimtes hetzelfde toestel m.
+  function modelOf(m, item) {
+    return item.model || m;
+  }
+  // Vermogen voor deze ruimte: het gekozen vermogen als dat in deze vorm
+  // (set = 0, losse binnenunit = 1) bestaat, anders het kleinste dat volstaat.
+  function kwFor(m, item, kind) {
+    var mm = modelOf(m, item);
+    if (item.fixKw && price(mm, item.fixKw, kind) != null) return item.fixKw;
+    return sizeFor(mm, item.kw, kind);
+  }
+  // Kan deze ruimte op een multi-split buitenunit? Dan geeft dit de reeks terug.
+  function familyOf(m, item) {
+    var mm = modelOf(m, item);
+    return mm.cfg.multi && P.multi[mm.cfg.multi] && kwFor(m, item, 1) != null ? mm.cfg.multi : null;
+  }
+
   // Eén ruimte met een eigen buitenunit (single-split)
   function singleUnit(m, item) {
-    var kw = sizeFor(m, item.kw, 0);
+    var mm = modelOf(m, item);
+    var kw = kwFor(m, item, 0);
     if (kw == null) return null;
     return {
       multi: false,
       items: [item],
       label: "Eén binnenunit",
       kw: [kw],
-      mat: price(m, kw, 0),
+      mat: price(mm, kw, 0),
       inst: INST.buitenunit + INST.binnenunit,
       pipe: pipeCost(item.meters),
     };
   }
 
-  // Meerdere ruimtes op één multi-split buitenunit
+  // Meerdere ruimtes op één multi-split buitenunit (alle uit dezelfde reeks)
   function multiUnit(m, items) {
-    var series = P.multi[m.cfg.multi];
+    var fam = familyOf(m, items[0]);
+    var series = P.multi[fam];
     if (!series || items.length > P.maxPerBuitenunit) return null;
     var kws = [],
       mat = 0,
       sum = 0,
       pipe = 0;
     for (var i = 0; i < items.length; i++) {
-      var kw = sizeFor(m, items[i].kw, 1);
+      if (familyOf(m, items[i]) !== fam) return null;
+      var kw = kwFor(m, items[i], 1);
       if (kw == null) return null;
       kws.push(kw);
-      mat += price(m, kw, 1);
+      mat += price(modelOf(m, items[i]), kw, 1);
       sum += kw;
       pipe += pipeCost(items[i].meters);
     }
@@ -149,6 +198,7 @@
       items: items,
       label: items.length + " binnenunits op één buitenunit (multi-split)",
       kw: kws,
+      serie: series.naam,
       mat: mat + best.prijs,
       inst: INST.buitenunit + INST.binnenunit * items.length,
       pipe: pipe,
@@ -156,18 +206,38 @@
   }
 
   // Alle ruimtes op één plek: zo weinig mogelijk buitenunits.
+  // Ruimtes met toestellen uit dezelfde multi-split reeks komen samen;
+  // andere toestellen krijgen een eigen buitenunit.
   function unitsForSpot(m, items) {
     if (!items.length) return [];
     var singles = [],
-      rest = [];
+      fams = {},
+      out = [];
     items.forEach(function (it) {
-      (m.cfg.multi && sizeFor(m, it.kw, 1) != null ? rest : singles).push(it);
+      var f = familyOf(m, it);
+      if (f) (fams[f] = fams[f] || []).push(it);
+      else singles.push(it);
     });
-    var out = [];
+    Object.keys(fams).forEach(function (f) {
+      var r = groupFamily(m, fams[f]);
+      out = out.concat(r.units);
+      singles = singles.concat(r.singles);
+    });
+    singles.forEach(function (it) {
+      var u = singleUnit(m, it);
+      if (u) out.push(u);
+    });
+    return out;
+  }
+
+  // Verdeelt ruimtes uit één reeks over zo weinig mogelijk multi-split buitenunits.
+  function groupFamily(m, rest) {
+    var singles = [],
+      out = [];
     if (rest.length === 1) singles.push(rest.pop());
     if (rest.length) {
       var sorted = rest.slice().sort(function (a, b) {
-        return b.kw - a.kw;
+        return (b.fixKw || b.kw) - (a.fixKw || a.kw);
       });
       var done = false;
       for (var k = Math.ceil(sorted.length / P.maxPerBuitenunit); k <= sorted.length && !done; k++) {
@@ -180,7 +250,7 @@
             if (gr.items.length < cap && (!tgt || gr.sum < tgt.sum)) tgt = gr;
           });
           tgt.items.push(it);
-          tgt.sum += it.kw;
+          tgt.sum += it.fixKw || it.kw;
         });
         var units = [];
         var ok = groups.every(function (gr) {
@@ -196,11 +266,7 @@
       }
       if (!done) singles = singles.concat(rest);
     }
-    singles.forEach(function (it) {
-      var u = singleUnit(m, it);
-      if (u) out.push(u);
-    });
-    return out;
+    return { units: out, singles: singles };
   }
 
   function evaluate(m, items, assign) {
@@ -215,7 +281,7 @@
       unitsForSpot(m, here).forEach(function (u) {
         u.spot = si;
         u.items = u.items.map(function (it) {
-          return { naam: it.naam, meters: it.meters };
+          return { naam: it.naam, meters: it.meters, model: it.model || null, kleur: it.kleur || "" };
         });
         res.units.push(u);
         res.mat += u.mat;
@@ -233,10 +299,17 @@
   // Probeert elke verdeling van de ruimtes over de plekken en houdt de goedkoopste.
   // Geeft ook het resultaat met alles op de hoofdplek terug, om te vergelijken.
   function calculate(m, withSecond) {
-    var items = roomList().map(function (r) {
+    var zelf = state.wens === "zelf";
+    var items = roomList().map(function (r, i) {
       var d = find(DISTS, "v", r.dist) || DISTS[1];
       var up = (r.floor || 0) * M_PER_FLOOR;
       var it = { naam: r.naam, kw: r.m2 * KW_PER_M2, m: [d.a + up, d.b + up], opts: [0] };
+      if (zelf) {
+        var k = state.keuzes[i] || {};
+        it.model = modelByName(k.model) || m;
+        it.fixKw = k.kw || null;
+        it.kleur = k.kleur || "";
+      }
       if (withSecond) it.opts = [0, 1];
       return it;
     });
@@ -269,10 +342,16 @@
   // =====================================================================
   // ANTWOORDEN VAN DE KLANT
   // =====================================================================
-  var state = { step: "aantal", n: null, rooms: [], tweede: null, wens: null, oud: null, keuze: null, sent: false };
+  // wens: een id uit "pakketten", of "zelf" (de klant stelt zelf samen)
+  // keuzes: bij "zelf", per ruimte { merk, model, kleur, kw } (kw null = automatisch)
+  function leeg() {
+    return { step: "aantal", n: null, rooms: [], tweede: null, wens: null, oud: null, keuze: null, keuzes: [], voorkeur: null, sent: false };
+  }
+  var state = leeg();
   try {
     var saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
     if (saved && saved.rooms) state = saved;
+    if (!state.keuzes) state.keuzes = [];
     state.sent = false;
   } catch (e) {}
   function save() {
@@ -290,6 +369,7 @@
         dist: null,
       });
     state.rooms.length = n;
+    if (state.keuzes.length > n) state.keuzes.length = n;
   }
   // Ruimtes met een naam ("Slaapkamer 2") en oppervlakte
   function roomList() {
@@ -313,7 +393,9 @@
   function steps() {
     var s = ["aantal", "ruimtes", "verdieping", "afstand"];
     if (anyFar()) s.push("tweede");
-    s.push("wens", "btw", "advies");
+    s.push("wens");
+    if (state.wens === "zelf") s.push("kies");
+    s.push("btw", state.wens === "zelf" ? "pakket" : "advies");
     return s;
   }
   function canNext(step) {
@@ -329,6 +411,10 @@
     if (step === "tweede") return !!state.tweede;
     if (step === "wens") return !!state.wens;
     if (step === "btw") return state.oud !== null;
+    if (step === "kies")
+      return state.rooms.every(function (r, i) {
+        return state.keuzes[i] && modelByName(state.keuzes[i].model);
+      });
     return true;
   }
   function go(step) {
@@ -470,6 +556,14 @@
           esc(p.waarom)
         );
       });
+      h += "</div>";
+      h += '<div class="pc-opts pc-opts-1 pc-zelf-opt">';
+      h += opt(
+        'data-wens="zelf"',
+        state.wens === "zelf",
+        "Ik stel mijn toestellen liever zelf samen",
+        "Kies per ruimte zelf het merk, het model, de kleur en het vermogen. Wij zoeken de buitenunit die erbij past."
+      );
       return h + "</div>";
     },
     btw: function () {
@@ -480,14 +574,16 @@
       return h + "</div>";
     },
     advies: renderAdvies,
+    pakket: renderPakket,
+    kies: renderKies,
   };
 
   function render() {
     var s = steps();
     if (s.indexOf(state.step) === -1) state.step = s[0];
     var i = s.indexOf(state.step);
-    if (state.step === "advies") {
-      root.innerHTML = SCREENS.advies();
+    if (state.step === "advies" || state.step === "pakket") {
+      root.innerHTML = SCREENS[state.step]();
       return;
     }
     var total = s.length - 1;
@@ -511,6 +607,122 @@
       ' <span class="ar">&rarr;</span></button>';
     h += "</div>";
     root.innerHTML = h;
+  }
+
+  // =====================================================================
+  // ZELF SAMENSTELLEN: per ruimte een merk, model, kleur en vermogen
+  // =====================================================================
+  function aanbevolenModel() {
+    var pk = find(P.pakketten, "aanbevolen", true) || P.pakketten[0];
+    return pk.model;
+  }
+  // Vult ontbrekende keuzes aan, met het gekozen of aanbevolen toestel.
+  function initKeuzes(model) {
+    var start = modelByName(model) || modelByName(state.voorkeur) || modelByName(aanbevolenModel()) || MODELS[0];
+    for (var i = 0; i < state.rooms.length; i++) {
+      var k = state.keuzes[i];
+      if (model || !k || !modelByName(k.model)) {
+        var kl = start.kleuren[0];
+        state.keuzes[i] = { merk: start.cfg.merk, model: start.cfg.model, kleur: kl ? kl.naam : "", kw: null };
+      }
+    }
+  }
+  // Voorgesteld vermogen voor een ruimte, voor dit toestel
+  function autoKw(m, r) {
+    var want = r.m2 * KW_PER_M2;
+    var s = sizeFor(m, want, 0);
+    return s != null ? s : sizeFor(m, want, 1);
+  }
+  function kwBereik(m) {
+    var s = sizesOf(m);
+    return s.length > 1 ? kwTxt(s[0]) + " tot " + kwTxt(s[s.length - 1]) : s.length ? kwTxt(s[0]) : "";
+  }
+
+  function renderKies() {
+    initKeuzes();
+    var list = roomList();
+    var h = q(
+      state.n === 1 ? "Kies uw toestel" : "Kies per ruimte uw toestel",
+      "Het vermogen stellen we voor op basis van de grootte van de ruimte; u kunt het zelf aanpassen. Toestellen uit dezelfde reeks kunnen samen op één buitenunit."
+    );
+    state.rooms.forEach(function (r, i) {
+      var k = state.keuzes[i];
+      var m = modelByName(k.model);
+      var kl = kleurVan(m, k.kleur);
+      var auto = autoKw(m, list[i]);
+      var kw = k.kw && sizesOf(m).indexOf(k.kw) !== -1 ? k.kw : auto;
+      h += '<div class="pc-room pc-kies" data-i="' + i + '">' + roomHead(list[i], i);
+
+      // samenvatting van de keuze
+      h += '<div class="pc-kies-sum">';
+      h += '<span class="pc-kies-ph"><img src="' + esc(kl && kl.src ? kl.src : m.img) + '" alt=""></span>';
+      h +=
+        "<span><b>" +
+        esc(m.cfg.merk + " " + m.cfg.naam) +
+        "</b><small>" +
+        esc(list[i].sizeLbl) +
+        " &middot; " +
+        kwTxt(kw) +
+        (kl ? " &middot; " + esc(kl.naam) : "") +
+        "</small></span>";
+      if (m.slug) h += '<a class="pc-kies-info" href="#toestel-' + esc(m.slug) + '">Meer info</a>';
+      h += "</div>";
+
+      // merk
+      h += '<div class="pc-kies-lbl">Merk</div><div class="chip-grid">';
+      MERKEN.forEach(function (mk) {
+        h += chip('data-kmerk="' + esc(mk) + '"', k.merk === mk, esc(mk));
+      });
+      h += "</div>";
+
+      // model
+      h += '<div class="pc-kies-lbl">Model</div><div class="pc-mods">';
+      modelsVan(k.merk).forEach(function (mm) {
+        var on = mm.cfg.model === k.model;
+        h +=
+          '<button type="button" class="pc-mod' +
+          (on ? " selected" : "") +
+          '" data-kmodel="' +
+          esc(mm.cfg.model) +
+          '" aria-pressed="' +
+          on +
+          '">' +
+          (mm.img ? '<img src="' + esc(mm.img) + '" alt="" loading="lazy">' : "") +
+          "<b>" +
+          esc(mm.cfg.naam) +
+          "</b><small>" +
+          kwBereik(mm) +
+          (mm.cfg.multi ? " &middot; ook multi-split" : "") +
+          "</small></button>";
+      });
+      h += "</div>";
+
+      // kleur
+      if (m.kleuren.length > 1) {
+        h += '<div class="pc-kies-lbl">Kleur</div><div class="chip-grid">';
+        m.kleuren.forEach(function (c) {
+          h += chip(
+            'data-kkleur="' + esc(c.naam) + '"',
+            kl && kl.naam === c.naam,
+            '<span class="pc-dot" style="background:' + esc(c.kleur) + '"></span>' + esc(c.naam)
+          );
+        });
+        h += "</div>";
+      }
+
+      // vermogen
+      h += '<div class="pc-kies-lbl">Vermogen</div><div class="chip-grid">';
+      sizesOf(m).forEach(function (s) {
+        h += chip('data-kkw="' + s + '"', s === kw, kwTxt(s) + (s === auto ? ' <span class="pc-tag">aanbevolen</span>' : ""));
+      });
+      h += "</div>";
+      if (kw < auto - 0.001) h += '<p class="pc-warn">Dit vermogen is aan de kleine kant voor deze ruimte.</p>';
+
+      if (i === 0 && state.n > 1)
+        h += '<button type="button" class="pc-link pc-kopieer" data-act="kopieer">Hetzelfde toestel voor alle ruimtes</button>';
+      h += "</div>";
+    });
+    return h;
   }
 
   // ---------- het advies ----------
@@ -603,8 +815,120 @@
         eur(r.hi) +
         "</span></button>";
     });
+    h +=
+      '<button type="button" class="pc-alt pc-alt-zelf" data-act="zelf"><span><b>Zelf samenstellen</b><small>Kies per ruimte zelf merk, model en kleur</small></span><span class="pc-alt-pr">&rarr;</span></button>';
     h += "</div></div>";
 
+    h += prijsBlok(res, pr, list, f);
+    h += '<div class="pc-restart"><button type="button" class="pc-back" data-act="restart">Opnieuw beginnen</button></div>';
+    return h;
+  }
+
+  // ---------- het zelf samengestelde pakket ----------
+  function renderPakket() {
+    initKeuzes();
+    var m0 = modelByName(state.keuzes[0].model);
+    var res = calculate(m0, withSecond());
+    var pr = priceRange(res);
+    res.lo = pr.lo;
+    res.hi = pr.hi;
+    res.pakket = { id: "zelf", titel: "Zelf samengesteld" };
+    lastRes = res;
+    var f = 1 + btwPct() / 100;
+    var list = roomList();
+
+    var h = '<div class="pc-top pc-top-done"><span class="pc-prog-lbl">Uw eigen pakket</span>';
+    h += '<button type="button" class="pc-back" data-act="kies">Toestellen aanpassen</button></div>';
+    h += '<div class="pc-result">';
+    h += '<div class="pc-device">';
+    h += '<div class="pc-kicker">Zelf samengesteld</div>';
+    h += '<h2 class="pc-device-name">Uw toestellen</h2>';
+
+    // per ruimte het gekozen toestel
+    h += '<div class="pc-pak">';
+    res.units.forEach(function (u) {
+      u.items.forEach(function (it, j) {
+        var m = it.model || m0;
+        var kl = kleurVan(m, it.kleur);
+        h +=
+          '<div class="pc-pak-row"><span class="pc-kies-ph"><img src="' +
+          esc(kl && kl.src ? kl.src : m.img) +
+          '" alt=""></span><span><b>' +
+          esc(it.naam) +
+          "</b><small>" +
+          esc(m.cfg.merk + " " + m.cfg.naam) +
+          " &middot; " +
+          kwTxt(u.kw[j]) +
+          (kl ? " &middot; " + esc(kl.naam) : "") +
+          "</small></span></div>";
+      });
+    });
+    h += "</div>";
+
+    // de buitenunits
+    h += '<div class="pc-plan"><div class="pc-plan-title">Zo plaatsen we het</div>';
+    res.units.forEach(function (u, i) {
+      h +=
+        '<div class="pc-unit"><div class="pc-unit-head"><span class="pc-unit-ic" aria-hidden="true"></span><b>Buitenunit' +
+        (res.units.length > 1 ? " " + (i + 1) : "") +
+        "</b> &middot; " +
+        (u.multi ? esc(u.serie) + " (multi-split)" : "eigen buitenunit (single-split)") +
+        " &middot; " +
+        SPOTS[u.spot].naam +
+        "</div><ul>" +
+        u.items
+          .map(function (it, j) {
+            var m = it.model || m0;
+            return "<li><span>" + esc(it.naam) + "</span><span>" + esc(m.cfg.naam) + " " + kwTxt(u.kw[j]) + "</span></li>";
+          })
+          .join("") +
+        "</ul></div>";
+    });
+    h += "</div>";
+
+    var tip = pakketTip(res);
+    if (tip) h += '<div class="pc-advice">' + tip + "</div>";
+    var adv = advies(res, f);
+    var tweedePlek = res.units.some(function (u) { return u.spot === 1; }) || (anyFar() && state.tweede === "nee");
+    if (adv && tweedePlek) h += '<div class="pc-advice">' + adv + "</div>";
+    h += "</div>";
+
+    h += prijsBlok(res, pr, list, f);
+    h += '<div class="pc-restart"><button type="button" class="pc-back" data-act="restart">Opnieuw beginnen</button></div>';
+    return h;
+  }
+
+  // Uitleg waarom er meerdere buitenunits nodig zijn bij een eigen pakket
+  function pakketTip(res) {
+    if (res.units.length < 2) return "";
+    var kop = "<b>Waarom " + res.units.length + " buitenunits?</b>";
+    var geenMulti = [],
+      vermogen = [],
+      reeksen = [];
+    res.units.forEach(function (u) {
+      u.items.forEach(function (it, j) {
+        var m = it.model;
+        if (!m) return;
+        if (!m.cfg.multi) {
+          if (geenMulti.indexOf(m.cfg.naam) === -1) geenMulti.push(m.cfg.naam);
+        } else {
+          if (reeksen.indexOf(m.cfg.multi) === -1) reeksen.push(m.cfg.multi);
+          if (!u.multi && price(m, u.kw[j], 1) == null) vermogen.push(it.naam + " (" + m.cfg.naam + " " + kwTxt(u.kw[j]) + ")");
+        }
+      });
+    });
+    var zelfde = " Kiest u voor elke ruimte een toestel uit dezelfde reeks dat ook multi-split kan, dan volstaat vaak één buitenunit.";
+    if (geenMulti.length)
+      return kop + esc(geenMulti.join(" en ")) + (geenMulti.length > 1 ? " kunnen" : " kan") + " niet op een multi-split buitenunit en krijgt dus een eigen buitenunit." + zelfde;
+    if (reeksen.length > 1) return kop + "Toestellen uit verschillende reeksen kunnen niet op dezelfde buitenunit." + zelfde;
+    if (vermogen.length)
+      return kop + "Het gekozen vermogen bestaat niet als losse multi-split binnenunit voor " + esc(vermogen.join(", ")) + ". Die ruimte krijgt daarom een eigen buitenunit.";
+    return kop + "Op één buitenunit passen maximaal " + P.maxPerBuitenunit + " binnenunits, en het totale vermogen van de binnenunits moet erbij passen.";
+  }
+
+  // Rechterkolom: prijsindicatie, opbouw en aanvraagformulier (advies en eigen pakket)
+  function prijsBlok(res, pr, list, f) {
+    var h = "";
     // rechts: de prijs
     h += '<div class="pc-price">';
     h += '<div class="pc-kicker">Prijsindicatie</div>';
@@ -646,7 +970,6 @@
     h += "</div>";
     h += '<p class="pc-fine">Dit is een indicatie. De exacte prijs krijgt u na het gratis plaatsbezoek.</p>';
     h += "</div></div>";
-    h += '<div class="pc-restart"><button type="button" class="pc-back" data-act="restart">Opnieuw beginnen</button></div>';
     return h;
   }
 
@@ -696,7 +1019,7 @@
     if (act === "prev") return prev();
     if (act === "edit") return go("aantal");
     if (act === "restart") {
-      state = { step: "aantal", n: null, rooms: [], tweede: null, wens: null, oud: null, keuze: null, sent: false };
+      state = leeg();
       return go("aantal");
     }
     if (act === "second") {
@@ -705,6 +1028,24 @@
       return render();
     }
     if (act === "send") return send();
+    if (act === "zelf") {
+      // vanuit het advies: begin met het aangeraden toestel in elke ruimte
+      var pk = pakket(state.keuze || state.wens);
+      state.wens = "zelf";
+      state.keuzes = [];
+      initKeuzes(pk.model);
+      return go("kies");
+    }
+    if (act === "kies") return go("kies");
+    if (act === "kopieer") {
+      var k0 = state.keuzes[0];
+      state.keuzes = state.keuzes.map(function () {
+        return { merk: k0.merk, model: k0.model, kleur: k0.kleur, kw: null };
+      });
+      save();
+      return render();
+    }
+    var k = roomEl && state.keuzes ? state.keuzes[+roomEl.getAttribute("data-i")] : null;
 
     if (t.hasAttribute("data-n")) {
       state.n = +t.getAttribute("data-n");
@@ -720,6 +1061,7 @@
     } else if (t.hasAttribute("data-wens")) {
       state.wens = t.getAttribute("data-wens");
       state.keuze = null;
+      if (state.wens === "zelf") initKeuzes();
       auto = true;
     } else if (t.hasAttribute("data-oud")) {
       state.oud = t.getAttribute("data-oud") === "1";
@@ -729,7 +1071,26 @@
       save();
       render();
       return go("advies");
-    } else return;
+    } else if (t.hasAttribute("data-kmerk") && k) {
+      var merk = t.getAttribute("data-kmerk");
+      if (k.merk !== merk) {
+        var eerste = modelsVan(merk)[0];
+        k.merk = merk;
+        k.model = eerste.cfg.model;
+        k.kleur = eerste.kleuren[0] ? eerste.kleuren[0].naam : "";
+        k.kw = null;
+      }
+    } else if (t.hasAttribute("data-kmodel") && k) {
+      var mm = modelByName(t.getAttribute("data-kmodel"));
+      if (mm && mm.cfg.model !== k.model) {
+        k.model = mm.cfg.model;
+        k.merk = mm.cfg.merk;
+        k.kleur = mm.kleuren[0] ? mm.kleuren[0].naam : "";
+        k.kw = null;
+      }
+    } else if (t.hasAttribute("data-kkleur") && k) k.kleur = t.getAttribute("data-kkleur");
+    else if (t.hasAttribute("data-kkw") && k) k.kw = parseFloat(t.getAttribute("data-kkw"));
+    else return;
 
     // Eén ruimte: ook bij ruimte-vragen meteen door zodra alles is ingevuld
     if (state.n === 1 && r && (t.hasAttribute("data-size") || t.hasAttribute("data-floor") || t.hasAttribute("data-dist")))
@@ -760,7 +1121,16 @@
       telefoon: tel,
       gemeente: gem,
       dienst: "nieuw",
-      toestel: lastRes.model.cfg.model + " (" + lastRes.pakket.titel + ")",
+      toestel:
+        state.wens === "zelf"
+          ? "Zelf samengesteld: " +
+            list
+              .map(function (r, i) {
+                var kz = state.keuzes[i] || {};
+                return r.naam + ": " + kz.model + (kz.kleur ? " (" + kz.kleur + ")" : "");
+              })
+              .join(" | ")
+          : lastRes.model.cfg.model + " (" + lastRes.pakket.titel + ")",
       indicatie: eur(lastRes.lo) + " - " + eur(lastRes.hi) + " (incl. " + btwPct() + "% btw)",
       ruimtes: list
         .map(function (r) {
@@ -775,16 +1145,17 @@
             " (" +
             SPOTS[u.spot].naam +
             "): " +
+            (u.multi ? u.serie + ", multi-split: " : "single-split: ") +
             u.items
               .map(function (it, j) {
-                return it.naam + " " + kwTxt(u.kw[j]);
+                return it.naam + " " + (it.model ? it.model.cfg.naam + " " : "") + kwTxt(u.kw[j]);
               })
               .join(", ")
           );
         })
         .join(" | "),
       tweedeBuitenunit: state.tweede || "",
-      source: "prijscalculator",
+      source: state.wens === "zelf" ? "configurator" : "prijscalculator",
       submittedAt: new Date().toISOString(),
     })
       .then(function () {
@@ -800,6 +1171,32 @@
       });
   }
 
+  // Vanaf de detailpagina van een toestel: "Stel een pakket samen met dit toestel".
+  window.rtConfigHeeft = function (model) {
+    return !!modelByName(model);
+  };
+  window.rtConfigMet = function (model) {
+    if (!modelByName(model)) return;
+    state.voorkeur = model;
+    state.wens = "zelf";
+    state.keuze = null;
+    state.sent = false;
+    initKeuzes(model);
+    var s = steps();
+    var klaar = !!state.n && s.slice(0, s.indexOf("wens")).every(canNext);
+    state.step = klaar ? "kies" : "aantal";
+    save();
+    if (window.goToPage) window.goToPage("toestellen", false);
+    render();
+    requestAnimationFrame(function () {
+      window.scrollTo({ top: root.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" });
+    });
+  };
+
   if (state.n) setRooms(state.n);
   render();
+
+  // Staat er bij het openen al een toestel open, bouw die pagina dan opnieuw op,
+  // zodat ook de knop "Stel een pakket samen" erop staat.
+  if (location.hash.indexOf("#toestel-") === 0 && window.rtToestelInfo) window.rtToestelInfo(location.hash.slice(9));
 })();

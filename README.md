@@ -41,6 +41,12 @@ Bovenaan de pagina *Toestellen* (`#prijs`) beantwoordt de klant een paar eenvoud
 
 Alle prijzen staan in `js/prijzen.js` (exclusief btw), net als welk toestel bij welke wens wordt aangeraden (`pakketten`). Zolang daar `voorlopig: true` staat, ziet de klant de melding dat het om voorbeeldprijzen gaat. De werking zelf staat in `js/prijscalculator.js`. Foto's en specificaties komen van de toestelkaarten; een toestel in `prijzen.js` hoort bij de kaart met dezelfde `data-model`.
 
+### Zelf samenstellen (configurator)
+
+Bij de vraag "Wat vindt u het belangrijkst?" kan de klant ook kiezen voor "Ik stel mijn toestellen liever zelf samen". Dan kiest hij per ruimte een merk, model, kleur en vermogen (het aanbevolen vermogen is aangeduid). De calculator zoekt zelf de buitenunits: ruimtes met toestellen uit dezelfde multi-split reeks (`multi` in `js/prijzen.js`) komen samen op één buitenunit, andere krijgen een eigen buitenunit, met uitleg voor de klant. De configurator is ook bereikbaar via "Zelf samenstellen" in het advies en via "Stel een pakket samen" op de detailpagina van een toestel.
+
+Alleen toestellen die in `js/prijzen.js` staan, zijn kiesbaar. Kleuren komen van de kleurknoppen op de toestelkaart. De aanvraag komt binnen met als onderwerp "Zelf samengesteld pakket", met per ruimte het gekozen toestel en de opstelling van de buitenunits.
+
 ## Online zetten
 
 Upload de volledige map (behalve `.git`) naar de webhost, zodat `index.html` in de hoofdmap staat. Werkt ook met Netlify, Vercel, Cloudflare Pages of GitHub Pages zonder extra instellingen.

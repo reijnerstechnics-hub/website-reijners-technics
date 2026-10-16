@@ -68,6 +68,8 @@ var RT_PRIJZEN = {
   //            (zie "multi" verderop), of null als het enkel single-split kan.
   //   prijzen: per vermogen (kW):  [ prijs set binnen+buiten , prijs losse binnenunit voor multi ]
   //            Zet null als die uitvoering niet bestaat.
+  // Deze lijst wordt ook gebruikt door de configurator ("Ik stel mijn toestellen
+  // zelf samen"): alleen toestellen die hier staan, kan de klant daar kiezen.
   // -------------------------------------------------------------------
   toestellen: [
     { merk: "Nuova", model: "Nuova Infinity AI Smart", naam: "Infinity AI Smart", multi: "nuova-inf",
@@ -76,8 +78,26 @@ var RT_PRIJZEN = {
       prijzen: { "3.5": [800, 450], "5.0": [1150, 600] } },
     { merk: "Nuova", model: "Nuova Stellar Inverter", naam: "Stellar Inverter", multi: "nuova-mso",
       prijzen: { "3.5": [950, 520], "5.0": [1300, 680] } },
-    { merk: "Nuova", model: "Nuova Vloermodel", naam: "Vloermodel", multi: null,
-      prijzen: { "2.5": [900, null], "3.5": [1000, null], "5.0": [1300, null], "7.1": [1700, null] } },
+    { merk: "Nuova", model: "Nuova Vloermodel", naam: "Vloermodel", multi: "nuova-inf",
+      prijzen: { "2.5": [900, 450], "3.5": [1000, 500], "5.0": [1300, 650], "7.1": [1700, null] } },
+
+    // Daikin: voorbeeldprijzen op basis van de winkelprijzen (excl. btw) van oktober 2026
+    { merk: "Daikin", model: "Daikin Sensira", naam: "Sensira", multi: null,
+      prijzen: { "2.0": [520, null], "2.5": [550, null], "3.5": [570, null], "5.0": [950, null], "6.0": [1030, null], "7.1": [1310, null] } },
+    { merk: "Daikin", model: "Daikin FTXF-F", naam: "FTXF-F", multi: null,
+      prijzen: { "2.0": [580, null], "2.5": [600, null], "6.0": [1070, null], "7.1": [1250, null] } },
+    { merk: "Daikin", model: "Daikin Comfora", naam: "Comfora", multi: "daikin-mxm",
+      prijzen: { "2.0": [780, 330], "2.5": [880, 370], "3.5": [990, 380], "5.0": [1400, 450], "6.0": [1550, 490], "7.1": [1810, 570] } },
+    { merk: "Daikin", model: "Daikin Perfera", naam: "Perfera", multi: "daikin-mxm",
+      prijzen: { "2.0": [970, 410], "2.5": [1070, 430], "3.5": [1190, 490], "4.2": [1400, 560], "5.0": [1540, 650], "6.0": [1730, 790], "7.1": [1980, 880] } },
+    { merk: "Daikin", model: "Daikin Stylish", naam: "Stylish", multi: "daikin-mxm",
+      prijzen: { "2.0": [1110, 440], "2.5": [1570, 520], "3.5": [1670, 560], "4.2": [1730, 620], "5.0": [2050, 660] } },
+    { merk: "Daikin", model: "Daikin Emura", naam: "Emura", multi: "daikin-mxm",
+      prijzen: { "2.0": [1400, 520], "2.5": [1490, 560], "3.5": [1690, 690], "4.2": [1960, 750], "5.0": [2130, 840] } },
+    { merk: "Daikin", model: "Daikin Perfera vloermodel", naam: "Perfera vloermodel", multi: "daikin-mxm",
+      prijzen: { "2.5": [1280, 650], "3.5": [1570, 800], "5.0": [1800, 970] } },
+    { merk: "Daikin", model: "Daikin Sensira CTXF-C multi-split binnenunit", naam: "Sensira multi", multi: "daikin-mxf",
+      prijzen: { "2.0": [null, 250], "2.5": [null, 260], "3.5": [null, 280] } },
 
     { merk: "LG", model: "LG DualCool WZ-serie", naam: "DualCool WZ", multi: null,
       prijzen: { "2.5": [750, null], "3.5": [850, null], "5.0": [1250, null], "7.0": [1650, null] } },
@@ -87,16 +107,18 @@ var RT_PRIJZEN = {
       prijzen: { "2.5": [850, 430], "3.5": [950, 480], "5.0": [1350, 650], "6.6": [1700, 800] } },
     { merk: "LG", model: "LG DualCool AI Air Special Smart Inverter", naam: "DualCool AI Air Special", multi: "lg-multif",
       prijzen: { "2.5": [1000, 520], "3.5": [1100, 580] } },
-    { merk: "LG", model: "LG Deluxe AI H-serie", naam: "Deluxe AI", multi: null,
-      prijzen: { "2.5": [1100, null], "3.5": [1250, null], "5.0": [1650, null], "7.0": [2100, null] } },
-    { merk: "LG", model: "LG Artcool AI Air Mirror", naam: "Artcool AI Air Mirror", multi: null,
-      prijzen: { "2.5": [1250, null], "3.5": [1400, null], "5.0": [1850, null] } },
-    { merk: "LG", model: "LG Artcool Gallery Special", naam: "Artcool Gallery", multi: null,
-      prijzen: { "2.5": [1650, null], "3.5": [1800, null] } },
-    { merk: "LG", model: "LG Artcool LCD Gallery Premium", naam: "Artcool LCD Gallery", multi: null,
-      prijzen: { "2.5": [2400, null], "3.5": [2600, null] } },
-    { merk: "LG", model: "LG Vloermodel UQ-reeks", naam: "Vloermodel UQ", multi: null,
-      prijzen: { "2.6": [1500, null], "3.5": [1650, null], "5.0": [2050, null] } },
+    { merk: "LG", model: "LG Deluxe AI H-serie", naam: "Deluxe AI", multi: "lg-multif",
+      prijzen: { "2.1": [null, 500], "2.5": [1100, 550], "3.5": [1250, 630], "5.0": [1650, 830], "7.0": [2100, 1050] } },
+    { merk: "LG", model: "LG Artcool AI Air Mirror", naam: "Artcool AI Air Mirror", multi: "lg-multif",
+      prijzen: { "2.5": [1250, 630], "3.5": [1400, 700], "5.0": [1850, 930] } },
+    { merk: "LG", model: "LG Artcool AI Matt Black", naam: "Artcool AI Matt Black", multi: "lg-multif",
+      prijzen: { "2.5": [1250, 630] } },
+    { merk: "LG", model: "LG Artcool Gallery Special", naam: "Artcool Gallery", multi: "lg-multif",
+      prijzen: { "2.5": [1650, 830], "3.5": [1800, 900] } },
+    { merk: "LG", model: "LG Artcool LCD Gallery Premium", naam: "Artcool LCD Gallery", multi: "lg-multif",
+      prijzen: { "2.5": [2400, 1200], "3.5": [2600, 1300] } },
+    { merk: "LG", model: "LG Vloermodel UQ-reeks", naam: "Vloermodel UQ", multi: "lg-multif",
+      prijzen: { "2.6": [1500, 750], "3.5": [1650, 830], "5.0": [2050, 1030] } },
 
     { merk: "Mitsubishi Electric", model: "Mitsubishi Electric MSZ-HR instapreeks", naam: "MSZ-HR", multi: "me-mxzha",
       prijzen: { "2.5": [900, 450], "3.5": [1000, 520], "5.0": [1400, 700], "6.0": [1750, null], "7.1": [2050, null] } },
@@ -168,6 +190,20 @@ var RT_PRIJZEN = {
       { poorten: 2, kw: 4.0, prijs: 1100 },
       { poorten: 2, kw: 5.0, prijs: 1250 },
       { poorten: 3, kw: 5.0, prijs: 1450 },
+    ] },
+    "daikin-mxm": { naam: "Daikin MXM", units: [
+      { poorten: 2, kw: 4.0, prijs: 1150 },
+      { poorten: 2, kw: 5.0, prijs: 1290 },
+      { poorten: 2, kw: 6.8, prijs: 1650 },
+      { poorten: 3, kw: 4.0, prijs: 1570 },
+      { poorten: 3, kw: 5.2, prijs: 1730 },
+      { poorten: 3, kw: 6.8, prijs: 1780 },
+      { poorten: 4, kw: 6.8, prijs: 1980 },
+      { poorten: 4, kw: 8.0, prijs: 2300 },
+      { poorten: 5, kw: 9.0, prijs: 2630 },
+    ] },
+    "daikin-mxf": { naam: "Daikin Sensira 2MXF", units: [
+      { poorten: 2, kw: 4.0, prijs: 1060 },
     ] },
     "mhi-scm": { naam: "MHI SCM", units: [
       { poorten: 2, kw: 4.0, prijs: 1300 },
