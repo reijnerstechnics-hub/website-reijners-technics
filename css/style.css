@@ -6593,3 +6593,308 @@ section.pc-catalog {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* ---------- menu: merken onder "Toestellen" ---------- */
+.nav-dd {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.nav-dd-caret {
+  margin-left: 5px;
+  vertical-align: 1px;
+  transition: transform 0.2s var(--ease);
+}
+.nav-dd-menu a {
+  display: block;
+}
+@media (min-width: 841px) {
+  /* onzichtbare brug, zodat het menu open blijft als de muis naar beneden gaat */
+  .nav-dd::after {
+    content: "";
+    position: absolute;
+    left: -10px;
+    right: -10px;
+    top: 100%;
+    height: 16px;
+  }
+  .nav-dd-menu {
+    position: absolute;
+    top: calc(100% + 14px);
+    left: -18px;
+    min-width: 260px;
+    padding: 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--sh-2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition:
+      opacity 0.18s var(--ease),
+      transform 0.18s var(--ease),
+      visibility 0.18s;
+    z-index: 60;
+  }
+  .nav-dd:hover .nav-dd-menu,
+  .nav-dd:focus-within .nav-dd-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+  .nav-dd:hover .nav-dd-caret,
+  .nav-dd:focus-within .nav-dd-caret {
+    transform: rotate(180deg);
+  }
+  .nav-dd.dicht .nav-dd-menu {
+    opacity: 0;
+    visibility: hidden;
+  }
+  nav.links .nav-dd-menu a {
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 9px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  nav.links .nav-dd-menu a:hover,
+  nav.links .nav-dd-menu a:focus-visible {
+    background: var(--gold-tint);
+    color: var(--gold-text);
+  }
+  nav.links .nav-dd-menu .nav-dd-all {
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    border-radius: 0 0 9px 9px;
+    color: var(--sky);
+    font-weight: 700;
+  }
+}
+@media (max-width: 840px) {
+  .nav-dd {
+    display: block;
+  }
+  .nav-dd > a {
+    display: block;
+  }
+  .nav-dd-caret {
+    display: none;
+  }
+  nav.links .nav-dd-menu a {
+    padding: 8px 20px 8px 36px;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+}
+
+/* ---------- toestellen: eerst een merk kiezen ---------- */
+.merk-keuze {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+.merk-tegel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--sh-1);
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.25s var(--ease),
+    border-color 0.2s,
+    box-shadow 0.25s var(--ease),
+    background 0.2s;
+}
+.merk-tegel:hover {
+  transform: translateY(-3px);
+  border-color: var(--gold);
+  box-shadow: var(--sh-2);
+}
+.merk-tegel:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.merk-tegel.on {
+  border-color: var(--gold);
+  background: var(--gold-tint);
+  box-shadow: 0 0 0 2px var(--gold);
+}
+.merk-foto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  margin-bottom: 8px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.merk-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.merk-tegel b {
+  font-family: "Sora", "Work Sans", sans-serif;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+.merk-tag {
+  font-size: 0.82rem;
+  color: var(--body);
+  line-height: 1.4;
+}
+.merk-n {
+  margin-top: auto;
+  padding-top: 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+}
+.merk-alle {
+  margin: 16px 0 0;
+  text-align: center;
+}
+.merk-alle button {
+  padding: 4px 6px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--sky);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.merk-alle button.on {
+  color: var(--gold-text);
+  font-weight: 700;
+}
+/* na de keuze worden de tegels een compacte rij, zodat de toestellen hoger staan */
+.merk-gekozen .merk-foto,
+.merk-gekozen .merk-tag {
+  display: none;
+}
+.merk-gekozen .merk-tegel {
+  padding: 12px 14px;
+}
+#toestellen-lijst {
+  margin-top: 32px;
+  scroll-margin-top: 90px;
+}
+@media (max-width: 1000px) {
+  .merk-keuze {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .merk-keuze {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .merk-tag {
+    display: none;
+  }
+}
+
+/* ---------- toestellen: categorieën in de linkerkolom ---------- */
+.cat-list h4:first-child {
+  margin-top: 0;
+}
+.cat-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  margin-bottom: 2px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  font-size: 0.92rem;
+  color: var(--body);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cat-btn em {
+  flex: none;
+  min-width: 26px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  font-style: normal;
+  font-size: 0.76rem;
+  text-align: center;
+  color: var(--muted);
+}
+.cat-btn:hover {
+  background: var(--surface-alt);
+}
+.cat-btn.on {
+  background: var(--gold-tint);
+  color: var(--gold-text);
+  font-weight: 700;
+}
+.cat-btn.on em {
+  background: #fff;
+  color: var(--gold-text);
+}
+@media (max-width: 900px) {
+  .cat-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .cat-list h4 {
+    flex-basis: 100%;
+  }
+  .cat-btn {
+    width: auto;
+    margin: 0;
+    border: 1px solid var(--line);
+  }
+}
+
+/* ---------- privacyverklaring ---------- */
+.privacy-text {
+  max-width: 760px;
+}
+.privacy-text h2 {
+  margin: 34px 0 10px;
+  font-size: 1.2rem;
+}
+.privacy-text p,
+.privacy-text li {
+  color: var(--body);
+  line-height: 1.7;
+}
+.privacy-text ul {
+  padding-left: 20px;
+}
+.privacy-text li {
+  margin-bottom: 6px;
+}
+.privacy-text a {
+  color: var(--sky);
+}
+.privacy-date {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.pc-catalog:not(.merk-gekozen) .devices-note {
+  display: none;
+}

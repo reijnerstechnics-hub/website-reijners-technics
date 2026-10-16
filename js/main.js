@@ -26,6 +26,7 @@
     realisaties: "realisaties.html",
     "over-ons": "over-ons.html",
     contact: "contact.html",
+    privacy: "privacy.html",
   };
   var pageNames = Object.keys(PAGE_FILES);
   var currentPage = document.body.getAttribute("data-page");
@@ -1216,65 +1217,180 @@ window.rtGoToOffer = function (d, model) {
   });
 })();
 
+// =====================================================================
+// TOESTELLEN: MERK EN CATEGORIE
+// Eerst kiest de bezoeker een merk: met de tegels bovenaan de lijst of
+// via het menu onder "Toestellen". Daarna verschijnen links de categorieën
+// van dat merk. Een kaart hoort bij een categorie via
+//   data-category: "single" en/of "multi"
+//   data-type:     "wand", "vloer", "cassette", "kanaal" of "buiten"
+// Een categorie zonder toestellen bij het gekozen merk wordt niet getoond.
+// =====================================================================
 (function () {
-  var brandChecks = document.querySelectorAll(".brand-filter");
-  var typeChecks = document.querySelectorAll(".type-filter-cb");
-  if (!brandChecks.length && !typeChecks.length) return;
+  var section = document.getElementById("alle-toestellen");
+  var lijst = document.getElementById("toestellen-lijst");
+  if (!section || !lijst) return;
+  var catBox = lijst.querySelector(".cat-list");
+  var cards = Array.prototype.slice.call(section.querySelectorAll(".device-card"));
 
-  function checkedValues(list) {
-    return Array.prototype.filter
-      .call(list, function (cb) {
-        return cb.checked;
-      })
-      .map(function (cb) {
-        return cb.value;
-      });
+  function heeft(card, cat) {
+    return (card.dataset.category || "").split(" ").indexOf(cat) !== -1;
   }
-  function allValues(list) {
-    return Array.prototype.map.call(list, function (cb) {
-      return cb.value;
-    });
+  function soort(type) {
+    return function (card) {
+      return card.dataset.type === type;
+    };
+  }
+  var CATS = [
+    { id: "alle", label: "Alle toestellen", test: function () { return true; } },
+    { kop: "Systeem" },
+    { id: "single", label: "Single-split", test: function (c) { return heeft(c, "single"); } },
+    { id: "multi", label: "Multi-split", test: function (c) { return heeft(c, "multi"); } },
+    { kop: "Soort toestel" },
+    { id: "wand", label: "Wandmodellen", test: soort("wand") },
+    { id: "vloer", label: "Vloermodellen", test: soort("vloer") },
+    { id: "cassette", label: "Cassettes", test: soort("cassette") },
+    { id: "kanaal", label: "Kanaal- en inbouwunits", test: soort("kanaal") },
+    { id: "buiten", label: "Multi-split buitenunits", test: soort("buiten") },
+  ];
+  function zoekCat(id) {
+    for (var i = 0; i < CATS.length; i++) if (CATS[i].id === id) return CATS[i];
+    return CATS[0];
   }
 
-  function applyFilters() {
-    var brands = checkedValues(brandChecks);
-    var types = checkedValues(typeChecks);
-    if (!brands.length) brands = allValues(brandChecks);
-    if (!types.length) types = allValues(typeChecks);
+  var state = { merk: null, cat: "alle" };
+  function vanMerk(card) {
+    return state.merk === "alle" || card.dataset.brand === state.merk;
+  }
 
-    document.querySelectorAll(".device-card").forEach(function (card) {
-      var cats = (card.dataset.category || "single multi").split(" ");
-      var brandMatch = brands.indexOf(card.dataset.brand) !== -1;
-      var typeMatch = cats.some(function (c) {
-        return types.indexOf(c) !== -1;
-      });
-      card.hidden = !(brandMatch && typeMatch);
+  // aantal modellen op elke merktegel
+  section.querySelectorAll(".merk-tegel").forEach(function (t) {
+    var n = cards.filter(function (c) {
+      return c.dataset.brand === t.dataset.merk;
+    }).length;
+    t.querySelector(".merk-n").textContent = n + (n === 1 ? " model" : " modellen");
+  });
+
+  function render() {
+    section.querySelectorAll(".merk-keuze [data-merk], .merk-alle [data-merk]").forEach(function (b) {
+      var on = b.dataset.merk === state.merk;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
     });
-    document.querySelectorAll(".brand-sub").forEach(function (sub) {
+    section.classList.toggle("merk-gekozen", !!state.merk);
+    lijst.hidden = !state.merk;
+    if (!state.merk) return;
+
+    // categorieën van dit merk, met het aantal toestellen
+    var mijn = cards.filter(vanMerk);
+    catBox.innerHTML = "";
+    var kop = null;
+    var gevonden = false;
+    CATS.forEach(function (cat) {
+      if (cat.kop) {
+        kop = document.createElement("h4");
+        kop.textContent = cat.kop;
+        return;
+      }
+      var n = mijn.filter(cat.test).length;
+      if (!n) return;
+      if (kop) {
+        catBox.appendChild(kop);
+        kop = null;
+      }
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "cat-btn";
+      b.dataset.cat = cat.id;
+      var naam = document.createElement("span");
+      naam.textContent = cat.label;
+      var aantal = document.createElement("em");
+      aantal.textContent = n;
+      b.appendChild(naam);
+      b.appendChild(aantal);
+      catBox.appendChild(b);
+      if (cat.id === state.cat) gevonden = true;
+    });
+    if (!gevonden) state.cat = "alle";
+    catBox.querySelectorAll(".cat-btn").forEach(function (b) {
+      var on = b.dataset.cat === state.cat;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+
+    // kaarten tonen of verbergen, lege groepen ook verbergen
+    var test = zoekCat(state.cat).test;
+    cards.forEach(function (c) {
+      c.hidden = !(vanMerk(c) && test(c));
+    });
+    section.querySelectorAll(".brand-sub").forEach(function (sub) {
       var devices = sub.nextElementSibling;
       if (devices && devices.classList.contains("devices")) {
-        var anyVisible = Array.prototype.some.call(devices.querySelectorAll(".device-card"), function (c) {
-          return !c.hidden;
-        });
-        sub.hidden = !anyVisible;
-        devices.hidden = !anyVisible;
+        var zichtbaar = !!devices.querySelector(".device-card:not([hidden])");
+        sub.hidden = !zichtbaar;
+        devices.hidden = !zichtbaar;
       }
     });
-    document.querySelectorAll(".brand-block").forEach(function (blockEl) {
-      var anyVisible = Array.prototype.some.call(blockEl.querySelectorAll(".device-card"), function (c) {
-        return !c.hidden;
-      });
-      blockEl.hidden = !anyVisible;
+    section.querySelectorAll(".brand-block").forEach(function (blk) {
+      blk.hidden = !blk.querySelector(".device-card:not([hidden])");
     });
+
+    // knop op de gsm toont de gekozen categorie
+    var fb = section.querySelector(".v4-filterbtn");
+    if (fb && fb.lastChild) fb.lastChild.nodeValue = "Categorie: " + zoekCat(state.cat).label;
   }
 
-  brandChecks.forEach(function (cb) {
-    cb.addEventListener("change", applyFilters);
+  function naarLijst() {
+    var y = lijst.getBoundingClientRect().top + window.scrollY - 90;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }
+
+  window.rtKiesMerk = function (merk) {
+    state.merk = merk;
+    state.cat = "alle";
+    render();
+  };
+
+  // merktegels en "alle merken"
+  section.querySelectorAll(".merk-keuze [data-merk], .merk-alle [data-merk]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      window.rtKiesMerk(b.dataset.merk);
+      requestAnimationFrame(naarLijst);
+    });
   });
-  typeChecks.forEach(function (cb) {
-    cb.addEventListener("change", applyFilters);
+
+  // categorie kiezen
+  catBox.addEventListener("click", function (e) {
+    var b = e.target.closest(".cat-btn");
+    if (!b) return;
+    state.cat = b.dataset.cat;
+    render();
+    var side = lijst.querySelector(".toestellen-sidebar");
+    var fb = section.querySelector(".v4-filterbtn");
+    if (side && side.classList.contains("v4-open")) {
+      side.classList.remove("v4-open");
+      if (fb) fb.setAttribute("aria-expanded", "false");
+    }
+    if (lijst.getBoundingClientRect().top < 0) naarLijst();
   });
-  applyFilters();
+
+  // menu "Toestellen" > merk. De algemene navigatie opent daarna zelf de
+  // pagina Toestellen en scrolt naar de lijst (#toestellen-lijst).
+  document.querySelectorAll(".nav-dd-menu [data-merk]").forEach(function (a) {
+    a.addEventListener("click", function () {
+      window.rtKiesMerk(a.dataset.merk);
+      var dd = a.closest(".nav-dd");
+      if (dd) dd.classList.add("dicht");
+      a.blur();
+    });
+  });
+  document.querySelectorAll(".nav-dd").forEach(function (dd) {
+    dd.addEventListener("mouseleave", function () {
+      dd.classList.remove("dicht");
+    });
+  });
+
+  render();
 })();
 
 // =====================================================================
@@ -1542,7 +1658,7 @@ window.rtGoToOffer = function (d, model) {
     var help = document.createElement("div");
     help.className = "v4-help";
     help.innerHTML =
-      '<span class="v3-avatar">RR</span><h3>Twijfelt u tussen modellen?</h3><p>Rim helpt u kiezen tijdens het gratis plaatsbezoek. Hij kijkt naar uw ruimte, uw isolatie en waar het toestel kan hangen.</p>' +
+      '<span class="v3-avatar"><img src="assets/img/rim-reijners.webp" alt="Rim Reijners"></span><h3>Twijfelt u tussen modellen?</h3><p>Rim helpt u kiezen tijdens het gratis plaatsbezoek. Hij kijkt naar uw ruimte, uw isolatie en waar het toestel kan hangen.</p>' +
       '<a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="nieuw">Gratis plaatsbezoek aanvragen <span class="ar">&rarr;</span></a>';
     grid.appendChild(help);
     help.querySelector("a").addEventListener("click", function (e) {
@@ -1573,7 +1689,7 @@ window.rtGoToOffer = function (d, model) {
     fb.className = "v4-filterbtn";
     fb.setAttribute("aria-expanded", "false");
     fb.innerHTML =
-      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5h18M6 12h12M10 19h4"/></svg>Filter op merk en type';
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5h18M6 12h12M10 19h4"/></svg>Kies een categorie';
     side.parentNode.insertBefore(fb, side);
     fb.addEventListener("click", function () {
       var open = side.classList.toggle("v4-open");
