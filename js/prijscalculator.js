@@ -1,15 +1,18 @@
 // =====================================================================
 // PRIJSADVIES  (bovenaan de pagina Toestellen, #prijs)
 // ---------------------------------------------------------------------
-// De klant beantwoordt een paar eenvoudige vragen, één per scherm:
-// hoeveel ruimtes, hoe groot, op welke verdieping, hoe ver van de
-// buitenunit, wat hij belangrijk vindt en hoe oud de woning is.
-// Daarna kiest de calculator zelf het toestel (zie "pakketten" in
-// js/prijzen.js) en zoekt hij de voordeligste opstelling: hoeveel
-// buitenunits, en waar. Maximaal RT_PRIJZEN.maxPerBuitenunit
-// binnenunits per buitenunit.
+// Drie korte vragen, één per scherm: hoeveel kamers, hoe groot is elke
+// kamer, en wat vindt de klant het belangrijkst. Daarna ziet hij drie
+// voorstellen (voordelig, beste prijs-kwaliteit en premium), elk met een
+// richtprijs. Welke toestellen dat zijn, staat in js/prijzen.js
+// (zie "wensen").
 //
-// Foto's en specificaties komen van de kaarten in de lijst met alle
+// Per voorstel zoekt de calculator zelf de voordeligste opstelling:
+// meerdere kamers op één multi-split buitenunit als het toestel dat kan,
+// anders een eigen buitenunit per kamer. Maximaal
+// RT_PRIJZEN.maxPerBuitenunit binnenunits per buitenunit.
+//
+// Foto en uitleg van een toestel komen van de kaart in de lijst met alle
 // toestellen (via data-model).
 // =====================================================================
 (function () {
@@ -19,37 +22,22 @@
   var P = RT_PRIJZEN;
   var INST = P.installatie;
   var KW_PER_M2 = 0.1; // vuistregel: 100 W per m² (goed geïsoleerde woning)
-  var STORE_KEY = "rt-prijsadvies";
+  var STORE_KEY = "rt-prijsadvies-v2";
+  var NIVEAUS = ["voordelig", "kwaliteit", "premium"];
 
-  // Antwoorden die de klant kan kiezen
-  var TYPES = ["Woonkamer", "Slaapkamer", "Bureau", "Keuken", "Andere"];
   var SIZES = [
     { v: "s", t: "Klein", s: "tot 15 m²", m2: 12 },
     { v: "m", t: "Gemiddeld", s: "15 tot 25 m²", m2: 20 },
     { v: "l", t: "Groot", s: "25 tot 40 m²", m2: 32 },
     { v: "xl", t: "Heel groot", s: "meer dan 40 m²", m2: 48 },
   ];
-  var FLOORS = [
-    { v: 0, t: "Gelijkvloers" },
-    { v: 1, t: "1e verdieping" },
-    { v: 2, t: "2e verdieping of zolder" },
-  ];
-  // Leiding in meter tot de hoofdplek (achtergevel/tuin) en tot de andere kant van het huis
-  var DISTS = [
-    { v: "kort", t: "Vlakbij", s: "tegen dezelfde buitenmuur", a: 3, b: 15 },
-    { v: "midden", t: "Midden in huis", s: "een paar kamers verder", a: 8, b: 8 },
-    { v: "ver", t: "Andere kant van het huis", s: "tegen de voor- of zijgevel", a: 15, b: 3 },
-  ];
-  var M_PER_FLOOR = 3;
-  var SPOTS = [{ naam: "achtergevel of tuin" }, { naam: "andere kant van het huis" }];
 
   var euro = new Intl.NumberFormat("nl-BE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
   function eur(v) {
     return euro.format(Math.round(v));
   }
   function kwTxt(k) {
-    if (typeof k === "number") return k.toFixed(1).replace(".", ",") + " kW";
-    return String(k).replace(".", ",") + " kW";
+    return Number(k).toFixed(1).replace(".", ",") + " kW";
   }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -61,7 +49,7 @@
     return null;
   }
 
-  // ---------- toestellen: foto en specificaties uit de lijst met alle toestellen ----------
+  // ---------- toestellen: foto en uitleg uit de lijst met alle toestellen ----------
   var MODELS = P.toestellen.map(function (t) {
     var sizes = Object.keys(t.prijzen)
       .map(parseFloat)
@@ -71,40 +59,15 @@
     var cta = document.querySelector('.device-cta[data-model="' + t.model.replace(/"/g, '\\"') + '"]');
     var card = cta ? cta.closest(".device-card") : null;
     var img = card ? card.querySelector(".device-photo img") : null;
-    var specs = card ? card.querySelector(".device-specs") : null;
-    var kleuren = card
-      ? Array.prototype.map.call(card.querySelectorAll(".color-swatch"), function (s) {
-          return { naam: s.getAttribute("aria-label"), src: s.getAttribute("data-src"), kleur: s.style.background };
-        })
-      : [];
+    var desc = card ? card.querySelector(".device-desc") : null;
     return {
       cfg: t,
       sizes: sizes,
       img: img ? img.getAttribute("src") || img.getAttribute("data-src") : "",
-      specs: specs ? specs.innerHTML : "",
-      kleuren: kleuren,
+      desc: desc ? desc.textContent.trim() : "",
       slug: card ? card.dataset.slug || "" : "",
     };
   });
-  // merken in de volgorde van de prijslijst
-  var MERKEN = [];
-  MODELS.forEach(function (m) {
-    if (MERKEN.indexOf(m.cfg.merk) === -1) MERKEN.push(m.cfg.merk);
-  });
-  function modelsVan(merk) {
-    return MODELS.filter(function (m) {
-      return m.cfg.merk === merk;
-    });
-  }
-  // alle vermogens waarin een toestel bestaat (als set of als losse binnenunit)
-  function sizesOf(m) {
-    return m.sizes.filter(function (s) {
-      return price(m, s, 0) != null || price(m, s, 1) != null;
-    });
-  }
-  function kleurVan(m, naam) {
-    return find(m.kleuren, "naam", naam) || m.kleuren[0] || null;
-  }
   function modelByName(name) {
     for (var i = 0; i < MODELS.length; i++) if (MODELS[i].cfg.model === name) return MODELS[i];
     return null;
@@ -126,65 +89,29 @@
   // =====================================================================
   // REKENEN
   // =====================================================================
-  function pipeCost(meters) {
-    return Math.max(0, meters - INST.leidingInbegrepen) * INST.perMeter;
-  }
-  function extraMeters(meters) {
-    return Math.max(0, meters - INST.leidingInbegrepen);
-  }
+  // extra leiding per binnenunit bovenop wat in de plaatsing zit
+  var PIPE = Math.max(0, INST.standaardLeiding - INST.leidingInbegrepen) * INST.perMeter;
 
-  // Bij "zelf samenstellen" heeft elke ruimte een eigen toestel (item.model)
-  // en soms een zelf gekozen vermogen (item.fixKw). Bij het advies niet:
-  // dan geldt voor alle ruimtes hetzelfde toestel m.
-  function modelOf(m, item) {
-    return item.model || m;
-  }
-  // Vermogen voor deze ruimte: het gekozen vermogen als dat in deze vorm
-  // (set = 0, losse binnenunit = 1) bestaat, anders het kleinste dat volstaat.
-  function kwFor(m, item, kind) {
-    var mm = modelOf(m, item);
-    if (item.fixKw && price(mm, item.fixKw, kind) != null) return item.fixKw;
-    return sizeFor(mm, item.kw, kind);
-  }
-  // Kan deze ruimte op een multi-split buitenunit? Dan geeft dit de reeks terug.
-  function familyOf(m, item) {
-    var mm = modelOf(m, item);
-    return mm.cfg.multi && P.multi[mm.cfg.multi] && kwFor(m, item, 1) != null ? mm.cfg.multi : null;
-  }
-
-  // Eén ruimte met een eigen buitenunit (single-split)
+  // Eén kamer met een eigen buitenunit (single-split)
   function singleUnit(m, item) {
-    var mm = modelOf(m, item);
-    var kw = kwFor(m, item, 0);
+    var kw = sizeFor(m, item.kw, 0);
     if (kw == null) return null;
-    return {
-      multi: false,
-      items: [item],
-      label: "Eén binnenunit",
-      kw: [kw],
-      mat: price(mm, kw, 0),
-      inst: INST.buitenunit + INST.binnenunit,
-      pipe: pipeCost(item.meters),
-    };
+    return { multi: false, items: [item], kw: [kw], mat: price(m, kw, 0), inst: INST.buitenunit + INST.binnenunit, pipe: PIPE };
   }
 
-  // Meerdere ruimtes op één multi-split buitenunit (alle uit dezelfde reeks)
+  // Meerdere kamers op één multi-split buitenunit
   function multiUnit(m, items) {
-    var fam = familyOf(m, items[0]);
-    var series = P.multi[fam];
+    var series = P.multi[m.cfg.multi];
     if (!series || items.length > P.maxPerBuitenunit) return null;
     var kws = [],
       mat = 0,
-      sum = 0,
-      pipe = 0;
+      sum = 0;
     for (var i = 0; i < items.length; i++) {
-      if (familyOf(m, items[i]) !== fam) return null;
-      var kw = kwFor(m, items[i], 1);
+      var kw = sizeFor(m, items[i].kw, 1);
       if (kw == null) return null;
       kws.push(kw);
-      mat += price(modelOf(m, items[i]), kw, 1);
+      mat += price(m, kw, 1);
       sum += kw;
-      pipe += pipeCost(items[i].meters);
     }
     var best = null;
     series.units.forEach(function (u) {
@@ -196,48 +123,26 @@
     return {
       multi: true,
       items: items,
-      label: items.length + " binnenunits op één buitenunit (multi-split)",
       kw: kws,
-      serie: series.naam,
       mat: mat + best.prijs,
       inst: INST.buitenunit + INST.binnenunit * items.length,
-      pipe: pipe,
+      pipe: PIPE * items.length,
     };
   }
 
-  // Alle ruimtes op één plek: zo weinig mogelijk buitenunits.
-  // Ruimtes met toestellen uit dezelfde multi-split reeks komen samen;
-  // andere toestellen krijgen een eigen buitenunit.
-  function unitsForSpot(m, items) {
-    if (!items.length) return [];
+  // Zo weinig mogelijk buitenunits: kamers samen op multi-split buitenunits als
+  // het toestel dat kan, anders een eigen buitenunit per kamer.
+  function unitsFor(m, items) {
     var singles = [],
-      fams = {},
+      rest = [],
       out = [];
     items.forEach(function (it) {
-      var f = familyOf(m, it);
-      if (f) (fams[f] = fams[f] || []).push(it);
-      else singles.push(it);
+      (m.cfg.multi && sizeFor(m, it.kw, 1) != null ? rest : singles).push(it);
     });
-    Object.keys(fams).forEach(function (f) {
-      var r = groupFamily(m, fams[f]);
-      out = out.concat(r.units);
-      singles = singles.concat(r.singles);
-    });
-    singles.forEach(function (it) {
-      var u = singleUnit(m, it);
-      if (u) out.push(u);
-    });
-    return out;
-  }
-
-  // Verdeelt ruimtes uit één reeks over zo weinig mogelijk multi-split buitenunits.
-  function groupFamily(m, rest) {
-    var singles = [],
-      out = [];
     if (rest.length === 1) singles.push(rest.pop());
     if (rest.length) {
       var sorted = rest.slice().sort(function (a, b) {
-        return (b.fixKw || b.kw) - (a.fixKw || a.kw);
+        return b.kw - a.kw;
       });
       var done = false;
       for (var k = Math.ceil(sorted.length / P.maxPerBuitenunit); k <= sorted.length && !done; k++) {
@@ -250,7 +155,7 @@
             if (gr.items.length < cap && (!tgt || gr.sum < tgt.sum)) tgt = gr;
           });
           tgt.items.push(it);
-          tgt.sum += it.fixKw || it.kw;
+          tgt.sum += it.kw;
         });
         var units = [];
         var ok = groups.every(function (gr) {
@@ -266,92 +171,52 @@
       }
       if (!done) singles = singles.concat(rest);
     }
-    return { units: out, singles: singles };
+    singles.forEach(function (it) {
+      var u = singleUnit(m, it);
+      if (u) out.push(u);
+    });
+    return out;
   }
 
-  function evaluate(m, items, assign) {
-    var res = { units: [], mat: 0, inst: 0, pipe: 0, meters: 0 };
-    SPOTS.forEach(function (sp, si) {
-      var here = items.filter(function (it, idx) {
-        return assign[idx] === si;
-      });
-      here.forEach(function (it) {
-        it.meters = it.m[si];
-      });
-      unitsForSpot(m, here).forEach(function (u) {
-        u.spot = si;
-        u.items = u.items.map(function (it) {
-          return { naam: it.naam, meters: it.meters, model: it.model || null, kleur: it.kleur || "" };
-        });
-        res.units.push(u);
-        res.mat += u.mat;
-        res.inst += u.inst;
-        res.pipe += u.pipe;
-        u.items.forEach(function (it) {
-          res.meters += extraMeters(it.meters);
-        });
-      });
+  function calculate(m) {
+    var items = roomList().map(function (r) {
+      return { naam: r.naam, kw: r.m2 * KW_PER_M2 };
+    });
+    var res = { model: m, units: unitsFor(m, items), mat: 0, inst: 0, pipe: 0 };
+    res.units.forEach(function (u) {
+      res.mat += u.mat;
+      res.inst += u.inst;
+      res.pipe += u.pipe;
     });
     res.excl = res.mat + res.inst + res.pipe;
+    var incl = res.excl * (1 + P.btw.standaard / 100);
+    res.lo = Math.floor((incl * (1 - P.marge.min / 100)) / 50) * 50;
+    res.hi = Math.ceil((incl * (1 + P.marge.max / 100)) / 50) * 50;
     return res;
   }
 
-  // Probeert elke verdeling van de ruimtes over de plekken en houdt de goedkoopste.
-  // Geeft ook het resultaat met alles op de hoofdplek terug, om te vergelijken.
-  function calculate(m, withSecond) {
-    var zelf = state.wens === "zelf";
-    var items = roomList().map(function (r, i) {
-      var d = find(DISTS, "v", r.dist) || DISTS[1];
-      var up = (r.floor || 0) * M_PER_FLOOR;
-      var it = { naam: r.naam, kw: r.m2 * KW_PER_M2, m: [d.a + up, d.b + up], opts: [0] };
-      if (zelf) {
-        var k = state.keuzes[i] || {};
-        it.model = modelByName(k.model) || m;
-        it.fixKw = k.kw || null;
-        it.kleur = k.kleur || "";
-      }
-      if (withSecond) it.opts = [0, 1];
-      return it;
-    });
-    var best = null,
-      allMain = null,
-      assign = [];
-    (function walk(i) {
-      if (i === items.length) {
-        var res = evaluate(m, items, assign);
-        if (!best || res.excl < best.excl - 0.5 || (Math.abs(res.excl - best.excl) <= 0.5 && res.units.length < best.units.length))
-          best = res;
-        if (
-          assign.every(function (a) {
-            return a === 0;
-          })
-        )
-          allMain = res;
-        return;
-      }
-      items[i].opts.forEach(function (o) {
-        assign[i] = o;
-        walk(i + 1);
-      });
-    })(0);
-    best.allMain = allMain;
-    best.model = m;
-    return best;
+  // Korte omschrijving van de opstelling, bv. "1 buitenunit met 3 binnenunits"
+  function opstelling(res) {
+    var n = res.units.length;
+    var binnen = res.units.reduce(function (s, u) {
+      return s + u.items.length;
+    }, 0);
+    if (binnen === 1) return "1 binnenunit en 1 buitenunit";
+    if (n === 1) return "1 buitenunit met " + binnen + " binnenunits (multi-split)";
+    if (n === binnen) return binnen + " kamers, elk met een eigen buitenunit";
+    return n + " buitenunits voor " + binnen + " binnenunits";
   }
 
   // =====================================================================
   // ANTWOORDEN VAN DE KLANT
   // =====================================================================
-  // wens: een id uit "pakketten", of "zelf" (de klant stelt zelf samen)
-  // keuzes: bij "zelf", per ruimte { merk, model, kleur, kw } (kw null = automatisch)
   function leeg() {
-    return { step: "aantal", n: null, rooms: [], tweede: null, wens: null, oud: null, keuze: null, keuzes: [], voorkeur: null, sent: false };
+    return { step: "aantal", n: null, sizes: [], wens: null, gekozen: null, sent: false };
   }
   var state = leeg();
   try {
     var saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
-    if (saved && saved.rooms) state = saved;
-    if (!state.keuzes) state.keuzes = [];
+    if (saved && saved.sizes) state = saved;
     state.sent = false;
   } catch (e) {}
   function save() {
@@ -359,62 +224,31 @@
       localStorage.setItem(STORE_KEY, JSON.stringify(state));
     } catch (e) {}
   }
-
   function setRooms(n) {
-    while (state.rooms.length < n)
-      state.rooms.push({
-        type: state.rooms.length ? "Slaapkamer" : "Woonkamer",
-        size: null,
-        floor: state.rooms.length ? 1 : 0,
-        dist: null,
-      });
-    state.rooms.length = n;
-    if (state.keuzes.length > n) state.keuzes.length = n;
+    while (state.sizes.length < n) state.sizes.push(null);
+    state.sizes.length = n;
   }
-  // Ruimtes met een naam ("Slaapkamer 2") en oppervlakte
   function roomList() {
-    var seen = {};
-    var count = {};
-    state.rooms.forEach(function (r) {
-      count[r.type] = (count[r.type] || 0) + 1;
-    });
-    return state.rooms.map(function (r, i) {
-      seen[r.type] = (seen[r.type] || 0) + 1;
-      var naam = r.type === "Andere" ? "Ruimte " + (i + 1) : r.type + (count[r.type] > 1 ? " " + seen[r.type] : "");
-      var sz = find(SIZES, "v", r.size) || SIZES[1];
-      return { naam: naam, m2: sz.m2, floor: r.floor, dist: r.dist, sizeLbl: sz.s };
+    return state.sizes.map(function (v, i) {
+      var sz = find(SIZES, "v", v) || SIZES[1];
+      return { naam: state.n === 1 ? "Uw kamer" : "Kamer " + (i + 1), m2: sz.m2, sizeLbl: sz.s };
     });
   }
-  function anyFar() {
-    return state.rooms.some(function (r) {
-      return r.dist === "ver";
-    });
+  function wens() {
+    return find(P.wensen, "id", state.wens) || P.wensen[0];
   }
-  function steps() {
-    var s = ["aantal", "ruimtes", "verdieping", "afstand"];
-    if (anyFar()) s.push("tweede");
-    s.push("wens");
-    if (state.wens === "zelf") s.push("kies");
-    s.push("btw", state.wens === "zelf" ? "pakket" : "advies");
-    return s;
-  }
+
+  var STEPS = ["aantal", "grootte", "wens", "voorstel"];
   function canNext(step) {
     if (step === "aantal") return !!state.n;
-    if (step === "ruimtes")
-      return state.rooms.every(function (r) {
-        return r.size;
-      });
-    if (step === "afstand")
-      return state.rooms.every(function (r) {
-        return r.dist;
-      });
-    if (step === "tweede") return !!state.tweede;
+    if (step === "grootte")
+      return (
+        state.sizes.length > 0 &&
+        state.sizes.every(function (s) {
+          return s;
+        })
+      );
     if (step === "wens") return !!state.wens;
-    if (step === "btw") return state.oud !== null;
-    if (step === "kies")
-      return state.rooms.every(function (r, i) {
-        return state.keuzes[i] && modelByName(state.keuzes[i].model);
-      });
     return true;
   }
   function go(step) {
@@ -422,18 +256,15 @@
     save();
     render();
     var top = root.getBoundingClientRect().top;
-    if (top < 70 || top > window.innerHeight * 0.6)
-      window.scrollTo({ top: window.scrollY + top - 90, behavior: "smooth" });
+    if (top < 70 || top > window.innerHeight * 0.6) window.scrollTo({ top: window.scrollY + top - 90, behavior: "smooth" });
   }
   function next() {
-    var s = steps();
-    var i = s.indexOf(state.step);
-    if (i < s.length - 1 && canNext(state.step)) go(s[i + 1]);
+    var i = STEPS.indexOf(state.step);
+    if (i < STEPS.length - 1 && canNext(state.step)) go(STEPS[i + 1]);
   }
   function prev() {
-    var s = steps();
-    var i = s.indexOf(state.step);
-    if (i > 0) go(s[i - 1]);
+    var i = STEPS.indexOf(state.step);
+    if (i > 0) go(STEPS[i - 1]);
   }
 
   // =====================================================================
@@ -454,139 +285,51 @@
       "</button>"
     );
   }
-  function chip(attrs, selected, label) {
-    return (
-      '<button type="button" class="chip' + (selected ? " selected" : "") + '" ' + attrs + ' aria-pressed="' + !!selected + '">' + label + "</button>"
-    );
-  }
   function q(title, hint) {
     return '<h2 class="pc-q">' + title + "</h2>" + (hint ? '<p class="pc-hint">' + hint + "</p>" : "");
-  }
-  function roomHead(r, i) {
-    return '<div class="pc-room-lbl"><span>' + (i + 1) + "</span>" + esc(r.naam) + "</div>";
   }
 
   var SCREENS = {
     aantal: function () {
-      var h = q("In hoeveel ruimtes wilt u een airco?", "Tel elke kamer waar een binnenunit moet komen.");
+      var h = q("In hoeveel kamers wilt u een airco?", "Tel elke kamer waar een toestel moet komen.");
       h += '<div class="pc-opts pc-opts-n">';
-      for (var n = 1; n <= 6; n++)
-        h += opt('data-n="' + n + '"', state.n === n, n === 6 ? "6 of meer" : String(n), n === 1 ? "ruimte" : "ruimtes");
+      for (var n = 1; n <= 6; n++) h += opt('data-n="' + n + '"', state.n === n, n === 6 ? "6 of meer" : String(n), n === 1 ? "kamer" : "kamers");
       h += "</div>";
-      if (state.n === 6) h += '<p class="pc-hint">Bij meer dan 6 ruimtes rekenen we met 6. De rest bespreken we graag samen.</p>';
+      if (state.n === 6) h += '<p class="pc-hint">Bij meer dan 6 kamers rekenen we met 6. De rest bespreken we graag samen.</p>';
       return h;
     },
-    ruimtes: function () {
-      var h = q(
-        state.n === 1 ? "Welke ruimte is het, en hoe groot?" : "Welke ruimtes zijn het, en hoe groot?",
-        "Een schatting is genoeg. Daarmee kiezen we het juiste vermogen."
-      );
+    grootte: function () {
+      var h = q(state.n === 1 ? "Hoe groot is de kamer?" : "Hoe groot is elke kamer?", "Een schatting is genoeg. Daarmee kiezen we het juiste vermogen.");
       var list = roomList();
-      state.rooms.forEach(function (r, i) {
-        h += '<div class="pc-room" data-i="' + i + '">' + roomHead(list[i], i);
-        h += '<div class="chip-grid">';
-        TYPES.forEach(function (t) {
-          h += chip('data-type="' + t + '"', r.type === t, t);
-        });
-        h += '</div><div class="pc-opts pc-opts-4">';
+      state.sizes.forEach(function (v, i) {
+        h += '<div class="pc-room" data-i="' + i + '">';
+        if (state.n > 1) h += '<div class="pc-room-lbl"><span>' + (i + 1) + "</span>" + esc(list[i].naam) + "</div>";
+        h += '<div class="pc-opts pc-opts-4">';
         SIZES.forEach(function (s) {
-          h += opt('data-size="' + s.v + '"', r.size === s.v, s.t, s.s);
+          h += opt('data-size="' + s.v + '"', v === s.v, s.t, s.s);
         });
         h += "</div></div>";
       });
       return h;
-    },
-    verdieping: function () {
-      var h = q(
-        state.n === 1 ? "Op welke verdieping ligt de ruimte?" : "Op welke verdieping ligt elke ruimte?",
-        "Hoe hoger, hoe meer leiding er nodig is naar de buitenunit."
-      );
-      var list = roomList();
-      state.rooms.forEach(function (r, i) {
-        h += '<div class="pc-room" data-i="' + i + '">' + roomHead(list[i], i) + '<div class="pc-opts pc-opts-3">';
-        FLOORS.forEach(function (f) {
-          h += opt('data-floor="' + f.v + '"', r.floor === f.v, f.t);
-        });
-        h += "</div></div>";
-      });
-      return h;
-    },
-    afstand: function () {
-      var h = q(
-        "Hoe ver ligt " + (state.n === 1 ? "de ruimte" : "elke ruimte") + " van de buitenunit?",
-        "De buitenunit komt meestal tegen de achtergevel of in de tuin. Hoe dichterbij, hoe minder leiding en hoe goedkoper."
-      );
-      var list = roomList();
-      state.rooms.forEach(function (r, i) {
-        h += '<div class="pc-room" data-i="' + i + '">' + roomHead(list[i], i) + '<div class="pc-opts pc-opts-3">';
-        DISTS.forEach(function (d) {
-          h += opt('data-dist="' + d.v + '"', r.dist === d.v, d.t, d.s);
-        });
-        h += "</div></div>";
-      });
-      return h;
-    },
-    tweede: function () {
-      var far = roomList()
-        .filter(function (r) {
-          return r.dist === "ver";
-        })
-        .map(function (r) {
-          return esc(r.naam);
-        });
-      var h = q(
-        "Kan er aan de andere kant van het huis ook een buitenunit komen?",
-        (far.length === 1 ? far[0] + " ligt" : far.join(" en ") + " liggen") +
-          " ver van de achtergevel. Een tweede buitenunit dichterbij betekent minder leiding. Dat is soms goedkoper. Wij rekenen het voor u uit."
-      );
-      h += '<div class="pc-opts pc-opts-3">';
-      h += opt('data-tweede="ja"', state.tweede === "ja", "Ja, dat kan", "bv. tegen de zijgevel of voorgevel");
-      h += opt('data-tweede="nee"', state.tweede === "nee", "Nee, liever niet");
-      h += opt('data-tweede="weetniet"', state.tweede === "weetniet", "Weet ik niet", "we rekenen het voor u uit");
-      return h + "</div>";
     },
     wens: function () {
-      var h = q("Wat vindt u het belangrijkst?", "Op basis daarvan kiezen wij het toestel dat bij u past.");
+      var h = q("Wat vindt u het belangrijkst?", "Daarna krijgt u drie voorstellen, elk met een richtprijs.");
       h += '<div class="pc-opts pc-opts-2">';
-      P.pakketten.forEach(function (p) {
-        h += opt(
-          'data-wens="' + p.id + '"',
-          state.wens === p.id,
-          esc(p.vraag) + (p.aanbevolen ? ' <span class="pc-badge">Meest gekozen</span>' : ""),
-          esc(p.waarom)
-        );
+      P.wensen.forEach(function (w) {
+        h += opt('data-wens="' + w.id + '"', state.wens === w.id, esc(w.vraag), esc(w.uitleg));
       });
-      h += "</div>";
-      h += '<div class="pc-opts pc-opts-1 pc-zelf-opt">';
-      h += opt(
-        'data-wens="zelf"',
-        state.wens === "zelf",
-        "Ik stel mijn toestellen liever zelf samen",
-        "Kies per ruimte zelf het merk, het model, de kleur en het vermogen. Wij zoeken de buitenunit die erbij past."
-      );
       return h + "</div>";
     },
-    btw: function () {
-      var h = q("Is uw woning ouder dan 10 jaar?", "Dat bepaalt hoeveel btw u betaalt.");
-      h += '<div class="pc-opts pc-opts-2">';
-      h += opt('data-oud="1"', state.oud === true, "Ja", P.btw.oud + "% btw");
-      h += opt('data-oud="0"', state.oud === false, "Nee, jonger of nieuwbouw", P.btw.nieuw + "% btw");
-      return h + "</div>";
-    },
-    advies: renderAdvies,
-    pakket: renderPakket,
-    kies: renderKies,
   };
 
   function render() {
-    var s = steps();
-    if (s.indexOf(state.step) === -1) state.step = s[0];
-    var i = s.indexOf(state.step);
-    if (state.step === "advies" || state.step === "pakket") {
-      root.innerHTML = SCREENS[state.step]();
+    if (STEPS.indexOf(state.step) === -1) state.step = "aantal";
+    if (state.step === "voorstel") {
+      root.innerHTML = renderVoorstellen();
       return;
     }
-    var total = s.length - 1;
+    var i = STEPS.indexOf(state.step);
+    var total = STEPS.length - 1;
     var h =
       '<div class="pc-top"><div class="pc-prog"><span style="width:' +
       Math.round((i / total) * 100) +
@@ -598,410 +341,109 @@
     h += '<div class="pc-screen">' + SCREENS[state.step]() + "</div>";
     h += '<div class="pc-nav">';
     h += i > 0 ? '<button type="button" class="pc-back" data-act="prev">&larr; Vorige</button>' : "<span></span>";
-    var last = i === total - 1;
     h +=
       '<button type="button" class="btn btn-gold" data-act="next"' +
       (canNext(state.step) ? "" : " disabled") +
       ">" +
-      (last ? "Toon mijn advies" : "Volgende") +
+      (i === total - 1 ? "Toon mijn voorstellen" : "Volgende") +
       ' <span class="ar">&rarr;</span></button>';
     h += "</div>";
     root.innerHTML = h;
   }
 
-  // =====================================================================
-  // ZELF SAMENSTELLEN: per ruimte een merk, model, kleur en vermogen
-  // =====================================================================
-  function aanbevolenModel() {
-    var pk = find(P.pakketten, "aanbevolen", true) || P.pakketten[0];
-    return pk.model;
-  }
-  // Vult ontbrekende keuzes aan, met het gekozen of aanbevolen toestel.
-  function initKeuzes(model) {
-    var start = modelByName(model) || modelByName(state.voorkeur) || modelByName(aanbevolenModel()) || MODELS[0];
-    for (var i = 0; i < state.rooms.length; i++) {
-      var k = state.keuzes[i];
-      if (model || !k || !modelByName(k.model)) {
-        var kl = start.kleuren[0];
-        state.keuzes[i] = { merk: start.cfg.merk, model: start.cfg.model, kleur: kl ? kl.naam : "", kw: null };
-      }
-    }
-  }
-  // Voorgesteld vermogen voor een ruimte, voor dit toestel
-  function autoKw(m, r) {
-    var want = r.m2 * KW_PER_M2;
-    var s = sizeFor(m, want, 0);
-    return s != null ? s : sizeFor(m, want, 1);
-  }
-  function kwBereik(m) {
-    var s = sizesOf(m);
-    return s.length > 1 ? kwTxt(s[0]) + " tot " + kwTxt(s[s.length - 1]) : s.length ? kwTxt(s[0]) : "";
-  }
-
-  function renderKies() {
-    initKeuzes();
-    var list = roomList();
-    var h = q(
-      state.n === 1 ? "Kies uw toestel" : "Kies per ruimte uw toestel",
-      "Het vermogen stellen we voor op basis van de grootte van de ruimte; u kunt het zelf aanpassen. Toestellen uit dezelfde reeks kunnen samen op één buitenunit."
-    );
-    state.rooms.forEach(function (r, i) {
-      var k = state.keuzes[i];
-      var m = modelByName(k.model);
-      var kl = kleurVan(m, k.kleur);
-      var auto = autoKw(m, list[i]);
-      var kw = k.kw && sizesOf(m).indexOf(k.kw) !== -1 ? k.kw : auto;
-      h += '<div class="pc-room pc-kies" data-i="' + i + '">' + roomHead(list[i], i);
-
-      // samenvatting van de keuze
-      h += '<div class="pc-kies-sum">';
-      h += '<span class="pc-kies-ph"><img src="' + esc(kl && kl.src ? kl.src : m.img) + '" alt=""></span>';
-      h +=
-        "<span><b>" +
-        esc(m.cfg.merk + " " + m.cfg.naam) +
-        "</b><small>" +
-        esc(list[i].sizeLbl) +
-        " &middot; " +
-        kwTxt(kw) +
-        (kl ? " &middot; " + esc(kl.naam) : "") +
-        "</small></span>";
-      if (m.slug) h += '<a class="pc-kies-info" href="#toestel-' + esc(m.slug) + '">Meer info</a>';
-      h += "</div>";
-
-      // merk
-      h += '<div class="pc-kies-lbl">Merk</div><div class="chip-grid">';
-      MERKEN.forEach(function (mk) {
-        h += chip('data-kmerk="' + esc(mk) + '"', k.merk === mk, esc(mk));
-      });
-      h += "</div>";
-
-      // model
-      h += '<div class="pc-kies-lbl">Model</div><div class="pc-mods">';
-      modelsVan(k.merk).forEach(function (mm) {
-        var on = mm.cfg.model === k.model;
-        h +=
-          '<button type="button" class="pc-mod' +
-          (on ? " selected" : "") +
-          '" data-kmodel="' +
-          esc(mm.cfg.model) +
-          '" aria-pressed="' +
-          on +
-          '">' +
-          (mm.img ? '<img src="' + esc(mm.img) + '" alt="" loading="lazy">' : "") +
-          "<b>" +
-          esc(mm.cfg.naam) +
-          "</b><small>" +
-          kwBereik(mm) +
-          (mm.cfg.multi ? " &middot; ook multi-split" : "") +
-          "</small></button>";
-      });
-      h += "</div>";
-
-      // kleur
-      if (m.kleuren.length > 1) {
-        h += '<div class="pc-kies-lbl">Kleur</div><div class="chip-grid">';
-        m.kleuren.forEach(function (c) {
-          h += chip(
-            'data-kkleur="' + esc(c.naam) + '"',
-            kl && kl.naam === c.naam,
-            '<span class="pc-dot" style="background:' + esc(c.kleur) + '"></span>' + esc(c.naam)
-          );
-        });
-        h += "</div>";
-      }
-
-      // vermogen
-      h += '<div class="pc-kies-lbl">Vermogen</div><div class="chip-grid">';
-      sizesOf(m).forEach(function (s) {
-        h += chip('data-kkw="' + s + '"', s === kw, kwTxt(s) + (s === auto ? ' <span class="pc-tag">aanbevolen</span>' : ""));
-      });
-      h += "</div>";
-      if (kw < auto - 0.001) h += '<p class="pc-warn">Dit vermogen is aan de kleine kant voor deze ruimte.</p>';
-
-      if (i === 0 && state.n > 1)
-        h += '<button type="button" class="pc-link pc-kopieer" data-act="kopieer">Hetzelfde toestel voor alle ruimtes</button>';
-      h += "</div>";
+  // ---------- de drie voorstellen ----------
+  var results = {};
+  function renderVoorstellen() {
+    var w = wens();
+    results = {};
+    NIVEAUS.forEach(function (nv) {
+      var m = modelByName(w.voorstellen[nv]);
+      if (m) results[nv] = calculate(m);
     });
-    return h;
-  }
+    if (!results[state.gekozen]) state.gekozen = results[w.markeer] ? w.markeer : NIVEAUS[0];
 
-  // ---------- het advies ----------
-  var lastRes = null;
-  function pakket(id) {
-    return find(P.pakketten, "id", id) || P.pakketten[0];
-  }
-  function btwPct() {
-    return state.oud ? P.btw.oud : P.btw.nieuw;
-  }
-  function priceRange(res) {
-    var incl = res.excl * (1 + btwPct() / 100);
-    return {
-      incl: incl,
-      lo: Math.floor((incl * (1 - P.marge.min / 100)) / 50) * 50,
-      hi: Math.ceil((incl * (1 + P.marge.max / 100)) / 50) * 50,
-    };
-  }
-  function withSecond() {
-    return anyFar() && state.tweede !== "nee";
-  }
-
-  function renderAdvies() {
-    var pk = pakket(state.keuze || state.wens);
-    var m = modelByName(pk.model);
-    if (!m) return '<p class="pc-hint">Dit toestel staat niet in de prijslijst.</p>';
-    var res = calculate(m, withSecond());
-    var pr = priceRange(res);
-    res.lo = pr.lo;
-    res.hi = pr.hi;
-    res.pakket = pk;
-    lastRes = res;
-    var f = 1 + btwPct() / 100;
-
-    var h = '<div class="pc-top pc-top-done"><span class="pc-prog-lbl">Uw persoonlijk advies</span>';
+    var list = roomList();
+    var h = '<div class="pc-top pc-top-done"><span class="pc-prog-lbl">Uw drie voorstellen</span>';
     h += '<button type="button" class="pc-back" data-act="edit">Antwoorden aanpassen</button></div>';
-    h += '<div class="pc-result">';
-
-    // links: het toestel
-    h += '<div class="pc-device">';
-    h += '<div class="pc-kicker">Wij raden u aan</div>';
-    if (m.img) h += '<div class="pc-device-ph"><img src="' + esc(m.img) + '" alt="' + esc(pk.model) + '"></div>';
-    h += '<h2 class="pc-device-name">' + esc(m.cfg.merk) + " " + esc(m.cfg.naam) + "</h2>";
-    h += '<p class="pc-device-why">' + esc(pk.waarom) + "</p>";
-
-    var list = roomList();
-    h += '<div class="pc-plan"><div class="pc-plan-title">Zo plaatsen we het</div>';
-    res.units.forEach(function (u, i) {
-      h +=
-        '<div class="pc-unit"><div class="pc-unit-head"><span class="pc-unit-ic" aria-hidden="true"></span><b>Buitenunit' +
-        (res.units.length > 1 ? " " + (i + 1) : "") +
-        "</b> &middot; " +
-        SPOTS[u.spot].naam +
-        '</div><ul>' +
-        u.items
-          .map(function (it, j) {
-            return "<li><span>" + esc(it.naam) + "</span><span>binnenunit " + kwTxt(u.kw[j]) + "</span></li>";
-          })
-          .join("") +
-        "</ul></div>";
-    });
-    h += "</div>";
-
-    var adv = advies(res, f);
-    if (adv) h += '<div class="pc-advice">' + adv + "</div>";
-
-    if (m.specs)
-      h +=
-        '<details class="pc-details"><summary>Alle specificaties van dit toestel</summary><div class="device-specs">' +
-        m.specs +
-        "</div></details>";
-
-    // andere keuzes
-    h += '<div class="pc-alts"><div class="pc-plan-title">Liever iets anders?</div>';
-    P.pakketten.forEach(function (p) {
-      if (p.id === pk.id) return;
-      var mm = modelByName(p.model);
-      if (!mm) return;
-      var r = priceRange(calculate(mm, withSecond()));
-      h +=
-        '<button type="button" class="pc-alt" data-keuze="' +
-        p.id +
-        '"><span><b>' +
-        esc(p.titel) +
-        "</b><small>" +
-        esc(mm.cfg.merk + " " + mm.cfg.naam) +
-        "</small></span><span class=\"pc-alt-pr\">" +
-        eur(r.lo) +
-        " &ndash; " +
-        eur(r.hi) +
-        "</span></button>";
-    });
     h +=
-      '<button type="button" class="pc-alt pc-alt-zelf" data-act="zelf"><span><b>Zelf samenstellen</b><small>Kies per ruimte zelf merk, model en kleur</small></span><span class="pc-alt-pr">&rarr;</span></button>';
-    h += "</div></div>";
+      '<p class="pc-vs-intro">Voor ' +
+      (list.length === 1 ? "1 kamer van " + esc(list[0].sizeLbl) : list.length + " kamers") +
+      ", toestellen en plaatsing inbegrepen. Kies het voorstel dat u aanspreekt; Rim bespreekt het graag met u.</p>";
 
-    h += prijsBlok(res, pr, list, f);
-    h += '<div class="pc-restart"><button type="button" class="pc-back" data-act="restart">Opnieuw beginnen</button></div>';
-    return h;
-  }
-
-  // ---------- het zelf samengestelde pakket ----------
-  function renderPakket() {
-    initKeuzes();
-    var m0 = modelByName(state.keuzes[0].model);
-    var res = calculate(m0, withSecond());
-    var pr = priceRange(res);
-    res.lo = pr.lo;
-    res.hi = pr.hi;
-    res.pakket = { id: "zelf", titel: "Zelf samengesteld" };
-    lastRes = res;
-    var f = 1 + btwPct() / 100;
-    var list = roomList();
-
-    var h = '<div class="pc-top pc-top-done"><span class="pc-prog-lbl">Uw eigen pakket</span>';
-    h += '<button type="button" class="pc-back" data-act="kies">Toestellen aanpassen</button></div>';
-    h += '<div class="pc-result">';
-    h += '<div class="pc-device">';
-    h += '<div class="pc-kicker">Zelf samengesteld</div>';
-    h += '<h2 class="pc-device-name">Uw toestellen</h2>';
-
-    // per ruimte het gekozen toestel
-    h += '<div class="pc-pak">';
-    res.units.forEach(function (u) {
-      u.items.forEach(function (it, j) {
-        var m = it.model || m0;
-        var kl = kleurVan(m, it.kleur);
-        h +=
-          '<div class="pc-pak-row"><span class="pc-kies-ph"><img src="' +
-          esc(kl && kl.src ? kl.src : m.img) +
-          '" alt=""></span><span><b>' +
-          esc(it.naam) +
-          "</b><small>" +
-          esc(m.cfg.merk + " " + m.cfg.naam) +
-          " &middot; " +
-          kwTxt(u.kw[j]) +
-          (kl ? " &middot; " + esc(kl.naam) : "") +
-          "</small></span></div>";
+    h += '<div class="pc-vs-grid">';
+    NIVEAUS.forEach(function (nv) {
+      var res = results[nv];
+      if (!res) return;
+      var m = res.model;
+      var on = state.gekozen === nv;
+      var niveau = P.niveaus[nv];
+      var kws = [];
+      res.units.forEach(function (u) {
+        kws = kws.concat(u.kw);
       });
-    });
-    h += "</div>";
-
-    // de buitenunits
-    h += '<div class="pc-plan"><div class="pc-plan-title">Zo plaatsen we het</div>';
-    res.units.forEach(function (u, i) {
+      var kMin = Math.min.apply(null, kws),
+        kMax = Math.max.apply(null, kws);
+      h += '<div class="pc-vs' + (on ? " on" : "") + " pc-vs-" + nv + '">';
+      h += '<div class="pc-vs-head"><span class="pc-vs-niveau">' + esc(niveau.titel) + "</span>";
+      if (nv === w.markeer) h += '<span class="pc-badge">Past bij uw wens</span>';
+      h += "</div>";
+      if (m.img) h += '<div class="pc-vs-ph"><img src="' + esc(m.img) + '" alt="' + esc(m.cfg.model) + '" loading="lazy"></div>';
+      h += '<div class="pc-vs-merk">' + esc(m.cfg.merk) + "</div>";
+      h += '<h3 class="pc-vs-naam">' + esc(m.cfg.naam) + "</h3>";
+      h += '<p class="pc-vs-why">' + esc(m.desc || niveau.uitleg) + "</p>";
+      h += '<div class="pc-vs-prijs"><small>Richtprijs</small><b>' + eur(res.lo) + " &ndash; " + eur(res.hi) + "</b></div>";
+      h += '<ul class="pc-vs-info"><li>' + esc(opstelling(res)) + "</li>";
+      h += "<li>" + (kws.length > 1 ? "Binnenunits van " : "Vermogen ") + kwTxt(kMin) + (kMax > kMin ? " tot " + kwTxt(kMax) : "") + "</li></ul>";
       h +=
-        '<div class="pc-unit"><div class="pc-unit-head"><span class="pc-unit-ic" aria-hidden="true"></span><b>Buitenunit' +
-        (res.units.length > 1 ? " " + (i + 1) : "") +
-        "</b> &middot; " +
-        (u.multi ? esc(u.serie) + " (multi-split)" : "eigen buitenunit (single-split)") +
-        " &middot; " +
-        SPOTS[u.spot].naam +
-        "</div><ul>" +
-        u.items
-          .map(function (it, j) {
-            var m = it.model || m0;
-            return "<li><span>" + esc(it.naam) + "</span><span>" + esc(m.cfg.naam) + " " + kwTxt(u.kw[j]) + "</span></li>";
-          })
-          .join("") +
-        "</ul></div>";
+        '<button type="button" class="btn ' +
+        (on ? "btn-gold" : "v3-btn-line") +
+        ' pc-vs-btn" data-kies="' +
+        nv +
+        '" aria-pressed="' +
+        on +
+        '">' +
+        (on ? "&#10003; Gekozen" : "Kies dit voorstel") +
+        "</button>";
+      if (m.slug) h += '<a class="pc-vs-meer" href="#toestel-' + esc(m.slug) + '">Meer over dit toestel</a>';
+      h += "</div>";
     });
     h += "</div>";
 
-    var tip = pakketTip(res);
-    if (tip) h += '<div class="pc-advice">' + tip + "</div>";
-    var adv = advies(res, f);
-    var tweedePlek = res.units.some(function (u) { return u.spot === 1; }) || (anyFar() && state.tweede === "nee");
-    if (adv && tweedePlek) h += '<div class="pc-advice">' + adv + "</div>";
-    h += "</div>";
-
-    h += prijsBlok(res, pr, list, f);
-    h += '<div class="pc-restart"><button type="button" class="pc-back" data-act="restart">Opnieuw beginnen</button></div>';
-    return h;
-  }
-
-  // Uitleg waarom er meerdere buitenunits nodig zijn bij een eigen pakket
-  function pakketTip(res) {
-    if (res.units.length < 2) return "";
-    var kop = "<b>Waarom " + res.units.length + " buitenunits?</b>";
-    var geenMulti = [],
-      vermogen = [],
-      reeksen = [];
-    res.units.forEach(function (u) {
-      u.items.forEach(function (it, j) {
-        var m = it.model;
-        if (!m) return;
-        if (!m.cfg.multi) {
-          if (geenMulti.indexOf(m.cfg.naam) === -1) geenMulti.push(m.cfg.naam);
-        } else {
-          if (reeksen.indexOf(m.cfg.multi) === -1) reeksen.push(m.cfg.multi);
-          if (!u.multi && price(m, u.kw[j], 1) == null) vermogen.push(it.naam + " (" + m.cfg.naam + " " + kwTxt(u.kw[j]) + ")");
-        }
-      });
-    });
-    var zelfde = " Kiest u voor elke ruimte een toestel uit dezelfde reeks dat ook multi-split kan, dan volstaat vaak één buitenunit.";
-    if (geenMulti.length)
-      return kop + esc(geenMulti.join(" en ")) + (geenMulti.length > 1 ? " kunnen" : " kan") + " niet op een multi-split buitenunit en krijgt dus een eigen buitenunit." + zelfde;
-    if (reeksen.length > 1) return kop + "Toestellen uit verschillende reeksen kunnen niet op dezelfde buitenunit." + zelfde;
-    if (vermogen.length)
-      return kop + "Het gekozen vermogen bestaat niet als losse multi-split binnenunit voor " + esc(vermogen.join(", ")) + ". Die ruimte krijgt daarom een eigen buitenunit.";
-    return kop + "Op één buitenunit passen maximaal " + P.maxPerBuitenunit + " binnenunits, en het totale vermogen van de binnenunits moet erbij passen.";
-  }
-
-  // Rechterkolom: prijsindicatie, opbouw en aanvraagformulier (advies en eigen pakket)
-  function prijsBlok(res, pr, list, f) {
-    var h = "";
-    // rechts: de prijs
-    h += '<div class="pc-price">';
-    h += '<div class="pc-kicker">Prijsindicatie</div>';
-    h += '<div class="pc-price-big">' + eur(pr.lo) + " &ndash; " + eur(pr.hi) + "</div>";
-    h += '<div class="pc-price-sub">incl. ' + btwPct() + "% btw, toestellen en plaatsing</div>";
-    h += '<ul class="pc-incl"><li>Toestel' + (list.length > 1 ? "len" : "") + " geleverd en geplaatst</li><li>Leidingen netjes afgewerkt</li><li>Opstarten en uitleg van de bediening</li></ul>";
     h +=
-      '<details class="pc-details pc-details-dark"><summary>Hoe is deze prijs opgebouwd?</summary><div class="pc-rows">' +
-      "<div><span>Toestellen</span><span>" +
-      eur(res.mat * f) +
-      "</span></div>" +
-      "<div><span>Plaatsing</span><span>" +
-      eur(res.inst * f) +
-      "</span></div>" +
-      "<div><span>Extra leiding (" +
-      res.meters +
-      " m)</span><span>" +
-      eur(res.pipe * f) +
-      "</span></div>" +
-      '<div class="tot"><span>Samen</span><span>' +
-      eur(pr.incl) +
-      '</span></div></div><p class="pc-fine">Bedragen incl. btw. De vork houdt rekening met wat we pas ter plaatse zien, zoals muren, hoogte en elektriciteit.</p></details>';
-    if (P.voorlopig)
-      h += '<div class="pc-demo">Let op: deze calculator gebruikt nog voorbeeldprijzen.</div>';
+      '<p class="pc-fine">Richtprijzen incl. ' +
+      P.btw.standaard +
+      "% btw (woning ouder dan 10 jaar; jonger: " +
+      P.btw.nieuw +
+      "% btw), voor de toestellen en een standaardplaatsing. De exacte prijs krijgt u na het gratis plaatsbezoek.</p>";
+    if (P.voorlopig) h += '<div class="pc-demo">Let op: dit prijsadvies gebruikt nog voorbeeldprijzen.</div>';
 
-    h += '<div class="pc-lead">';
+    // aanvraag
+    var gk = results[state.gekozen];
+    h += '<div class="pc-lead pc-vs-lead">';
     if (state.sent) {
-      h += "<b>Bedankt! Rim belt u binnen 24 uur terug.</b><span class=\"pc-muted\">Dan plannen we samen het gratis plaatsbezoek.</span>";
+      h += '<b>Bedankt! Rim belt u binnen 24 uur terug.</b><span class="pc-muted">Dan plannen we samen het gratis plaatsbezoek.</span>';
     } else {
       h +=
-        "<b>Vaste prijs nodig?</b>" +
-        '<span class="pc-muted">Rim belt u binnen 24 uur terug en komt gratis langs. Daarna krijgt u een vaste offerte.</span>' +
+        "<div><b>Uw keuze: " +
+        esc(P.niveaus[state.gekozen].titel) +
+        " &middot; " +
+        esc(gk.model.cfg.merk + " " + gk.model.cfg.naam) +
+        " &middot; " +
+        eur(gk.lo) +
+        " &ndash; " +
+        eur(gk.hi) +
+        '</b><span class="pc-muted">Rim belt u binnen 24 uur terug en komt gratis langs. Daarna krijgt u een vaste offerte.</span></div>' +
+        '<div class="pc-vs-form">' +
         '<div class="field"><label for="pc-naam">Naam</label><input id="pc-naam" type="text" autocomplete="name"></div>' +
         '<div class="field"><label for="pc-tel">Telefoon</label><input id="pc-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="04xx xx xx xx"></div>' +
         '<div class="field"><label for="pc-gem">Gemeente</label><input id="pc-gem" type="text" autocomplete="address-level2" placeholder="bv. Bree"></div>' +
-        '<div class="calc-status" id="pc-status" role="alert"></div>' +
-        '<button type="button" class="btn btn-gold" data-act="send">Vraag mijn gratis plaatsbezoek aan <span class="ar">&rarr;</span></button>';
+        '<button type="button" class="btn btn-gold" data-act="send">Vraag mijn gratis plaatsbezoek aan <span class="ar">&rarr;</span></button>' +
+        "</div>" +
+        '<div class="calc-status" id="pc-status" role="alert"></div>';
     }
     h += "</div>";
-    h += '<p class="pc-fine">Dit is een indicatie. De exacte prijs krijgt u na het gratis plaatsbezoek.</p>';
-    h += "</div></div>";
+    h += '<div class="pc-restart"><button type="button" class="pc-back" data-act="restart">Opnieuw beginnen</button></div>';
     return h;
-  }
-
-  function advies(res, f) {
-    var spots = [];
-    res.units.forEach(function (u) {
-      if (spots.indexOf(u.spot) === -1) spots.push(u.spot);
-    });
-    var main = res.allMain;
-    if (spots.indexOf(1) !== -1 && main && main.excl > res.excl + 1) {
-      return (
-        (spots.length > 1
-          ? "<b>Daarom 2 plekken voor de buitenunits</b>Met een buitenunit aan de andere kant van het huis is er "
-          : "<b>Beste plek: de andere kant van het huis</b>Daar is er ") +
-        (main.meters - res.meters) +
-        " m minder leiding nodig. Dat is ongeveer <b>" +
-        eur((main.excl - res.excl) * f) +
-        "</b> goedkoper dan alles aan de achtergevel." +
-        (state.tweede === "weetniet" ? " Of dat bij u kan, bekijken we tijdens het plaatsbezoek." : "")
-      );
-    }
-    if (anyFar() && state.tweede === "nee")
-      return (
-        '<b>Tip</b>Kan er aan de andere kant van het huis toch een buitenunit komen? Dan is er minder leiding nodig. <button type="button" class="pc-link" data-act="second">Reken het uit</button>'
-      );
-    if (res.units.length > 1 && spots.length === 1 && res.units.every(function (u) { return u.multi; }))
-      return "<b>Waarom " + res.units.length + " buitenunits?</b>Op één buitenunit passen maximaal " + P.maxPerBuitenunit + " binnenunits.";
-    if (!res.model.cfg.multi && state.rooms.length > 1)
-      return "<b>Goed om te weten</b>Bij dit toestel krijgt elke ruimte een eigen buitenunit.";
-    if (state.rooms.length > 1 && res.units.length === 1)
-      return "<b>Eén buitenunit voor alles</b>Alle binnenunits komen op één buitenunit. Zo hangt er maar één toestel aan de gevel.";
-    return "";
   }
 
   // =====================================================================
@@ -1010,10 +452,8 @@
   root.addEventListener("click", function (e) {
     var t = e.target.closest("button");
     if (!t || !root.contains(t)) return;
-    var roomEl = t.closest("[data-i]");
-    var r = roomEl ? state.rooms[+roomEl.getAttribute("data-i")] : null;
     var act = t.getAttribute("data-act");
-    var auto = false; // na één keuze meteen door naar de volgende vraag
+    var auto = false; // na een keuze meteen door naar de volgende vraag
 
     if (act === "next") return next();
     if (act === "prev") return prev();
@@ -1022,79 +462,29 @@
       state = leeg();
       return go("aantal");
     }
-    if (act === "second") {
-      state.tweede = "ja";
-      save();
-      return render();
-    }
     if (act === "send") return send();
-    if (act === "zelf") {
-      // vanuit het advies: begin met het aangeraden toestel in elke ruimte
-      var pk = pakket(state.keuze || state.wens);
-      state.wens = "zelf";
-      state.keuzes = [];
-      initKeuzes(pk.model);
-      return go("kies");
-    }
-    if (act === "kies") return go("kies");
-    if (act === "kopieer") {
-      var k0 = state.keuzes[0];
-      state.keuzes = state.keuzes.map(function () {
-        return { merk: k0.merk, model: k0.model, kleur: k0.kleur, kw: null };
-      });
-      save();
-      return render();
-    }
-    var k = roomEl && state.keuzes ? state.keuzes[+roomEl.getAttribute("data-i")] : null;
 
     if (t.hasAttribute("data-n")) {
       state.n = +t.getAttribute("data-n");
       setRooms(state.n);
       auto = true;
-    } else if (t.hasAttribute("data-type")) r.type = t.getAttribute("data-type");
-    else if (t.hasAttribute("data-size")) r.size = t.getAttribute("data-size");
-    else if (t.hasAttribute("data-floor")) r.floor = +t.getAttribute("data-floor");
-    else if (t.hasAttribute("data-dist")) r.dist = t.getAttribute("data-dist");
-    else if (t.hasAttribute("data-tweede")) {
-      state.tweede = t.getAttribute("data-tweede");
-      auto = true;
+    } else if (t.hasAttribute("data-size")) {
+      state.sizes[+t.closest("[data-i]").getAttribute("data-i")] = t.getAttribute("data-size");
+      auto = canNext("grootte");
     } else if (t.hasAttribute("data-wens")) {
       state.wens = t.getAttribute("data-wens");
-      state.keuze = null;
-      if (state.wens === "zelf") initKeuzes();
+      state.gekozen = null;
       auto = true;
-    } else if (t.hasAttribute("data-oud")) {
-      state.oud = t.getAttribute("data-oud") === "1";
-      auto = true;
-    } else if (t.hasAttribute("data-keuze")) {
-      state.keuze = t.getAttribute("data-keuze");
+    } else if (t.hasAttribute("data-kies")) {
+      state.gekozen = t.getAttribute("data-kies");
       save();
       render();
-      return go("advies");
-    } else if (t.hasAttribute("data-kmerk") && k) {
-      var merk = t.getAttribute("data-kmerk");
-      if (k.merk !== merk) {
-        var eerste = modelsVan(merk)[0];
-        k.merk = merk;
-        k.model = eerste.cfg.model;
-        k.kleur = eerste.kleuren[0] ? eerste.kleuren[0].naam : "";
-        k.kw = null;
-      }
-    } else if (t.hasAttribute("data-kmodel") && k) {
-      var mm = modelByName(t.getAttribute("data-kmodel"));
-      if (mm && mm.cfg.model !== k.model) {
-        k.model = mm.cfg.model;
-        k.merk = mm.cfg.merk;
-        k.kleur = mm.kleuren[0] ? mm.kleuren[0].naam : "";
-        k.kw = null;
-      }
-    } else if (t.hasAttribute("data-kkleur") && k) k.kleur = t.getAttribute("data-kkleur");
-    else if (t.hasAttribute("data-kkw") && k) k.kw = parseFloat(t.getAttribute("data-kkw"));
-    else return;
+      var lead = root.querySelector(".pc-vs-lead");
+      if (lead && lead.getBoundingClientRect().top > window.innerHeight - 120)
+        window.scrollTo({ top: window.scrollY + lead.getBoundingClientRect().top - 160, behavior: "smooth" });
+      return;
+    } else return;
 
-    // Eén ruimte: ook bij ruimte-vragen meteen door zodra alles is ingevuld
-    if (state.n === 1 && r && (t.hasAttribute("data-size") || t.hasAttribute("data-floor") || t.hasAttribute("data-dist")))
-      auto = true;
     save();
     render();
     if (auto) setTimeout(next, 220);
@@ -1110,52 +500,36 @@
       st.className = "calc-status err";
       return;
     }
-    if (!lastRes || typeof sendLead !== "function") return;
+    var res = results[state.gekozen];
+    if (!res || typeof sendLead !== "function") return;
     var btn = root.querySelector('[data-act="send"]');
     btn.disabled = true;
     st.textContent = "Bezig met versturen...";
     st.className = "calc-status";
-    var list = roomList();
     sendLead({
       naam: naam,
       telefoon: tel,
       gemeente: gem,
       dienst: "nieuw",
-      toestel:
-        state.wens === "zelf"
-          ? "Zelf samengesteld: " +
-            list
-              .map(function (r, i) {
-                var kz = state.keuzes[i] || {};
-                return r.naam + ": " + kz.model + (kz.kleur ? " (" + kz.kleur + ")" : "");
-              })
-              .join(" | ")
-          : lastRes.model.cfg.model + " (" + lastRes.pakket.titel + ")",
-      indicatie: eur(lastRes.lo) + " - " + eur(lastRes.hi) + " (incl. " + btwPct() + "% btw)",
-      ruimtes: list
+      wens: wens().vraag,
+      voorstel: P.niveaus[state.gekozen].titel,
+      toestel: res.model.cfg.model,
+      richtprijs: eur(res.lo) + " - " + eur(res.hi) + " (incl. " + P.btw.standaard + "% btw)",
+      kamers: roomList()
         .map(function (r) {
-          return r.naam + ": " + r.sizeLbl + ", " + FLOORS[r.floor].t + ", " + find(DISTS, "v", r.dist).t.toLowerCase();
+          return r.naam + ": " + r.sizeLbl;
         })
         .join(" | "),
-      opstelling: lastRes.units
-        .map(function (u, i) {
-          return (
-            "Buitenunit " +
-            (i + 1) +
-            " (" +
-            SPOTS[u.spot].naam +
-            "): " +
-            (u.multi ? u.serie + ", multi-split: " : "single-split: ") +
-            u.items
-              .map(function (it, j) {
-                return it.naam + " " + (it.model ? it.model.cfg.naam + " " : "") + kwTxt(u.kw[j]);
-              })
-              .join(", ")
-          );
-        })
-        .join(" | "),
-      tweedeBuitenunit: state.tweede || "",
-      source: state.wens === "zelf" ? "configurator" : "prijscalculator",
+      opstelling:
+        opstelling(res) +
+        " (" +
+        res.units
+          .map(function (u) {
+            return u.kw.map(kwTxt).join(" + ");
+          })
+          .join(" | ") +
+        ")",
+      source: "prijscalculator",
       submittedAt: new Date().toISOString(),
     })
       .then(function () {
@@ -1165,38 +539,11 @@
       })
       .catch(function () {
         btn.disabled = false;
-        st.innerHTML =
-          'Versturen lukte niet. Probeer het opnieuw of bel <a href="tel:+32491113313">0491 11 33 13</a>.';
+        st.innerHTML = 'Versturen lukte niet. Probeer het opnieuw of bel <a href="tel:+32491113313">0491 11 33 13</a>.';
         st.className = "calc-status err";
       });
   }
 
-  // Vanaf de detailpagina van een toestel: "Stel een pakket samen met dit toestel".
-  window.rtConfigHeeft = function (model) {
-    return !!modelByName(model);
-  };
-  window.rtConfigMet = function (model) {
-    if (!modelByName(model)) return;
-    state.voorkeur = model;
-    state.wens = "zelf";
-    state.keuze = null;
-    state.sent = false;
-    initKeuzes(model);
-    var s = steps();
-    var klaar = !!state.n && s.slice(0, s.indexOf("wens")).every(canNext);
-    state.step = klaar ? "kies" : "aantal";
-    save();
-    if (window.goToPage) window.goToPage("toestellen", false);
-    render();
-    requestAnimationFrame(function () {
-      window.scrollTo({ top: root.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" });
-    });
-  };
-
   if (state.n) setRooms(state.n);
   render();
-
-  // Staat er bij het openen al een toestel open, bouw die pagina dan opnieuw op,
-  // zodat ook de knop "Stel een pakket samen" erop staat.
-  if (location.hash.indexOf("#toestel-") === 0 && window.rtToestelInfo) window.rtToestelInfo(location.hash.slice(9));
 })();

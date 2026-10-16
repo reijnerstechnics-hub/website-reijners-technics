@@ -37,15 +37,16 @@ Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via What
 
 ## Prijsadvies
 
-Bovenaan de pagina *Toestellen* (`#prijs`) beantwoordt de klant een paar eenvoudige vragen: hoeveel ruimtes, hoe groot, welke verdieping, hoe ver van de buitenunit, wat hij belangrijk vindt en hoe oud de woning is. Daarna kiest de calculator zelf het toestel en de voordeligste opstelling (maximaal 5 binnenunits per buitenunit, en een tweede buitenunit aan de andere kant van het huis als dat goedkoper is). Onder de vragen staat de lijst met alle toestellen.
+Bovenaan de pagina *Toestellen* (`#prijs`) beantwoordt de klant drie vragen: hoeveel kamers, hoe groot elke kamer is en wat hij het belangrijkst vindt. Daarna krijgt hij drie voorstellen naast elkaar: **Voordelig**, **Beste prijs-kwaliteit** en **Premium**, elk met merk, model, foto en een richtprijs ("tussen € x en € y"). Het voorstel dat bij zijn wens past, krijgt het label "Past bij uw wens". De klant kiest een voorstel en laat zijn naam en telefoonnummer achter.
 
-Alle prijzen staan in `js/prijzen.js` (exclusief btw), net als welk toestel bij welke wens wordt aangeraden (`pakketten`). Zolang daar `voorlopig: true` staat, ziet de klant de melding dat het om voorbeeldprijzen gaat. De werking zelf staat in `js/prijscalculator.js`. Foto's en specificaties komen van de toestelkaarten; een toestel in `prijzen.js` hoort bij de kaart met dezelfde `data-model`.
+Alles staat in `js/prijzen.js` (exclusief btw):
 
-### Zelf samenstellen (configurator)
+- `wensen`: de knoppen bij "Wat vindt u het belangrijkst?" en per wens de drie toestellen (voordelig, kwaliteit, premium);
+- `toestellen` en `multi`: de prijzen per model en vermogen, en de multi-split buitenunits. Per voorstel zoekt de calculator zelf de voordeligste opstelling (meerdere kamers op één buitenunit als het toestel dat kan);
+- `installatie.standaardLeiding`: met zoveel meter leiding per kamer rekent de richtprijs;
+- `btw.standaard`: het btw-tarief van de richtprijs (de klant ziet erbij wat het is voor een woning jonger dan 10 jaar).
 
-Bij de vraag "Wat vindt u het belangrijkst?" kan de klant ook kiezen voor "Ik stel mijn toestellen liever zelf samen". Dan kiest hij per ruimte een merk, model, kleur en vermogen (het aanbevolen vermogen is aangeduid). De calculator zoekt zelf de buitenunits: ruimtes met toestellen uit dezelfde multi-split reeks (`multi` in `js/prijzen.js`) komen samen op één buitenunit, andere krijgen een eigen buitenunit, met uitleg voor de klant. De configurator is ook bereikbaar via "Zelf samenstellen" in het advies en via "Stel een pakket samen" op de detailpagina van een toestel.
-
-Alleen toestellen die in `js/prijzen.js` staan, zijn kiesbaar. Kleuren komen van de kleurknoppen op de toestelkaart. De aanvraag komt binnen met als onderwerp "Zelf samengesteld pakket", met per ruimte het gekozen toestel en de opstelling van de buitenunits.
+Zolang daar `voorlopig: true` staat, ziet de klant de melding dat het om voorbeeldprijzen gaat. De werking zelf staat in `js/prijscalculator.js`. Foto en uitleg komen van de toestelkaarten; een toestel in `prijzen.js` hoort bij de kaart met dezelfde `data-model`.
 
 ## Online zetten
 

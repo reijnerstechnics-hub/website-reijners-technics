@@ -150,7 +150,6 @@ var SOURCE_SUBJECTS = {
   "aanvraagformulier-aanvulling": "Aanvulling op een aanvraag",
   "contact-form": "Nieuw bericht via het contactformulier",
   prijscalculator: "Offerteaanvraag via de prijscalculator",
-  configurator: "Zelf samengesteld pakket",
 };
 
 function sendLead(data) {
@@ -1739,14 +1738,11 @@ var RT_MERKEN = {
     var bel = el("a", "btn v3-btn-line", "Bel Rim");
     bel.href = "tel:+32491113313";
     acts.appendChild(offerte);
-    // configurator (js/prijscalculator.js): enkel voor toestellen met een prijs
-    if (window.rtConfigHeeft && window.rtConfigHeeft(model)) {
-      var pakket = el("button", "btn v3-btn-line", "Stel een pakket samen");
-      pakket.type = "button";
-      pakket.addEventListener("click", function () {
-        window.rtConfigMet(model);
-      });
-      acts.appendChild(pakket);
+    // prijsadvies bovenaan de pagina Toestellen (niet voor warm water)
+    if (card.dataset.type !== "boiler") {
+      var richt = el("a", "btn v3-btn-line", "Richtprijs berekenen");
+      richt.href = "#prijs";
+      acts.appendChild(richt);
     }
     acts.appendChild(bel);
     info.appendChild(acts);

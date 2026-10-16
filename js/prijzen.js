@@ -1,10 +1,11 @@
 // =====================================================================
-// PRIJZEN VOOR DE PRIJSCALCULATOR  (pagina "Prijs berekenen")
+// PRIJZEN VOOR HET PRIJSADVIES  (bovenaan de pagina Toestellen, #prijs)
 // ---------------------------------------------------------------------
-// Alle bedragen zijn in euro, EXCLUSIEF btw. De calculator rekent de btw
-// er zelf bij, naargelang de klant aanduidt hoe oud de woning is.
+// Alle bedragen zijn in euro, EXCLUSIEF btw. Het prijsadvies rekent de
+// btw er zelf bij (zie "btw" hieronder).
 //
-// Hier pas je de prijzen aan. Aan de rest van de code hoef je niets te doen.
+// Hier pas je de prijzen en de voorstellen aan. Aan de rest van de code
+// hoef je niets te doen.
 //
 // LET OP: de prijzen hieronder zijn VOORBEELDPRIJZEN. Vul je eigen prijzen
 // in en zet daarna  voorlopig: false . Zolang voorlopig op true staat,
@@ -13,8 +14,9 @@
 var RT_PRIJZEN = {
   voorlopig: true,
 
-  // Btw-tarieven (in %). De klant kiest zelf of de woning ouder is dan 10 jaar.
-  btw: { oud: 6, nieuw: 21 },
+  // Btw-tarieven (in %). De richtprijs rekent met "standaard"; de klant ziet
+  // erbij dat een woning jonger dan 10 jaar het andere tarief heeft.
+  btw: { standaard: 6, nieuw: 21 },
 
   // De klant ziet een vork: berekende prijs min/plus dit percentage.
   marge: { min: 5, max: 15 },
@@ -25,7 +27,7 @@ var RT_PRIJZEN = {
     binnenunit: 350, //        per binnenunit: montage, muurdoorvoer, condensafvoer, aansluiten
     leidingInbegrepen: 3, //   meter leiding per binnenunit die al in de plaatsing zit
     perMeter: 45, //           per extra meter: koperleiding, isolatie, kabel en afwerking met goot
-    maxLeiding: 25, //         vanaf hier toont de calculator een waarschuwing (meter per binnenunit)
+    standaardLeiding: 6, //    met zoveel meter leiding per binnenunit rekent de richtprijs
   },
 
   // Op één buitenunit mogen maximaal zoveel binnenunits.
@@ -36,40 +38,44 @@ var RT_PRIJZEN = {
   multiMaxAansluiting: 1.3,
 
   // -------------------------------------------------------------------
-  // ADVIES: de klant kiest geen toestel, maar zegt wat hij belangrijk vindt.
-  // Per wens kies jij hier welk toestel de calculator aanraadt.
-  //   model:  een model uit de lijst "toestellen" hieronder
-  //   vraag:  de knop die de klant ziet
-  //   waarom: de uitleg bij het advies
-  // De volgorde is ook de volgorde van de knoppen. De eerste met
-  // aanbevolen: true krijgt het label "Meest gekozen".
+  // DRIE VOORSTELLEN
+  // Na drie vragen (hoeveel kamers, hoe groot, wat is het belangrijkst)
+  // ziet de klant altijd drie voorstellen: voordelig, beste prijs-kwaliteit
+  // en premium, elk met een richtprijs.
+  //
+  // niveaus: de naam en korte uitleg van de drie voorstellen.
+  // wensen:  de knoppen bij "Wat vindt u het belangrijkst?".
+  //   vraag:       de tekst op de knop
+  //   uitleg:      de kleine tekst onder de knop
+  //   markeer:     welk voorstel het label "Past bij uw wens" krijgt
+  //   voorstellen: per niveau een toestel uit de lijst "toestellen"
+  //                hieronder (exact dezelfde naam als bij "model")
   // -------------------------------------------------------------------
-  pakketten: [
-    { id: "voordelig", titel: "Voordelig", model: "Nuova Infinity AI Smart",
-      vraag: "Zo voordelig mogelijk",
-      waarom: "Een betrouwbaar toestel tegen een scherpe prijs. Koelt en verwarmt, met wifi-bediening via de app." },
-    { id: "comfort", titel: "Prijs-kwaliteit", model: "Mitsubishi Electric MSZ-AY Compact", aanbevolen: true,
-      vraag: "Goede prijs-kwaliteit",
-      waarom: "Een topmerk dat jarenlang meegaat. Stil, zuinig (A+++ voor koelen) en met ingebouwde wifi." },
-    { id: "stil", titel: "Extra stil en zuinig", model: "Mitsubishi Electric MSZ-LN Diamond",
-      vraag: "Extra stil en zuinig",
-      waarom: "Het topmodel: fluisterstil vanaf 19 dB, A+++ voor koelen en verwarmen, met een sensor die de lucht stuurt naar waar u zit." },
-    { id: "design", titel: "Mooi design", model: "Mitsubishi Electric MSZ-EF Premium Design",
-      vraag: "Mooi design",
-      waarom: "Strak designtoestel in wit, zilver of zwart, dat mooi in uw interieur past. Ook zeer zuinig." },
+  niveaus: {
+    voordelig: { titel: "Voordelig", uitleg: "Betrouwbaar en scherp geprijsd" },
+    kwaliteit: { titel: "Beste prijs-kwaliteit", uitleg: "Een topmerk dat jarenlang meegaat" },
+    premium: { titel: "Premium", uitleg: "Het beste wat er is" },
+  },
+  wensen: [
+    { id: "prijs", vraag: "Zo voordelig mogelijk", uitleg: "Een betrouwbaar toestel tegen een scherpe prijs", markeer: "voordelig",
+      voorstellen: { voordelig: "Nuova Infinity AI Smart", kwaliteit: "Daikin Perfera", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
+    { id: "kwaliteit", vraag: "Goede prijs-kwaliteit", uitleg: "Een topmerk dat jarenlang meegaat", markeer: "kwaliteit",
+      voorstellen: { voordelig: "Nuova Infinity AI Smart", kwaliteit: "Daikin Perfera", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
+    { id: "stil", vraag: "Extra stil en zuinig", uitleg: "Fluisterstil en zo weinig mogelijk verbruik", markeer: "premium",
+      voorstellen: { voordelig: "Nuova Stellar Inverter", kwaliteit: "Mitsubishi Electric MSZ-AY Compact", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
+    { id: "design", vraag: "Mooi design", uitleg: "Een toestel dat mooi in uw interieur past", markeer: "kwaliteit",
+      voorstellen: { voordelig: "Nuova Stellar Inverter", kwaliteit: "Mitsubishi Electric MSZ-EF Premium Design", premium: "Daikin Emura" } },
   ],
 
   // -------------------------------------------------------------------
   // TOESTELLEN en hun prijzen.
   //   model:   moet exact gelijk zijn aan data-model van de kaart op de
-  //            pagina Toestellen. Zo toont de calculator dezelfde foto en
-  //            specificaties.
+  //            pagina Toestellen. Zo toont het prijsadvies dezelfde foto
+  //            en uitleg.
   //   multi:   welke multi-split buitenunits bij dit toestel horen
   //            (zie "multi" verderop), of null als het enkel single-split kan.
   //   prijzen: per vermogen (kW):  [ prijs set binnen+buiten , prijs losse binnenunit voor multi ]
   //            Zet null als die uitvoering niet bestaat.
-  // Deze lijst wordt ook gebruikt door de configurator ("Ik stel mijn toestellen
-  // zelf samen"): alleen toestellen die hier staan, kan de klant daar kiezen.
   // -------------------------------------------------------------------
   toestellen: [
     { merk: "Nuova", model: "Nuova Infinity AI Smart", naam: "Infinity AI Smart", multi: "nuova-inf",
@@ -81,23 +87,23 @@ var RT_PRIJZEN = {
     { merk: "Nuova", model: "Nuova Vloermodel", naam: "Vloermodel", multi: "nuova-inf",
       prijzen: { "2.5": [900, 450], "3.5": [1000, 500], "5.0": [1300, 650], "7.1": [1700, null] } },
 
-    // Daikin: voorbeeldprijzen op basis van de winkelprijzen (excl. btw) van oktober 2026
+    // Daikin: voorbeeldprijzen (winkelprijs excl. btw x 1,6, zelfde schaal als de andere merken)
     { merk: "Daikin", model: "Daikin Sensira", naam: "Sensira", multi: null,
-      prijzen: { "2.0": [520, null], "2.5": [550, null], "3.5": [570, null], "5.0": [950, null], "6.0": [1030, null], "7.1": [1310, null] } },
+      prijzen: { "2.0": [830, null], "2.5": [880, null], "3.5": [910, null], "5.0": [1520, null], "6.0": [1650, null], "7.1": [2100, null] } },
     { merk: "Daikin", model: "Daikin FTXF-F", naam: "FTXF-F", multi: null,
-      prijzen: { "2.0": [580, null], "2.5": [600, null], "6.0": [1070, null], "7.1": [1250, null] } },
+      prijzen: { "2.0": [930, null], "2.5": [960, null], "6.0": [1710, null], "7.1": [2000, null] } },
     { merk: "Daikin", model: "Daikin Comfora", naam: "Comfora", multi: "daikin-mxm",
-      prijzen: { "2.0": [780, 330], "2.5": [880, 370], "3.5": [990, 380], "5.0": [1400, 450], "6.0": [1550, 490], "7.1": [1810, 570] } },
+      prijzen: { "2.0": [1250, 530], "2.5": [1410, 590], "3.5": [1580, 610], "5.0": [2240, 720], "6.0": [2480, 780], "7.1": [2900, 910] } },
     { merk: "Daikin", model: "Daikin Perfera", naam: "Perfera", multi: "daikin-mxm",
-      prijzen: { "2.0": [970, 410], "2.5": [1070, 430], "3.5": [1190, 490], "4.2": [1400, 560], "5.0": [1540, 650], "6.0": [1730, 790], "7.1": [1980, 880] } },
+      prijzen: { "2.0": [1550, 660], "2.5": [1710, 690], "3.5": [1900, 780], "4.2": [2240, 900], "5.0": [2460, 1040], "6.0": [2770, 1260], "7.1": [3170, 1410] } },
     { merk: "Daikin", model: "Daikin Stylish", naam: "Stylish", multi: "daikin-mxm",
-      prijzen: { "2.0": [1110, 440], "2.5": [1570, 520], "3.5": [1670, 560], "4.2": [1730, 620], "5.0": [2050, 660] } },
+      prijzen: { "2.0": [1780, 700], "2.5": [2510, 830], "3.5": [2670, 900], "4.2": [2770, 990], "5.0": [3280, 1060] } },
     { merk: "Daikin", model: "Daikin Emura", naam: "Emura", multi: "daikin-mxm",
-      prijzen: { "2.0": [1400, 520], "2.5": [1490, 560], "3.5": [1690, 690], "4.2": [1960, 750], "5.0": [2130, 840] } },
+      prijzen: { "2.0": [2240, 830], "2.5": [2380, 900], "3.5": [2700, 1100], "4.2": [3140, 1200], "5.0": [3410, 1340] } },
     { merk: "Daikin", model: "Daikin Perfera vloermodel", naam: "Perfera vloermodel", multi: "daikin-mxm",
-      prijzen: { "2.5": [1280, 650], "3.5": [1570, 800], "5.0": [1800, 970] } },
+      prijzen: { "2.5": [2050, 1040], "3.5": [2510, 1280], "5.0": [2880, 1550] } },
     { merk: "Daikin", model: "Daikin Sensira CTXF-C multi-split binnenunit", naam: "Sensira multi", multi: "daikin-mxf",
-      prijzen: { "2.0": [null, 250], "2.5": [null, 260], "3.5": [null, 280] } },
+      prijzen: { "2.0": [null, 400], "2.5": [null, 420], "3.5": [null, 450] } },
 
     { merk: "LG", model: "LG DualCool WZ-serie", naam: "DualCool WZ", multi: null,
       prijzen: { "2.5": [750, null], "3.5": [850, null], "5.0": [1250, null], "7.0": [1650, null] } },
@@ -192,18 +198,18 @@ var RT_PRIJZEN = {
       { poorten: 3, kw: 5.0, prijs: 1450 },
     ] },
     "daikin-mxm": { naam: "Daikin MXM", units: [
-      { poorten: 2, kw: 4.0, prijs: 1150 },
-      { poorten: 2, kw: 5.0, prijs: 1290 },
-      { poorten: 2, kw: 6.8, prijs: 1650 },
-      { poorten: 3, kw: 4.0, prijs: 1570 },
-      { poorten: 3, kw: 5.2, prijs: 1730 },
-      { poorten: 3, kw: 6.8, prijs: 1780 },
-      { poorten: 4, kw: 6.8, prijs: 1980 },
-      { poorten: 4, kw: 8.0, prijs: 2300 },
-      { poorten: 5, kw: 9.0, prijs: 2630 },
+      { poorten: 2, kw: 4.0, prijs: 1840 },
+      { poorten: 2, kw: 5.0, prijs: 2060 },
+      { poorten: 2, kw: 6.8, prijs: 2640 },
+      { poorten: 3, kw: 4.0, prijs: 2510 },
+      { poorten: 3, kw: 5.2, prijs: 2770 },
+      { poorten: 3, kw: 6.8, prijs: 2850 },
+      { poorten: 4, kw: 6.8, prijs: 3170 },
+      { poorten: 4, kw: 8.0, prijs: 3680 },
+      { poorten: 5, kw: 9.0, prijs: 4210 },
     ] },
     "daikin-mxf": { naam: "Daikin Sensira 2MXF", units: [
-      { poorten: 2, kw: 4.0, prijs: 1060 },
+      { poorten: 2, kw: 4.0, prijs: 1700 },
     ] },
     "mhi-scm": { naam: "MHI SCM", units: [
       { poorten: 2, kw: 4.0, prijs: 1300 },
