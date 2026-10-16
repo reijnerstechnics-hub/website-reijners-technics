@@ -41,11 +41,11 @@ Op de pagina *Toestellen* kiest de bezoeker eerst een merk (of zoekt op naam), d
 
 Een kaart heeft drie kenmerken:
 
-- `data-brand`: `daikin`, `lg`, `me` (Mitsubishi Electric), `mhi` (Mitsubishi Heavy Industries), `nuova`, `toshiba` of `ariston`;
+- `data-brand`: `daikin`, `lg`, `me` (Mitsubishi Electric), `mhi` (Mitsubishi Heavy Industries), `nuova` of `toshiba`;
 - `data-type`: de soort toestel
   - split-airco (binnen- én buitenunit): `wand`, `vloer`, `cassette`, `kanaal`, `plafond`, `zuil`
   - zonder buitenunit: `monoblock`, `mobiel`
-  - warm water en verwarming: `boiler`, `luchtwater`
+  - warm water: `boiler` (warmtepompboiler)
   - losse buitenunit voor multi-split: `buiten`
 - `data-category`: `single` (één kamer met een eigen buitenunit), `multi` (binnenunit voor een multi-split), `single multi` (allebei) of leeg.
 

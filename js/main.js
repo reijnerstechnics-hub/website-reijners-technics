@@ -744,7 +744,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een airco- en warmtepompinstallateur in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en lucht/lucht-warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries, en warmtepompboilers en lucht/water-warmtepompen. Er staan bewust geen prijzen op de website. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een airco- en warmtepompinstallateur in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en lucht/lucht-warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries, en warmtepompboilers. Er staan bewust geen prijzen op de website. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -1240,7 +1240,6 @@ var RT_MERKEN = {
   mhi: "Mitsubishi Heavy Industries",
   nuova: "Nuova",
   toshiba: "Toshiba",
-  ariston: "Ariston",
 };
 // Logo per merk (assets/img/logo-....svg), voor de merktegels en de koppen in de lijst
 var RT_LOGOS = {
@@ -1250,7 +1249,6 @@ var RT_LOGOS = {
   mhi: "logo-mhi.svg",
   nuova: "logo-nuova.svg",
   toshiba: "logo-toshiba.svg",
-  ariston: "logo-ariston.svg",
 };
 // Soort toestel (data-type) en de groep waartoe het hoort. Zo ziet de bezoeker
 // meteen of het een split-airco is (binnen- én buitenunit) of niet.
@@ -1264,7 +1262,6 @@ var RT_SOORTEN = [
   { type: "monoblock", groep: "zonder", titel: "Monoblock, zonder buitenunit" },
   { type: "mobiel", groep: "zonder", titel: "Mobiele airco's" },
   { type: "boiler", groep: "water", titel: "Warmtepompboilers" },
-  { type: "luchtwater", groep: "water", titel: "Lucht/water-warmtepompen" },
   { type: "buiten", groep: "buiten", titel: "Buitenunits voor multi-split" },
 ];
 function rtGroep(type) {
@@ -1357,9 +1354,8 @@ function rtGroep(type) {
     { kop: "Zonder buitenunit", sub: "alles zit in één toestel" },
     { id: "monoblock", label: "Monoblock (vaste airco)", test: soort("monoblock") },
     { id: "mobiel", label: "Mobiele airco's", test: soort("mobiel") },
-    { kop: "Warm water en verwarming" },
+    { kop: "Warm water" },
     { id: "boiler", label: "Warmtepompboilers", test: soort("boiler") },
-    { id: "luchtwater", label: "Lucht/water-warmtepompen", test: soort("luchtwater") },
     { kop: "Voor hoeveel kamers?", sub: "multi-split: meerdere binnenunits op één buitenunit" },
     { id: "single", label: "Eén kamer (single-split)", test: function (c) { return heeft(c, "single"); } },
     { id: "multi", label: "Meerdere kamers (multi-split)", test: function (c) { return heeft(c, "multi") && c.dataset.type !== "buiten"; } },
@@ -1389,7 +1385,6 @@ function rtGroep(type) {
     monoblock: ["monoblock"], monoblok: ["monoblock"],
     mobiel: ["mobiel"], mobiele: ["mobiel"],
     boiler: ["boiler"], boilers: ["boiler"], warmtepompboiler: ["boiler"], warmtepompboilers: ["boiler"],
-    "lucht/water": ["luchtwater"], luchtwater: ["luchtwater"], "lucht-water": ["luchtwater"],
   };
   function past(card) {
     if (!state.q) return true;
@@ -1639,7 +1634,6 @@ function rtGroep(type) {
     mobiel: "Mobiele airco",
     buiten: "Buitenunit",
     boiler: "Warmtepompboiler",
-    luchtwater: "Lucht/water-warmtepomp",
   };
   // Label op de foto: is het een split-airco of niet?
   var BADGES = {
@@ -1657,7 +1651,6 @@ function rtGroep(type) {
     if (t === "monoblock") return "Alles in één toestel, geen buitenunit aan de gevel";
     if (t === "mobiel") return "Verplaatsbaar, met een afvoerslang naar buiten";
     if (t === "boiler") return "Voor warm water in keuken en badkamer";
-    if (t === "luchtwater") return "Voor uw centrale verwarming en warm water";
     if (s && m) return "Voor 1 kamer, of meerdere kamers op 1 buitenunit";
     if (s) return "Voor 1 kamer, met een eigen buitenunit";
     if (m) return "Binnenunit voor multi-split (meerdere kamers)";
@@ -1684,8 +1677,6 @@ function rtGroep(type) {
       "Een zuilmodel staat als een smalle kast op de vloer en blaast de lucht krachtig en ver de ruimte in. Bedoeld voor grote ruimtes zoals een winkel, zaal of showroom.",
     mobiel:
       "Een mobiele airco staat op wieltjes en gaat gewoon in het stopcontact. De warme lucht gaat via een slang naar buiten, bijvoorbeeld door een raam. Handig als tijdelijke oplossing, maar luider en minder zuinig dan een vaste airco.",
-    luchtwater:
-      "Een lucht/water-warmtepomp haalt warmte uit de buitenlucht en geeft die af aan het water van uw centrale verwarming en uw warm water. Ze kan een gas- of stookolieketel vervangen. Of ze bij uw woning en radiatoren past, bekijken we tijdens het plaatsbezoek.",
   };
 
   function slug(s) {
@@ -1766,7 +1757,7 @@ function rtGroep(type) {
     // label (split of niet): op de computer over de foto, op de gsm naast de foto
     var groep = rtGroep(card.dataset.type);
     var foto = card.querySelector(".device-photo");
-    var badge = el("span", "device-badge badge-" + groep, card.dataset.type === "luchtwater" ? "Verwarming + warm water" : BADGES[groep]);
+    var badge = el("span", "device-badge badge-" + groep, BADGES[groep]);
     card.insertBefore(badge, foto ? foto.nextSibling : card.firstChild);
     // en een zin in gewone taal onder de naam
     var wie = voorWie(card);
@@ -1875,7 +1866,7 @@ function rtGroep(type) {
     info.appendChild(h1);
     var groep = rtGroep(card.dataset.type);
     var tags = el("div", "td-tags");
-    tags.appendChild(el("span", "td-tag-" + groep, card.dataset.type === "luchtwater" ? "Verwarming + warm water" : BADGES[groep]));
+    tags.appendChild(el("span", "td-tag-" + groep, BADGES[groep]));
     if (card.dataset.type !== "buiten") tags.appendChild(el("span", null, TYPES[card.dataset.type] || ""));
     if (heeft(card, "single")) tags.appendChild(el("span", null, "Single-split"));
     if (heeft(card, "multi")) tags.appendChild(el("span", null, card.dataset.type === "buiten" ? "Voor multi-split" : "Multi-split"));
@@ -1899,7 +1890,7 @@ function rtGroep(type) {
     bel.href = "tel:+32491113313";
     acts.appendChild(offerte);
     // prijsadvies bovenaan de pagina Toestellen (enkel voor vaste airco's)
-    if (["boiler", "luchtwater", "mobiel"].indexOf(card.dataset.type) === -1) {
+    if (["boiler", "mobiel"].indexOf(card.dataset.type) === -1) {
       var richt = el("a", "btn v3-btn-line", "Richtprijs berekenen");
       richt.href = "#prijs";
       acts.appendChild(richt);

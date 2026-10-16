@@ -7423,8 +7423,14 @@ section.pc-catalog {
 }
 
 /* ---------- merktegels met logo ---------- */
+/* 6 merken: 6 naast elkaar, 3 per rij op een tablet en 2 op de gsm */
 .merk-keuze {
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+@media (max-width: 1100px) {
+  .merk-keuze {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 .merk-tegel {
   align-items: center;
