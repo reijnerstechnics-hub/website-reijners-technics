@@ -7583,11 +7583,6 @@ section.pc-catalog {
   background: #eceff3;
   color: #46535f;
 }
-.badge-water,
-.td-tag-water {
-  background: var(--gold-tint);
-  color: var(--gold-text);
-}
 .device-sys {
   margin-top: -4px;
   font-size: 0.8rem;
@@ -7595,8 +7590,7 @@ section.pc-catalog {
 }
 .td-tags .td-tag-split,
 .td-tags .td-tag-zonder,
-.td-tags .td-tag-buiten,
-.td-tags .td-tag-water {
+.td-tags .td-tag-buiten {
   font-weight: 700;
 }
 .td-wie {

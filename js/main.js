@@ -744,7 +744,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een airco- en warmtepompinstallateur in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en lucht/lucht-warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries, en warmtepompboilers. Er staan bewust geen prijzen op de website. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een airco- en warmtepompinstallateur in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en lucht/lucht-warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Er staan bewust geen prijzen op de website. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -1228,7 +1228,7 @@ window.rtGoToOffer = function (d, model) {
 // van dat merk. Een kaart hoort bij een categorie via
 //   data-category: "single" en/of "multi" (leeg = geen split-systeem)
 //   data-type:     een soort uit RT_SOORTEN hieronder ("wand", "cassette",
-//                  "monoblock", "boiler", "buiten" ...)
+//                  "monoblock", "mobiel", "buiten" ...)
 // Een categorie zonder toestellen bij het gekozen merk wordt niet getoond.
 // De zoekbalk zoekt in alle merken tegelijk (naam, reeks, typecodes,
 // vermogen ...); een woord als "cassette" of "buitenunit" toont die soort.
@@ -1261,7 +1261,6 @@ var RT_SOORTEN = [
   { type: "zuil", groep: "split", titel: "Zuilmodellen" },
   { type: "monoblock", groep: "zonder", titel: "Monoblock, zonder buitenunit" },
   { type: "mobiel", groep: "zonder", titel: "Mobiele airco's" },
-  { type: "boiler", groep: "water", titel: "Warmtepompboilers" },
   { type: "buiten", groep: "buiten", titel: "Buitenunits voor multi-split" },
 ];
 function rtGroep(type) {
@@ -1354,8 +1353,6 @@ function rtGroep(type) {
     { kop: "Zonder buitenunit", sub: "alles zit in één toestel" },
     { id: "monoblock", label: "Monoblock (vaste airco)", test: soort("monoblock") },
     { id: "mobiel", label: "Mobiele airco's", test: soort("mobiel") },
-    { kop: "Warm water" },
-    { id: "boiler", label: "Warmtepompboilers", test: soort("boiler") },
     { kop: "Voor hoeveel kamers?", sub: "multi-split: meerdere binnenunits op één buitenunit" },
     { id: "single", label: "Eén kamer (single-split)", test: function (c) { return heeft(c, "single"); } },
     { id: "multi", label: "Meerdere kamers (multi-split)", test: function (c) { return heeft(c, "multi") && c.dataset.type !== "buiten"; } },
@@ -1373,8 +1370,12 @@ function rtGroep(type) {
   }
   // Zoekwoorden die een soort toestel betekenen. Wie "buitenunit" of
   // "cassette" typt, krijgt enkel die toestellen, niet elk toestel waar
-  // het woord ergens in de tekst staat.
+  // het woord ergens in de tekst staat. Een airco die ook verwarmt, is een
+  // lucht/lucht-warmtepomp: "warmtepomp" toont dus alle vaste toestellen.
+  var LUCHT_LUCHT = ["wand", "vloer", "cassette", "kanaal", "plafond", "zuil", "monoblock", "buiten"];
   var SOORT_WOORDEN = {
+    warmtepomp: LUCHT_LUCHT, warmtepompen: LUCHT_LUCHT, "lucht/lucht": LUCHT_LUCHT, "lucht-lucht": LUCHT_LUCHT,
+    "lucht/lucht-warmtepomp": LUCHT_LUCHT, "lucht/lucht-warmtepompen": LUCHT_LUCHT,
     buitenunit: ["buiten"], buitenunits: ["buiten"], buitendeel: ["buiten"],
     wandmodel: ["wand"], wandmodellen: ["wand"], wandunit: ["wand"],
     vloermodel: ["vloer"], vloermodellen: ["vloer"], console: ["vloer"],
@@ -1384,7 +1385,6 @@ function rtGroep(type) {
     zuil: ["zuil"], zuilmodel: ["zuil"],
     monoblock: ["monoblock"], monoblok: ["monoblock"],
     mobiel: ["mobiel"], mobiele: ["mobiel"],
-    boiler: ["boiler"], boilers: ["boiler"], warmtepompboiler: ["boiler"], warmtepompboilers: ["boiler"],
   };
   function past(card) {
     if (!state.q) return true;
@@ -1633,14 +1633,12 @@ function rtGroep(type) {
     monoblock: "Zonder buitenunit",
     mobiel: "Mobiele airco",
     buiten: "Buitenunit",
-    boiler: "Warmtepompboiler",
   };
   // Label op de foto: is het een split-airco of niet?
   var BADGES = {
     split: "Binnen- + buitenunit",
     zonder: "Zonder buitenunit",
     buiten: "Buitenunit",
-    water: "Warm water",
   };
   // Eén zin in gewone taal onder het label van de kaart
   function voorWie(card) {
@@ -1650,7 +1648,6 @@ function rtGroep(type) {
     if (t === "buiten") return "Wordt gecombineerd met meerdere binnenunits";
     if (t === "monoblock") return "Alles in één toestel, geen buitenunit aan de gevel";
     if (t === "mobiel") return "Verplaatsbaar, met een afvoerslang naar buiten";
-    if (t === "boiler") return "Voor warm water in keuken en badkamer";
     if (s && m) return "Voor 1 kamer, of meerdere kamers op 1 buitenunit";
     if (s) return "Voor 1 kamer, met een eigen buitenunit";
     if (m) return "Binnenunit voor multi-split (meerdere kamers)";
@@ -1669,8 +1666,6 @@ function rtGroep(type) {
       "Bij een monoblock zit alles in één toestel binnen. Er komt geen buitenunit aan de gevel, wel twee ronde doorvoeren door de buitenmuur. Een oplossing voor appartementen of gevels waar een buitenunit niet mag of niet kan.",
     buiten:
       "Op deze buitenunit sluit u meerdere binnenunits aan: één per kamer. Zo hebt u maar één toestel aan de gevel voor het hele huis. Het totale vermogen van de binnenunits moet passen bij de buitenunit; dat rekenen we voor u uit.",
-    boiler:
-      "Een warmtepompboiler verwarmt uw tapwater met warmte uit de lucht, in plaats van alleen met een elektrische weerstand. Hij staat meestal in een berging, garage of technische ruimte en vervangt een klassieke elektrische boiler.",
     plafond:
       "Een plafondmodel hangt zichtbaar onder het plafond en blaast de lucht ver de ruimte in. Een goede keuze voor grote ruimtes zonder verlaagd plafond, zoals een zaak, kantoor of grote leefruimte.",
     zuil:
@@ -1723,8 +1718,6 @@ function rtGroep(type) {
       };
       out.push(lo === hi ? f(lo) + " kW" : f(lo) + " - " + f(hi) + " kW");
     }
-    var inhoud = spec(card, ["Inhoud"]);
-    if (inhoud) out.push((inhoud.match(/\d+ l/g) || []).join(" / "));
     // energielabel voor koelen (bij een bereik: "tot" het beste label)
     var labels = (spec(card, ["Energielabel"]).split("/")[0].match(/A\+*/g) || []).filter(function (l, i, a) {
       return a.indexOf(l) === i;
@@ -1890,7 +1883,7 @@ function rtGroep(type) {
     bel.href = "tel:+32491113313";
     acts.appendChild(offerte);
     // prijsadvies bovenaan de pagina Toestellen (enkel voor vaste airco's)
-    if (["boiler", "mobiel"].indexOf(card.dataset.type) === -1) {
+    if (card.dataset.type !== "mobiel") {
       var richt = el("a", "btn v3-btn-line", "Richtprijs berekenen");
       richt.href = "#prijs";
       acts.appendChild(richt);

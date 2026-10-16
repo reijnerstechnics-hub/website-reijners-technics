@@ -45,13 +45,12 @@ Een kaart heeft drie kenmerken:
 - `data-type`: de soort toestel
   - split-airco (binnen- én buitenunit): `wand`, `vloer`, `cassette`, `kanaal`, `plafond`, `zuil`
   - zonder buitenunit: `monoblock`, `mobiel`
-  - warm water: `boiler` (warmtepompboiler)
   - losse buitenunit voor multi-split: `buiten`
 - `data-category`: `single` (één kamer met een eigen buitenunit), `multi` (binnenunit voor een multi-split), `single multi` (allebei) of leeg.
 
-Een nieuwe kaart mag overal in het merkblok staan: `js/main.js` zet de kaarten zelf per soort onder elkaar (lijst `RT_SOORTEN`) en voegt het label ("Binnen- + buitenunit", "Zonder buitenunit", "Buitenunit", "Warm water") en de zin "Voor 1 kamer, ..." toe. Losse buitenunits staan niet bij "Alle toestellen" maar in hun eigen categorie; bij het zoeken komen ze wel mee.
+Een nieuwe kaart mag overal in het merkblok staan: `js/main.js` zet de kaarten zelf per soort onder elkaar (lijst `RT_SOORTEN`) en voegt het label ("Binnen- + buitenunit", "Zonder buitenunit" of "Buitenunit") en de zin "Voor 1 kamer, ..." toe. Losse buitenunits staan niet bij "Alle toestellen" maar in hun eigen categorie; bij het zoeken komen ze wel mee.
 
-De naam van de detailpagina komt uit `data-model` van de knop *Offerte voor dit model*. De rijen van `device-specs` verschijnen op de detailpagina; de kaart in de lijst toont er zelf de kerngegevens uit (vermogen uit *Koelvermogen*, het label uit *Energielabel*, het geluid uit *Geluidsniveau binnen*, de inhoud uit *Inhoud*).
+De naam van de detailpagina komt uit `data-model` van de knop *Offerte voor dit model*. De rijen van `device-specs` verschijnen op de detailpagina; de kaart in de lijst toont er zelf de kerngegevens uit (vermogen uit *Koelvermogen*, het label uit *Energielabel*, het geluid uit *Geluidsniveau binnen*).
 
 Een nieuw merk: een merkblok met kaarten, een tegel in `.merk-keuze` met het logo in `assets/img/logo-<merk>.svg`, een link in het menu onder *Toestellen*, en de naam en het logo in `RT_MERKEN` en `RT_LOGOS` bovenaan het blok *TOESTELLEN: MERK, CATEGORIE EN ZOEKEN* in `js/main.js`.
 
