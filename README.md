@@ -35,6 +35,11 @@ var FORMSPREE_URL = "https://formspree.io/f/mdeakpaq";
 
 Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via WhatsApp te sturen.
 
+## Homepagina
+
+- **Zoekbalk** bovenaan: zoekt in alle toestellen van de pagina *Toestellen*. Terwijl de bezoeker typt, verschijnen de vijf best passende toestellen (klik = detailpagina); Enter of *Zoeken* toont alle resultaten in de lijst op de pagina *Toestellen*. De voorbeelden onder de zoekbalk (`data-q`) pas je aan in `index.html`; de werking staat in het blok *HOME: ZOEKBALK* in `js/main.js`.
+- **Wisselende foto's** rechts bovenaan: de `<img class="rot">` in het blok met `data-rotate="5000"` (elke 5 seconden een andere foto). Daar staan eigen foto's van de duurdere modellen (LG Artcool, LG Deluxe H-serie, Daikin Stylish). Met `style="object-position: ..."` kies je welk deel van een foto zichtbaar blijft.
+
 ## Toestellen
 
 Op de pagina *Toestellen* kiest de bezoeker eerst een merk (of zoekt op naam), daarna een soort toestel in de linkerkolom. Elk toestel is één kaart (`<div class="device-card">`) in het blok van zijn merk in `index.html` (`#toestellen-daikin`, `#toestellen-lg`, ...). Uit diezelfde kaart maakt de site ook de detailpagina (`#toestel-<naam>`), dus een toestel staat maar op één plaats.

@@ -691,6 +691,13 @@ window.rtGoToOffer = function (d, model) {
       return;
     }
     if (window.rtOfferStarted && window.rtOfferStarted()) return;
+    // niet tonen terwijl de bezoeker de zoekbalk bovenaan de homepagina gebruikt
+    var zoekt = document.getElementById("hz");
+    var suggesties = document.getElementById("hz-list");
+    if (zoekt && (zoekt.contains(document.activeElement) || (suggesties && !suggesties.hidden))) {
+      setTimeout(show, 5000);
+      return;
+    }
     var panel = document.getElementById("chat-panel");
     if (panel && !panel.hidden) return;
     if (calcInView()) {
@@ -728,6 +735,8 @@ window.rtGoToOffer = function (d, model) {
   });
   var chatToggle = document.getElementById("chat-toggle");
   if (chatToggle) chatToggle.addEventListener("click", hide);
+  var zoekVeld = document.getElementById("hz-input");
+  if (zoekVeld) zoekVeld.addEventListener("focus", hide);
 })();
 
 (function () {
@@ -1329,6 +1338,8 @@ function rtGroep(type) {
   }
   cards.forEach(function (c) {
     c._zoek = norm((RT_MERKEN[c.dataset.brand] || "") + " " + (c.dataset.brand === "mhi" ? "mhi " : "") + c.textContent);
+    var cta = c.querySelector(".device-cta");
+    c._titel = norm((RT_MERKEN[c.dataset.brand] || "") + " " + (cta ? cta.dataset.model : "") + " " + c.querySelector("h3").textContent);
   });
 
   function heeft(card, cat) {
@@ -1387,8 +1398,11 @@ function rtGroep(type) {
     mobiel: ["mobiel"], mobiele: ["mobiel"],
   };
   function past(card) {
-    if (!state.q) return true;
-    var woorden = norm(state.q).trim().split(" ");
+    return pastBij(card, state.q);
+  }
+  function pastBij(card, q) {
+    if (!q) return true;
+    var woorden = norm(q).trim().split(" ");
     for (var i = 0; i < woorden.length; i++) {
       var w = woorden[i];
       if (SOORT_WOORDEN.hasOwnProperty(w)) {
@@ -1584,6 +1598,34 @@ function rtGroep(type) {
       state.merk = "alle";
       render();
     });
+
+  // Voor de zoekbalk op de homepagina (blok HOME: ZOEKBALK).
+  // rtZoek: de passende toestellen, de beste eerst (naam past, geen losse buitenunit).
+  window.rtZoek = function (q) {
+    var woorden = norm(q).trim().split(" ").filter(Boolean);
+    if (!woorden.length) return [];
+    return cards
+      .filter(function (c) {
+        return pastBij(c, q);
+      })
+      .map(function (c, i) {
+        var inNaam = woorden.every(function (w) {
+          return c._titel.indexOf(w) !== -1;
+        });
+        return { card: c, score: (c.dataset.type === "buiten" ? 0 : 2) + (inNaam ? 1 : 0), i: i };
+      })
+      .sort(function (a, b) {
+        return b.score - a.score || a.i - b.i;
+      })
+      .map(function (r) {
+        return r.card;
+      });
+  };
+  // rtToonZoek: de zoekopdracht klaarzetten in de lijst op de pagina Toestellen
+  window.rtToonZoek = function (q) {
+    if (zoek) zoek.value = q;
+    zoekNaar(q);
+  };
 
   // links met data-merk elders op de site (menu onder "Toestellen", detailpagina).
   // De algemene navigatie opent daarna zelf de pagina Toestellen en scrolt
@@ -1995,6 +2037,172 @@ function rtGroep(type) {
   if (h.indexOf("toestel-") === 0 && window.rtToestelInfo(h.slice(8)) && window.goToPage) {
     window.goToPage("toestel", true, h);
   }
+})();
+
+// =====================================================================
+// HOME: ZOEKBALK
+// Bovenaan de homepagina. Terwijl de bezoeker typt, verschijnen de best
+// passende toestellen (klik = detailpagina van dat toestel). Enter of de
+// knop "Zoeken" toont alle resultaten in de lijst op de pagina Toestellen.
+// Het zoeken zelf gebeurt in het blok TOESTELLEN: MERK, CATEGORIE EN ZOEKEN.
+// =====================================================================
+(function () {
+  var form = document.getElementById("hz");
+  var input = document.getElementById("hz-input");
+  var box = document.getElementById("hz-list");
+  if (!form || !input || !box || !window.rtZoek) return;
+  var MAX = 5;
+  var items = [];
+  var actief = -1;
+  var wacht = null;
+  // op een smalle gsm past de volledige tekst niet in het veld
+  if (window.matchMedia && window.matchMedia("(max-width: 480px)").matches) input.placeholder = "Zoek een airco of merk";
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function naam(card) {
+    var cta = card.querySelector(".device-cta");
+    return cta && cta.dataset.model ? cta.dataset.model : card.querySelector("h3").textContent.trim();
+  }
+  // bv. "Wandmodel · 2,0 - 7,1 kW"
+  function uitleg(card) {
+    var soort = (card.querySelector(".device-brand") || {}).textContent || "";
+    soort = soort.replace(/^Airco · /, "");
+    soort = soort.charAt(0).toUpperCase() + soort.slice(1);
+    var kw = card.querySelector(".device-keys span");
+    return kw ? soort + " · " + kw.textContent : soort;
+  }
+
+  // via de gewone navigatie naar een adres (#toestel-..., #toestellen-lijst)
+  function ga(adres) {
+    var a = document.createElement("a");
+    a.href = adres;
+    a.hidden = true;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+  function naarResultaten(q) {
+    sluit();
+    input.blur();
+    if (q) window.rtToonZoek(q);
+    ga(q ? "#toestellen-lijst" : "#toestellen");
+  }
+
+  function sluit() {
+    box.hidden = true;
+    input.setAttribute("aria-expanded", "false");
+    input.removeAttribute("aria-activedescendant");
+    actief = -1;
+  }
+  function markeer() {
+    items.forEach(function (a, i) {
+      a.classList.toggle("on", i === actief);
+      a.setAttribute("aria-selected", i === actief ? "true" : "false");
+    });
+    if (actief >= 0) input.setAttribute("aria-activedescendant", items[actief].id);
+    else input.removeAttribute("aria-activedescendant");
+  }
+
+  function toon() {
+    var q = input.value.trim();
+    box.innerHTML = "";
+    items = [];
+    actief = -1;
+    if (q.length < 2) return sluit();
+    var gevonden = window.rtZoek(q);
+    gevonden.slice(0, MAX).forEach(function (card, i) {
+      var a = el("a", "hz-item");
+      a.href = "#toestel-" + card.dataset.slug;
+      a.id = "hz-optie-" + i;
+      a.setAttribute("role", "option");
+      a.setAttribute("aria-selected", "false");
+      var foto = card.querySelector(".device-photo img");
+      if (foto) {
+        var img = el("img");
+        img.src = foto.getAttribute("src");
+        img.alt = "";
+        a.appendChild(img);
+      }
+      var tx = el("span", "hz-tx");
+      tx.appendChild(el("b", null, naam(card)));
+      tx.appendChild(el("small", null, uitleg(card)));
+      a.appendChild(tx);
+      box.appendChild(a);
+      items.push(a);
+    });
+    if (gevonden.length > MAX) {
+      var alle = el("a", "hz-alle", "Bekijk alle " + gevonden.length + " resultaten ");
+      alle.href = "#toestellen-lijst";
+      alle.appendChild(el("span", "ar", "→"));
+      box.appendChild(alle);
+    } else if (!gevonden.length) {
+      var geen = el("div", "hz-geen", "Geen toestel gevonden voor “" + q + "”. ");
+      var merken = el("a", null, "Bekijk alle merken");
+      merken.href = "#toestellen";
+      geen.appendChild(merken);
+      box.appendChild(geen);
+    }
+    box.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+  }
+
+  input.addEventListener("input", function () {
+    clearTimeout(wacht);
+    wacht = setTimeout(toon, 120);
+  });
+  input.addEventListener("focus", function () {
+    // gsm: de zoekbalk bovenaan zetten, zodat de suggesties boven het toetsenbord staan
+    if (window.innerWidth <= 640) {
+      var y = form.getBoundingClientRect().top + window.scrollY - 90;
+      if (Math.abs(window.scrollY - y) > 30) window.scrollTo({ top: y, behavior: "smooth" });
+    }
+    if (input.value.trim().length >= 2) toon();
+  });
+  input.addEventListener("keydown", function (e) {
+    if ((e.key === "ArrowDown" || e.key === "ArrowUp") && !box.hidden && items.length) {
+      e.preventDefault();
+      var n = items.length;
+      actief = e.key === "ArrowDown" ? (actief + 1) % n : actief <= 0 ? n - 1 : actief - 1;
+      markeer();
+    } else if (e.key === "Escape" && !box.hidden) {
+      e.preventDefault();
+      sluit();
+    }
+  });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (actief >= 0 && items[actief]) items[actief].click();
+    else naarResultaten(input.value.trim());
+  });
+
+  // klik in de lijst: een toestel opent zijn detailpagina, "alle resultaten" de lijst
+  box.addEventListener("click", function (e) {
+    var a = e.target.closest("a");
+    if (!a) return;
+    if (a.classList.contains("hz-alle")) window.rtToonZoek(input.value.trim());
+    sluit();
+  });
+  // voorbeelden onder de zoekbalk
+  form.querySelectorAll("[data-q]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      input.value = b.dataset.q;
+      naarResultaten(b.dataset.q);
+    });
+  });
+  // sluiten bij een klik of tik ernaast, of als de focus de zoekbalk verlaat
+  document.addEventListener("click", function (e) {
+    if (!form.contains(e.target)) sluit();
+  });
+  form.addEventListener("focusout", function () {
+    setTimeout(function () {
+      if (!form.contains(document.activeElement)) sluit();
+    }, 200);
+  });
 })();
 
 // =====================================================================

@@ -63,6 +63,19 @@
       <div class="v3-kicker">Airco &amp; warmtepompen &middot; Uw installateur uit de regio</div>
       <h1>Uw airco aanvragen in <span class="u">2 minuten</span></h1>
       <p class="v3-lead"><span id="v4-sub">Kies waarmee we u helpen. Binnen 24 uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.</span></p>
+      <!-- ZOEKBALK: zoekt in alle toestellen, zie js/main.js (blok HOME: ZOEKBALK) -->
+      <form class="hz" id="hz" role="search" autocomplete="off">
+        <div class="hz-veld">
+          <div class="hz-bar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <label class="sr-only" for="hz-input">Zoek een airco</label>
+            <input type="search" id="hz-input" placeholder="Zoek een airco, merk of model" enterkeyhint="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="hz-list">
+            <button type="submit" class="hz-btn"><span class="hz-btn-tx">Zoeken</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </div>
+          <div class="hz-list" id="hz-list" role="listbox" aria-label="Gevonden toestellen" hidden></div>
+        </div>
+        <p class="hz-tip">Bijvoorbeeld: <button type="button" data-q="Daikin Stylish">Daikin Stylish</button>, <button type="button" data-q="LG Artcool">LG Artcool</button>, <button type="button" data-q="Mitsubishi Diamond">Mitsubishi Diamond</button> of <button type="button" data-q="multi-split">multi-split</button></p>
+      </form>
       <div class="v3-pick-lbl">Waarmee kunnen we helpen? E&eacute;n klik en u bent vertrokken.</div>
       <div class="v3-picks">
         <button type="button" class="v3-pick hl" data-start-dienst="nieuw"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M4.9 4.9l14.2 14.2M2 12h20M4.9 19.1 19.1 4.9"/></svg></span><b>Nieuwe airco of warmtepomp</b><small>Advies en plaatsing</small><span class="go" aria-hidden="true">&rarr;</span></button>
@@ -74,10 +87,11 @@
     <div class="v3-visual" aria-hidden="true" id="v4-visual">
       <div class="v3-frame"></div>
         <div class="nh-rot-box v3-main-ph" data-rotate="5000">
-      <img class="rot on" src="assets/img/h-n67.webp" alt="Mitsubishi-wandmodel tegen een lichtgrijze muur">
-      <img class="rot" data-src="assets/img/h-n66.webp" alt="Wit wandmodel strak onder het plafond">
-      <img class="rot" data-src="assets/img/h-s-ba3f2d8e25e8.webp" alt="Daikin-wandmodel in mat zwart tegen een witte muur">
-      <img class="rot" data-src="assets/img/h-n78.webp" alt="Wit wandmodel net onder een houten plafond">
+      <img class="rot on" src="assets/img/g-n53.webp" alt="Zwart LG Artcool-wandmodel tegen een okergele muur">
+      <img class="rot" data-src="assets/img/h-s-ba3f2d8e25e8.webp" alt="Daikin Stylish in mat zwart tegen een witte muur">
+      <img class="rot" data-src="assets/img/s-06545912d880.webp" alt="Wit LG Deluxe-wandmodel (H-serie) boven twee houten wandplanken">
+      <img class="rot" data-src="assets/img/g-s-1feaeb8d86c5.webp" alt="Twee LG Artcool Gallery-wandmodellen naast de open haard" style="object-position:12% 50%">
+      <img class="rot" data-src="assets/img/g-s-eee01264090f.webp" alt="LG Artcool-wandmodel in roze uitvoering tegen een bakstenen muur">
     </div>
       <div class="v4-thermo"><span class="dot" aria-hidden="true"></span><div><small id="v4-thlbl">Verwarmen naar</small><span class="t" id="v4-temp">30,0&deg;</span></div></div>
       <div class="v3-sub-ph"><img src="assets/img/g-n71.webp" alt="" loading="lazy"></div>
@@ -103,7 +117,7 @@
       <p>Geen callcenter of tussenpersoon. Wie u aan de telefoon krijgt, komt ook zelf het plaatsbezoek doen en voert de installatie uit.</p>
     </div>
     <div class="v3-bento">
-      <div class="v3-tile big rv"><img src="assets/img/s-06545912d880.webp" alt="LG-wandmodel tegen een witte muur" loading="lazy" style="object-position:center 30%"><div class="tx"><h3>Nette plaatsing, tot in het detail</h3><p>Rechte leidingen, een strakke doorvoer en een toestel dat mooi in het interieur past.</p></div></div>
+      <div class="v3-tile big rv"><img src="assets/img/g-s-28547dfdbbfa.webp" alt="Wit wandmodel strak tegen een witte muur, onder een balk" loading="lazy"><div class="tx"><h3>Nette plaatsing, tot in het detail</h3><p>Rechte leidingen, een strakke doorvoer en een toestel dat mooi in het interieur past.</p></div></div>
       <div class="v3-tile rv"><div class="num"><span data-count="24">24</span><em>uur</em></div><h3>Snel teruggebeld</h3><p>Na uw aanvraag belt Rim u zelf terug.</p></div>
       <a class="v3-tile ph rv" href="#realisaties"><img src="assets/img/g-n80.webp" alt="Open buitenunit met alle aansluitingen" loading="lazy"><div class="cap"><h3>Ook achter de kap netjes</h3><p>Zo sluiten we aan &rarr;</p></div></a>
       <div class="v3-tile dark rv"><h3>6 merken, eerlijk advies</h3><p>We kiezen samen het toestel dat bij uw ruimte past.</p><div class="brands"><span>Nuova</span><span>LG</span><span>Mitsubishi Electric</span><span>MHI</span><span>Daikin</span><span>Toshiba</span></div></div>

@@ -7709,3 +7709,192 @@ section.pc-catalog {
     grid-template-rows: 280px auto auto;
   }
 }
+
+/* ---------- home: zoekbalk bovenaan (met suggesties terwijl u typt) ---------- */
+.hz {
+  max-width: 570px;
+  margin-top: 26px;
+}
+.hz-veld {
+  position: relative;
+}
+.hz-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 18px;
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  color: var(--muted);
+  transition: box-shadow 0.2s;
+}
+.hz-bar:focus-within {
+  box-shadow:
+    0 0 0 3px rgba(227, 166, 62, 0.6),
+    0 14px 34px rgba(0, 0, 0, 0.28);
+}
+.hz-bar > svg {
+  flex: none;
+}
+.hz-bar input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  outline: none;
+}
+.hz-bar input::placeholder {
+  color: #7d8b98;
+}
+.hz-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.hz-btn:hover {
+  background: #f0b553;
+}
+.hz-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.hz-tip {
+  margin: 10px 0 0 6px;
+  font-size: 0.84rem;
+  color: #9fb2c4;
+}
+.hz-tip button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: #e6edf3;
+  text-decoration: underline;
+  text-decoration-color: rgba(227, 166, 62, 0.7);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.hz-tip button:hover {
+  color: var(--gold);
+}
+.hz-list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 30;
+  max-height: min(420px, 62vh);
+  overflow-y: auto;
+  padding: 6px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.32);
+  color: var(--ink);
+}
+.hz-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.hz-item:hover,
+.hz-item.on {
+  background: var(--surface-alt);
+}
+.hz-item img {
+  flex: none;
+  width: 56px;
+  height: 42px;
+  object-fit: contain;
+}
+.hz-tx {
+  min-width: 0;
+}
+.hz-tx b {
+  display: block;
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+.hz-tx small {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hz-alle {
+  display: block;
+  margin-top: 4px;
+  padding: 11px 12px 9px;
+  border-top: 1px solid var(--line);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--sky);
+  text-decoration: none;
+}
+.hz-alle:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.hz-geen {
+  padding: 12px;
+  font-size: 0.9rem;
+  color: var(--body);
+}
+.hz-geen a {
+  color: var(--sky);
+  font-weight: 700;
+}
+@media (max-width: 480px) {
+  .hz-bar {
+    padding-left: 14px;
+  }
+  /* gsm: knop met enkel een pijl, zodat er meer plaats is om te typen */
+  .hz-btn {
+    padding: 11px 13px;
+  }
+  .hz-btn-tx {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  /* compacte suggesties: alles op één regel, zodat ze boven het toetsenbord passen */
+  .hz-item {
+    gap: 10px;
+    padding: 6px 8px;
+  }
+  .hz-item img {
+    width: 46px;
+    height: 36px;
+  }
+  .hz-tx b {
+    font-size: 0.88rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
