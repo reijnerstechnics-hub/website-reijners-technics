@@ -75,7 +75,11 @@ Zolang daar `voorlopig: true` staat, ziet de klant de melding dat het om voorbee
 
 ## Online zetten
 
-Upload de volledige map (behalve `.git`) naar de webhost, zodat `index.html` in de hoofdmap staat. Werkt ook met Netlify, Vercel, Cloudflare Pages of GitHub Pages zonder extra instellingen.
+Upload de volledige map naar de webhost, zodat `index.html` in de hoofdmap staat. Laat weg wat enkel voor het werken aan de site dient: `.git`, `.claude`, `CLAUDE.md` en `voorbeeld`. Werkt ook met Netlify, Vercel, Cloudflare Pages of GitHub Pages zonder extra instellingen.
+
+## Team van agents (Claude Code)
+
+`CLAUDE.md` is het projectgeheugen: wat het bedrijf doet, de huisstijl, de toon en de vaste werkwijze (eerst een voorbeeld, pas online na akkoord). In `.claude/agents/` staat het team dat aan de site werkt: de `projectleider` (hoofdagent die de anderen aanstuurt), `ux-adviseur`, `ui-ontwerper`, `seo-specialist`, `toestellenbeheerder`, `tekstschrijver` en `tester`. Open een nieuwe Claude Code-sessie in deze map om ze te gebruiken; vraag gewoon wat je wilt veranderen, of noem een agent bij naam.
 
 ## AI-chat
 
