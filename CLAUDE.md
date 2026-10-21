@@ -23,12 +23,23 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - Nooit verzinnen: geen prijzen, reviews, getuigenissen, garanties, levertijden of specificaties zonder bron.
 - Antwoorden aan Rim: in eenvoudig Nederlands, zonder vakjargon. Rim is geen ontwikkelaar.
 
-## Huisstijl
+## Huisstijl (voorlopig, nog niet vastgelegd)
 
-- Kleuren (bovenaan `css/style.css`): donkerblauw `--ink` #16283d, goud `--gold` #e3a63e, lichtgoud `--gold-tint`, blauw `--sky` #3e7fb0, achtergrond `--paper` #f6f9fb.
-- Lettertypes: Source Serif 4 voor titels (`--font-kop`), Source Sans 3 voor tekst (`--font-tekst`), via Google Fonts in `index.html`.
-- Herkenbare onderdelen: gouden knop voor de hoofdactie; toestelkaarten met een label op de foto (Binnen- + buitenunit / Zonder buitenunit / Buitenunit); het kW-blok (lichtgoud, "tot 7,1 kW" en elke maat als knopje).
-- Eigen foto's van echte plaatsingen gaan voor op stockfoto's. Geen modieuze AI-look (geen Sora/Inter/Poppins, geen overdreven verlopen of glaseffecten).
+- **De kleuren en lettertypes zijn nog niet definitief.** Rim wil dat het team ze eerst kritisch beoordeelt: misschien werkt een ander lettertype of een andere kleurencombinatie beter.
+  - Een alternatief stel je altijd voor met een voorbeeld in `voorbeeld/` en screenshots op computer en gsm. Rim kiest.
+  - Pas na zijn keuze komt de huisstijl hier vast te staan.
+  - Tot dan gebruik je bij ander werk de huidige stijl. Wissel niet op eigen houtje.
+- **Nu in gebruik** (bovenaan `css/style.css`):
+  - donkerblauw `--ink` #16283d, goud `--gold` #e3a63e, lichtgoud `--gold-tint`, blauw `--sky` #3e7fb0, achtergrond `--paper` #f6f9fb;
+  - Source Serif 4 voor titels (`--font-kop`) en Source Sans 3 voor tekst (`--font-tekst`), via Google Fonts in `index.html`.
+- **Nu op de site, maar mag in een voorstel anders:**
+  - een gouden knop voor de hoofdactie;
+  - toestelkaarten met een label op de foto (Binnen- + buitenunit / Zonder buitenunit / Buitenunit);
+  - het kW-blok (lichtgoud, "tot 7,1 kW" en elke maat als knopje).
+- **Wat wel vastligt:**
+  - de site mag er niet uitzien alsof ze door AI gemaakt is: geen lettertypes die je op elke AI-site ziet (Sora, Inter, Poppins), geen overdreven verlopen of glaseffecten;
+  - eigen foto's van echte plaatsingen gaan voor op stockfoto's;
+  - alles moet goed leesbaar zijn, ook op gsm, met voldoende contrast.
 
 ## Technische opbouw (kort)
 
@@ -70,3 +81,4 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - De prijzen in `js/prijzen.js` zijn voorbeeldprijzen (`voorlopig: true`). Echte prijzen moeten van Rim komen. Toestellen die later zijn toegevoegd, zitten nog niet in het prijsadvies.
 - SEO: de site is één pagina met #adressen; de detailpagina's van toestellen maakt JavaScript, dus Google vindt ze niet apart. Er is nog geen structured data (LocalBusiness), geen `sitemap.xml` en geen `robots.txt`.
 - Er is nog geen eigen foto van een Mitsubishi Electric Diamond voor de wisselende foto's op de homepagina.
+- Huisstijl: het lettertype "C" (Source Serif + Source Sans) staat lokaal klaar, maar is nog niet online. De kleuren en lettertypes worden eerst door het team beoordeeld (zie *Huisstijl*).

@@ -38,8 +38,8 @@ Je bent de projectleider van het websiteteam van Reijners Technics. Je stuurt de
    - enkel airco's (lucht/lucht);
    - niets verzinnen;
    - Nederlands;
-   - huisstijl;
-   - geen echte formulieren versturen.
+   - geen echte formulieren versturen;
+   - de huisstijl is nog voorlopig: wijzig ze niet zonder Rims keuze, maar laat ze bij een audit of herontwerp wel kritisch beoordelen door de `ui-ontwerper` (met de `ux-adviseur` voor leesbaarheid), met alternatieven als voorbeeld.
 
 ## Je eindverslag (in deze volgorde)
 
