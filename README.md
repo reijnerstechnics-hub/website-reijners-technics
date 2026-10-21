@@ -8,7 +8,7 @@ Het is een statische website (HTML, CSS en JavaScript) zonder build-stap: elke w
 
 ```
 index.html        alle pagina's (home, diensten, toestellen, realisaties, over ons, contact)
-css/style.css     de volledige opmaak; kleuren staan bovenaan in :root
+css/style.css     de volledige opmaak; kleuren en lettertypes staan bovenaan in :root
 js/main.js        navigatie, formulieren, carrousels, filters, fotoviewer, animaties
 assets/img/       alle foto's, het logo en de merklogo's (logo-<merk>.svg)
 ```
@@ -42,20 +42,21 @@ Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via What
 
 ## Toestellen
 
-Op de pagina *Toestellen* kiest de bezoeker eerst een merk (of zoekt op naam), daarna een soort toestel in de linkerkolom. Elk toestel is één kaart (`<div class="device-card">`) in het blok van zijn merk in `index.html` (`#toestellen-daikin`, `#toestellen-lg`, ...). Uit diezelfde kaart maakt de site ook de detailpagina (`#toestel-<naam>`), dus een toestel staat maar op één plaats.
+Op de pagina *Toestellen* kiest de bezoeker eerst een merk (of zoekt op naam), daarna in de linkerkolom het vermogen dat hij nodig heeft en/of een soort toestel. Elk toestel is één kaart (`<div class="device-card">`) in het blok van zijn merk in `index.html` (`#toestellen-daikin`, `#toestellen-lg`, ...). Uit diezelfde kaart maakt de site ook de detailpagina (`#toestel-<naam>`), dus een toestel staat maar op één plaats.
 
-Een kaart heeft drie kenmerken:
+Een kaart heeft vier kenmerken:
 
 - `data-brand`: `daikin`, `lg`, `me` (Mitsubishi Electric), `mhi` (Mitsubishi Heavy Industries), `nuova` of `toshiba`;
 - `data-type`: de soort toestel
   - split-airco (binnen- én buitenunit): `wand`, `vloer`, `cassette`, `kanaal`, `plafond`, `zuil`
   - zonder buitenunit: `monoblock`, `mobiel`
   - losse buitenunit voor multi-split: `buiten`
-- `data-category`: `single` (één kamer met een eigen buitenunit), `multi` (binnenunit voor een multi-split), `single multi` (allebei) of leeg.
+- `data-category`: `single` (één kamer met een eigen buitenunit), `multi` (binnenunit voor een multi-split), `single multi` (allebei) of leeg;
+- `data-kw`: de vermogens in kW waarin het toestel bestaat, gescheiden door een spatie (bv. `2,0 2,5 3,5 5,0`), of een bereik als er geen vaste maten zijn (bv. `2,5-14,0`). Daaruit maakt de site het kW-blok op de kaart en de detailpagina ("tot 7,1 kW" met elke maat als knopje) en de filter *Vermogen* in de linkerkolom (2,5 / 3,5 / 5 / 7 kW of meer dan 7,5 kW).
 
 Een nieuwe kaart mag overal in het merkblok staan: `js/main.js` zet de kaarten zelf per soort onder elkaar (lijst `RT_SOORTEN`) en voegt het label ("Binnen- + buitenunit", "Zonder buitenunit" of "Buitenunit") en de zin "Voor 1 kamer, ..." toe. Losse buitenunits staan niet bij "Alle toestellen" maar in hun eigen categorie; bij het zoeken komen ze wel mee.
 
-De naam van de detailpagina komt uit `data-model` van de knop *Offerte voor dit model*. De rijen van `device-specs` verschijnen op de detailpagina; de kaart in de lijst toont er zelf de kerngegevens uit (vermogen uit *Koelvermogen*, het label uit *Energielabel*, het geluid uit *Geluidsniveau binnen*).
+De naam van de detailpagina komt uit `data-model` van de knop *Offerte voor dit model*. De rijen van `device-specs` verschijnen op de detailpagina; de kaart in de lijst toont er zelf de kerngegevens uit (het label uit *Energielabel*, het geluid uit *Geluidsniveau binnen*).
 
 Een nieuw merk: een merkblok met kaarten, een tegel in `.merk-keuze` met het logo in `assets/img/logo-<merk>.svg`, een link in het menu onder *Toestellen*, en de naam en het logo in `RT_MERKEN` en `RT_LOGOS` bovenaan het blok *TOESTELLEN: MERK, CATEGORIE EN ZOEKEN* in `js/main.js`.
 

@@ -1239,6 +1239,7 @@ window.rtGoToOffer = function (d, model) {
 //   data-type:     een soort uit RT_SOORTEN hieronder ("wand", "cassette",
 //                  "monoblock", "mobiel", "buiten" ...)
 // Een categorie zonder toestellen bij het gekozen merk wordt niet getoond.
+// Bovenaan de linkerkolom staat ook een filter op vermogen (uit data-kw).
 // De zoekbalk zoekt in alle merken tegelijk (naam, reeks, typecodes,
 // vermogen ...); een woord als "cassette" of "buitenunit" toont die soort.
 // =====================================================================
@@ -1275,6 +1276,26 @@ var RT_SOORTEN = [
 function rtGroep(type) {
   for (var i = 0; i < RT_SOORTEN.length; i++) if (RT_SOORTEN[i].type === type) return RT_SOORTEN[i].groep;
   return "split";
+}
+// Vermogen van een toestel uit data-kw op de kaart: de modellen ("2,0 2,5 3,5")
+// of een bereik ("2,5-14,0"). Voor het kW-blok op de kaart en de filter op vermogen.
+function rtKw(card) {
+  var maten = [];
+  var bereik = null;
+  (card.dataset.kw || "").split(/\s+/).forEach(function (t) {
+    if (!t) return;
+    var r = t.split("-").map(function (s) {
+      return parseFloat(s.replace(",", "."));
+    });
+    if (r.length === 2) bereik = r;
+    else maten.push(r[0]);
+  });
+  if (!maten.length && !bereik) return null;
+  var alle = maten.concat(bereik || []);
+  return { maten: maten, bereik: bereik, min: Math.min.apply(null, alle), max: Math.max.apply(null, alle) };
+}
+function rtKwTekst(n) {
+  return n.toFixed(1).replace(".", ",");
 }
 (function () {
   var section = document.getElementById("alle-toestellen");
@@ -1375,7 +1396,7 @@ function rtGroep(type) {
     return CATS[0];
   }
 
-  var state = { merk: null, cat: "alle", q: "" };
+  var state = { merk: null, cat: "alle", q: "", kw: null };
   function vanMerk(card) {
     return state.merk === "alle" || card.dataset.brand === state.merk;
   }
@@ -1416,6 +1437,31 @@ function rtGroep(type) {
     return true;
   }
 
+  // Filter op vermogen: welk vermogen hebt u ongeveer nodig? De oppervlakte
+  // volgt dezelfde vuistregel als op de detailpagina (90 tot 120 W per m²).
+  var KW_KEUZES = [
+    { id: "2", label: "2,5 kW", sub: "± 21-28 m²", zin: "van ongeveer 2,5 kW", van: 0, tot: 2.95 },
+    { id: "3", label: "3,5 kW", sub: "± 29-39 m²", zin: "van ongeveer 3,5 kW", van: 2.95, tot: 3.95 },
+    { id: "5", label: "5 kW", sub: "± 42-56 m²", zin: "van ongeveer 5 kW", van: 3.95, tot: 5.45 },
+    { id: "7", label: "7 kW", sub: "± 58-78 m²", zin: "van ongeveer 7 kW", van: 5.45, tot: 7.55 },
+    { id: "groot", label: "Meer dan 7,5 kW", sub: "grote ruimtes", zin: "van meer dan 7,5 kW", van: 7.55, tot: 999 },
+  ];
+  function kwKeuze(id) {
+    for (var i = 0; i < KW_KEUZES.length; i++) if (KW_KEUZES[i].id === id) return KW_KEUZES[i];
+    return null;
+  }
+  // past dit toestel bij het gekozen vermogen? (bestaat het in een maat binnen die keuze)
+  function pastKw(card, id) {
+    var k = kwKeuze(id === undefined ? state.kw : id);
+    if (!k) return true;
+    var kw = rtKw(card);
+    if (!kw) return false;
+    if (kw.bereik && kw.bereik[0] < k.tot && kw.bereik[1] >= k.van) return true;
+    return kw.maten.some(function (n) {
+      return n >= k.van && n < k.tot;
+    });
+  }
+
   // aantal modellen op elke merktegel (zonder losse buitenunits)
   section.querySelectorAll(".merk-tegel").forEach(function (t) {
     var n = cards.filter(function (c) {
@@ -1443,11 +1489,50 @@ function rtGroep(type) {
     if (zoekInfo) zoekInfo.textContent = "";
     if (!state.merk) return;
 
-    // categorieën van dit merk (en deze zoekopdracht), met het aantal toestellen
-    var mijn = cards.filter(function (c) {
-      return vanMerk(c) && past(c);
-    });
     catBox.innerHTML = "";
+
+    // bovenaan: het vermogen dat u nodig hebt (knoppen zonder toestellen zijn grijs)
+    var kwKop = document.createElement("h4");
+    kwKop.textContent = "Vermogen";
+    var kwUitleg = document.createElement("small");
+    kwUitleg.textContent = "vuistregel: ± 1 kW per 10 m²";
+    kwKop.appendChild(kwUitleg);
+    catBox.appendChild(kwKop);
+    var voorKw = cards.filter(function (c) {
+      return vanMerk(c) && past(c) && zoekCat(state.cat).test(c);
+    });
+    var kwRij = document.createElement("div");
+    kwRij.className = "kw-keuze";
+    [{ id: "", label: "Alle", sub: "elk vermogen" }].concat(KW_KEUZES).forEach(function (k) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "kw-btn";
+      b.dataset.kw = k.id;
+      var label = document.createElement("b");
+      label.textContent = k.label;
+      var sub = document.createElement("small");
+      sub.textContent = k.sub;
+      b.appendChild(label);
+      b.appendChild(sub);
+      if (k.id) {
+        b.disabled = !voorKw.some(function (c) {
+          return pastKw(c, k.id);
+        });
+      }
+      var on = (state.kw || "") === k.id;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      kwRij.appendChild(b);
+    });
+    catBox.appendChild(kwRij);
+    var soortKop = document.createElement("h4");
+    soortKop.textContent = "Soort toestel";
+    catBox.appendChild(soortKop);
+
+    // categorieën van dit merk (en deze zoekopdracht en dit vermogen), met het aantal toestellen
+    var mijn = cards.filter(function (c) {
+      return vanMerk(c) && past(c) && pastKw(c);
+    });
     var kop = null;
     var gevonden = false;
     CATS.forEach(function (cat) {
@@ -1491,7 +1576,7 @@ function rtGroep(type) {
     var test = zoekCat(state.cat).test;
     var zichtbaar = 0;
     cards.forEach(function (c) {
-      c.hidden = !(vanMerk(c) && past(c) && test(c));
+      c.hidden = !(vanMerk(c) && past(c) && test(c) && pastKw(c));
       if (!c.hidden) zichtbaar++;
     });
     section.querySelectorAll(".brand-sub").forEach(function (sub) {
@@ -1511,11 +1596,22 @@ function rtGroep(type) {
         ? zichtbaar + (zichtbaar === 1 ? " toestel gevonden" : " toestellen gevonden")
         : "Geen toestellen gevonden";
     }
-    if (leeg) leeg.hidden = zichtbaar > 0;
+    if (leeg) {
+      leeg.hidden = zichtbaar > 0;
+      // niets gevonden door het vermogen (en niet door een zoekterm)
+      var doorKw = !!state.kw && !state.q;
+      leeg.querySelector("b").textContent = doorKw ? "Geen toestellen met dit vermogen." : "Geen toestellen gevonden.";
+      leeg.querySelector("p").textContent = doorKw
+        ? "Bij deze keuze is er geen toestel " + kwKeuze(state.kw).zin + ". Kies een ander vermogen of merk, of vraag het gewoon aan Rim."
+        : "Probeer een andere zoekterm, of vraag het gewoon aan Rim: hij kent ook modellen die hier niet staan.";
+      if (wis) wis.textContent = doorKw ? "Toon alle vermogens" : "Toon alle toestellen";
+    }
 
-    // knop op de gsm toont de gekozen categorie
+    // knop op de gsm toont de gekozen categorie en het vermogen
     var fb = section.querySelector(".v4-filterbtn");
-    if (fb && fb.lastChild) fb.lastChild.nodeValue = "Categorie: " + zoekCat(state.cat).label;
+    if (fb && fb.lastChild) {
+      fb.lastChild.nodeValue = "Filter: " + zoekCat(state.cat).label + (state.kw ? " · " + kwKeuze(state.kw).label : "");
+    }
   }
 
   function naarLijst() {
@@ -1539,11 +1635,12 @@ function rtGroep(type) {
     });
   });
 
-  // categorie kiezen
+  // categorie of vermogen kiezen (nog eens op het gekozen vermogen klikken zet het af)
   catBox.addEventListener("click", function (e) {
-    var b = e.target.closest(".cat-btn");
-    if (!b) return;
-    state.cat = b.dataset.cat;
+    var b = e.target.closest(".cat-btn, .kw-btn");
+    if (!b || b.disabled) return;
+    if (b.classList.contains("kw-btn")) state.kw = b.dataset.kw && b.dataset.kw !== state.kw ? b.dataset.kw : null;
+    else state.cat = b.dataset.cat;
     render();
     var side = lijst.querySelector(".toestellen-sidebar");
     var fb = section.querySelector(".v4-filterbtn");
@@ -1592,9 +1689,16 @@ function rtGroep(type) {
   var wis = lijst.querySelector(".zoek-wis");
   if (wis)
     wis.addEventListener("click", function () {
+      // enkel het vermogen gaf geen resultaat: alleen dat afzetten
+      if (state.kw && !state.q) {
+        state.kw = null;
+        render();
+        return;
+      }
       if (zoek) zoek.value = "";
       merkVoorZoeken = undefined;
       state.q = "";
+      state.kw = null;
       state.merk = "alle";
       render();
     });
@@ -1744,22 +1848,46 @@ function rtGroep(type) {
     return e;
   }
 
-  // drie kerngegevens voor de kaart in de lijst
-  function kernen(card) {
-    var out = [];
-    // vermogen: van het kleinste tot het grootste model
-    var kw = spec(card, ["Koelvermogen", "Totaalvermogen", "Vermogen"]).replace(/\(bereik[^)]*\)/g, "");
-    var nums = (kw.match(/\d+,\d/g) || []).map(function (n) {
-      return parseFloat(n.replace(",", "."));
+  // vermogen in één regel, bv. "2,0 - 7,1 kW": uit data-kw, anders uit de rij Koelvermogen
+  function kwTekst(card) {
+    var kw = rtKw(card);
+    var nums = kw
+      ? [kw.min, kw.max]
+      : (spec(card, ["Koelvermogen", "Totaalvermogen", "Vermogen"]).replace(/\(bereik[^)]*\)/g, "").match(/\d+,\d/g) || []).map(function (n) {
+          return parseFloat(n.replace(",", "."));
+        });
+    if (!nums.length) return "";
+    var lo = Math.min.apply(null, nums),
+      hi = Math.max.apply(null, nums);
+    return lo === hi ? rtKwTekst(lo) + " kW" : rtKwTekst(lo) + " - " + rtKwTekst(hi) + " kW";
+  }
+
+  // Het vermogen in een eigen blok: bovenaan het grootste vermogen ("tot 7,1 kW"),
+  // daaronder elke maat waarin het toestel bestaat (uit data-kw op de kaart).
+  function kwBlok(card, groot) {
+    var kw = rtKw(card);
+    if (!kw) return null;
+    var box = el("div", "device-kw" + (groot ? " device-kw-groot" : ""));
+    var kop = el("div", "kw-kop");
+    kop.appendChild(el("span", null, card.dataset.type === "buiten" ? "Totaal vermogen" : "Vermogen"));
+    var max = el("b");
+    if (kw.min !== kw.max) max.appendChild(el("em", null, "tot "));
+    max.appendChild(document.createTextNode(rtKwTekst(kw.max) + " kW"));
+    kop.appendChild(max);
+    box.appendChild(kop);
+    var maten = el("div", "kw-maten");
+    kw.maten.forEach(function (n) {
+      maten.appendChild(el("span", n === kw.max && kw.maten.length > 1 ? "max" : null, rtKwTekst(n)));
     });
-    if (nums.length) {
-      var lo = Math.min.apply(null, nums),
-        hi = Math.max.apply(null, nums);
-      var f = function (n) {
-        return n.toFixed(1).replace(".", ",");
-      };
-      out.push(lo === hi ? f(lo) + " kW" : f(lo) + " - " + f(hi) + " kW");
-    }
+    if (kw.bereik) maten.appendChild(el("span", "bereik", rtKwTekst(kw.bereik[0]) + " – " + rtKwTekst(kw.bereik[1])));
+    box.appendChild(maten);
+    return box;
+  }
+
+  // drie kerngegevens voor de kaart in de lijst. zonderKw: het vermogen staat al in het kW-blok
+  function kernen(card, zonderKw) {
+    var out = [];
+    if (!zonderKw) out.push(kwTekst(card));
     // energielabel voor koelen (bij een bereik: "tot" het beste label)
     var labels = (spec(card, ["Energielabel"]).split("/")[0].match(/A\+*/g) || []).filter(function (l, i, a) {
       return a.indexOf(l) === i;
@@ -1794,18 +1922,21 @@ function rtGroep(type) {
     var foto = card.querySelector(".device-photo");
     var badge = el("span", "device-badge badge-" + groep, BADGES[groep]);
     card.insertBefore(badge, foto ? foto.nextSibling : card.firstChild);
-    // en een zin in gewone taal onder de naam
+    // en een zin in gewone taal onder de naam, met daaronder het vermogen
     var wie = voorWie(card);
-    var k = kernen(card);
+    if (wie) card.insertBefore(el("div", "device-sys", wie), h3.nextSibling);
+    var blok = kwBlok(card);
+    if (blok) card.insertBefore(blok, (card.querySelector(".device-sys") || h3).nextSibling);
+    card.dataset.kwTekst = kwTekst(card);
     var keys = el("div", "device-keys");
-    k.forEach(function (t) {
+    kernen(card, !!blok).forEach(function (t) {
       keys.appendChild(el("span", null, t));
     });
     var meer = el("a", "device-more", "Bekijk details");
     meer.href = "#toestel-" + id;
     meer.appendChild(el("span", "ar", " →"));
-    if (wie) card.insertBefore(el("div", "device-sys", wie), h3.nextSibling);
-    card.insertBefore(keys, cta);
+    if (keys.children.length) card.insertBefore(keys, cta);
+    else meer.classList.add("device-more-onder");
     card.insertBefore(meer, cta);
   });
 
@@ -1820,11 +1951,14 @@ function rtGroep(type) {
   // ---------- detailpagina ----------
   function vermogenTabel(card) {
     if (["wand", "vloer", "cassette", "kanaal", "plafond", "zuil", "monoblock"].indexOf(card.dataset.type) === -1) return null;
-    var kw = spec(card, ["Koelvermogen"]);
-    var nums = (kw.match(/\d+,\d/g) || [])
-      .map(function (n) {
-        return parseFloat(n.replace(",", "."));
-      })
+    // de maten uit data-kw, anders de getallen uit de rij Koelvermogen
+    var kwi = rtKw(card);
+    var nums = (kwi && kwi.maten.length
+      ? kwi.maten
+      : (spec(card, ["Koelvermogen"]).match(/\d+,\d/g) || []).map(function (n) {
+          return parseFloat(n.replace(",", "."));
+        })
+    )
       .filter(function (n, i, a) {
         return n >= 1.4 && n <= 16 && a.indexOf(n) === i;
       })
@@ -1908,12 +2042,14 @@ function rtGroep(type) {
     info.appendChild(tags);
     var wie = voorWie(card);
     if (wie) info.appendChild(el("p", "td-wie", wie));
+    var kwGroot = kwBlok(card, true);
+    if (kwGroot) info.appendChild(kwGroot);
     info.appendChild(el("p", "td-desc", card.querySelector(".device-desc").textContent));
     var keys = el("div", "td-keys");
-    kernen(card).forEach(function (t) {
+    kernen(card, !!kwGroot).forEach(function (t) {
       keys.appendChild(el("span", null, t));
     });
-    info.appendChild(keys);
+    if (keys.children.length) info.appendChild(keys);
     var acts = el("div", "td-acts");
     var offerte = el("button", "btn btn-gold", "Offerte voor dit model ");
     offerte.type = "button";
@@ -2073,8 +2209,8 @@ function rtGroep(type) {
     var soort = (card.querySelector(".device-brand") || {}).textContent || "";
     soort = soort.replace(/^Airco · /, "");
     soort = soort.charAt(0).toUpperCase() + soort.slice(1);
-    var kw = card.querySelector(".device-keys span");
-    return kw ? soort + " · " + kw.textContent : soort;
+    var kw = card.dataset.kwTekst;
+    return kw ? soort + " · " + kw : soort;
   }
 
   // via de gewone navigatie naar een adres (#toestel-..., #toestellen-lijst)

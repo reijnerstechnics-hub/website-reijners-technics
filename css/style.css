@@ -10,6 +10,9 @@
 /* Reijners Technics: "Fris & licht" huisstijl.
      Vast, licht kleurenschema (niet afhankelijk van het systeemthema van de bezoeker). */
 :root {
+  /* lettertypes: titels met schreef, tekst zonder (geladen in index.html via Google Fonts) */
+  --font-kop: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-tekst: "Source Sans 3", "Segoe UI", Arial, sans-serif;
   --ink: #16283d;
   --body: #3d4c5a;
   --muted: #6b7a87;
@@ -33,7 +36,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Work Sans", "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-tekst);
   font-size: 16px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -41,7 +44,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   text-wrap: balance;
   margin: 0;
@@ -49,7 +52,7 @@ h3 {
   letter-spacing: -0.01em;
 }
 .mono {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-variant-numeric: tabular-nums;
 }
 a {
@@ -65,7 +68,7 @@ svg {
   padding: 0 28px;
 }
 .eyebrow {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.78rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -145,7 +148,7 @@ section[data-page].page-active {
   padding: 18px 20px 22px;
 }
 .case-tag {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.76rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -176,7 +179,7 @@ section[data-page].page-active {
 }
 .brand-frame-tag {
   display: block;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-weight: 700;
   font-size: 0.78rem;
   letter-spacing: 0.06em;
@@ -299,7 +302,7 @@ section[data-page].page-active {
   z-index: 2;
   background: rgba(255, 255, 255, 0.92);
   color: var(--ink);
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-weight: 700;
   font-size: 0.68rem;
   letter-spacing: 0.04em;
@@ -404,7 +407,7 @@ section[data-page].page-active {
   background: none;
   border: none;
   text-align: left;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 700;
   font-size: 1rem;
   color: var(--ink);
@@ -465,7 +468,7 @@ section[data-page].page-active {
 }
 .cta-banner-text h3 {
   margin: 0 0 6px;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: 1.35rem;
   color: #fff;
@@ -514,7 +517,7 @@ header.site {
   gap: 20px;
 }
 .brand {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: 1.18rem;
   display: flex;
@@ -549,7 +552,7 @@ nav.links a:hover {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-weight: 700;
   font-size: 0.92rem;
   padding: 12px 22px;
@@ -742,7 +745,7 @@ nav.links a:hover {
   flex-wrap: wrap;
 }
 .brand-chip {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 700;
   font-size: 0.96rem;
   background: var(--surface);
@@ -761,7 +764,7 @@ nav.links a:hover {
 }
 .about-teaser blockquote {
   margin: 0;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 700;
   font-size: 1.4rem;
   line-height: 1.4;
@@ -892,7 +895,7 @@ section.alt {
 }
 .calc-progress-label {
   margin-top: 9px;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.72rem;
   color: var(--muted);
   letter-spacing: 0.08em;
@@ -924,7 +927,7 @@ section.alt {
   margin: 22px 0 22px;
 }
 .calc-q-num {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   color: var(--sky);
   font-size: 0.85rem;
   padding-top: 5px;
@@ -956,7 +959,7 @@ section.alt {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   transition:
     border-color 0.15s,
     background 0.15s;
@@ -1002,7 +1005,7 @@ section.alt {
   background: none;
   border: none;
   color: var(--muted);
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.78rem;
   cursor: pointer;
   padding: 8px 0;
@@ -1014,14 +1017,14 @@ section.alt {
 }
 
 .calc-price {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: clamp(2.1rem, 5vw, 2.8rem);
   color: var(--gold-dark);
   line-height: 1;
 } /* niet meer gebruikt, kan later opgeruimd */
 .calc-price-label {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.75rem;
   color: var(--muted);
   text-transform: uppercase;
@@ -1029,7 +1032,7 @@ section.alt {
   margin-bottom: 8px;
 }
 .calc-summary-title {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: clamp(1.3rem, 3vw, 1.7rem);
   color: var(--ink);
@@ -1047,7 +1050,7 @@ section.alt {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.8rem;
   color: var(--muted);
 }
@@ -1066,14 +1069,14 @@ section.alt {
   gap: 4px;
 }
 .calc-kw-box .calc-kw-label {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--gold-text);
 }
 .calc-kw-box .calc-kw-value {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: 1.3rem;
   color: var(--ink);
@@ -1096,7 +1099,7 @@ section.alt {
   align-items: center;
 }
 .calc-restart {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.78rem;
   color: var(--muted);
   text-decoration: underline;
@@ -1109,7 +1112,7 @@ section.alt {
 }
 .calc-status {
   font-size: 0.85rem;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   min-height: 1.2em;
   margin-top: 10px;
 }
@@ -1165,7 +1168,7 @@ section.alt {
 }
 .calc-extra-head strong {
   display: block;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   color: var(--ink);
   font-size: 1rem;
 }
@@ -1174,7 +1177,7 @@ section.alt {
   color: var(--muted);
 }
 .calc-extra-q {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.74rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -1198,7 +1201,7 @@ section.alt {
   gap: 8px;
 }
 .chip {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.9rem;
   background: var(--surface);
   border: 1.5px solid var(--line);
@@ -1267,7 +1270,7 @@ section.alt {
   box-shadow: 0 2px 10px rgba(20, 45, 70, 0.05);
 }
 .service .idx {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   color: var(--gold-dark);
   font-size: 0.8rem;
 }
@@ -1289,7 +1292,7 @@ section.alt {
   gap: 5px;
 }
 .service .specs div {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.75rem;
   color: var(--muted);
   display: flex;
@@ -1305,7 +1308,7 @@ section.alt {
   display: none !important;
 }
 .dual-badge {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1331,7 +1334,7 @@ section.alt {
   padding: 22px;
 }
 .toestellen-sidebar h4 {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.74rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1400,7 +1403,7 @@ section.alt {
   border-bottom: 1px solid var(--line);
 }
 .brand-sub {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1469,7 +1472,7 @@ section.alt {
   margin: -4px 0 2px;
 }
 .color-btn {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.68rem;
   letter-spacing: 0.02em;
   background: var(--surface-alt);
@@ -1509,7 +1512,7 @@ section.alt {
   gap: 12px;
 }
 .device-brand {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -1523,7 +1526,7 @@ section.alt {
   font-size: 0.72rem;
   color: var(--muted);
   font-weight: 500;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
 }
 .device-desc {
   font-size: 0.86rem;
@@ -1541,7 +1544,7 @@ section.alt {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.74rem;
   color: var(--muted);
 }
@@ -1619,7 +1622,7 @@ section.alt {
   border-radius: 50%;
   background: var(--gold-tint);
   color: var(--gold-text);
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-weight: 700;
   font-size: 0.82rem;
   display: flex;
@@ -1630,7 +1633,7 @@ section.alt {
   font-size: 0.95rem;
   font-weight: 700;
   margin: 0 0 3px;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
 }
 .step-mini p {
   margin: 0;
@@ -1662,7 +1665,7 @@ section.alt {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--muted);
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   margin-bottom: 3px;
 }
 .towns {
@@ -1672,7 +1675,7 @@ section.alt {
   margin-top: 8px;
 }
 .towns span {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.72rem;
   background: var(--sky-tint);
   color: var(--sky);
@@ -1692,7 +1695,7 @@ form {
 }
 .field label {
   display: block;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.74rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -1708,7 +1711,7 @@ form {
   border-radius: 12px;
   background: var(--surface);
   color: var(--ink);
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.96rem;
 }
 .field input:focus,
@@ -1740,7 +1743,7 @@ textarea {
 }
 .form-status {
   font-size: 0.85rem;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   min-height: 1.2em;
 }
 .form-status.ok {
@@ -1938,7 +1941,7 @@ footer .brand {
   outline-offset: 2px;
 }
 .wb-from {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -1946,7 +1949,7 @@ footer .brand {
 }
 .wb-title {
   display: block;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-size: 1.02rem;
   color: var(--ink);
   margin: 4px 28px 12px 0;
@@ -1959,7 +1962,7 @@ footer .brand {
 }
 .wb-opt {
   text-align: left;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.93rem;
   font-weight: 600;
   color: var(--ink);
@@ -1988,7 +1991,7 @@ footer .brand {
   background: none;
   border: none;
   padding: 4px 0;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.85rem;
   color: var(--sky);
   text-decoration: underline;
@@ -2083,7 +2086,7 @@ footer .brand {
 }
 .nh-float b {
   display: block;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   color: var(--ink);
   font-size: 1rem;
 }
@@ -2108,13 +2111,13 @@ footer .brand {
   flex-wrap: wrap;
 }
 .nh-brands-row span {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: 1.15rem;
   color: #8c99a5;
 }
 .nh-brands-row .nh-brands-label {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-weight: 500;
   font-size: 0.74rem;
   letter-spacing: 0.1em;
@@ -2143,7 +2146,7 @@ footer .brand {
   border-radius: 50%;
   background: var(--gold);
   color: var(--ink);
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -2177,7 +2180,7 @@ footer .brand {
   text-align: left;
   color: #fff;
   background: var(--ink);
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
 }
 .nh-tile img {
   position: absolute;
@@ -2206,7 +2209,7 @@ footer .brand {
 }
 .nh-tile-text b {
   display: block;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-size: 1.15rem;
   line-height: 1.25;
 }
@@ -2368,7 +2371,7 @@ img.rot.on {
   color: #fff;
 }
 .carousel-count {
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.8rem;
   color: var(--muted);
   letter-spacing: 0.04em;
@@ -2432,7 +2435,7 @@ img.rot.on {
 }
 .chat-panel-head strong {
   display: block;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-size: 1rem;
 }
 .chat-panel-head span {
@@ -2502,7 +2505,7 @@ img.rot.on {
   padding: 10px 13px;
   border: 1.5px solid var(--line);
   border-radius: 999px;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-size: 0.88rem;
   background: var(--surface);
   color: var(--ink);
@@ -2583,7 +2586,7 @@ img.rot.on {
     border-radius: 999px;
     background: var(--gold);
     color: var(--ink);
-    font-family: "Work Sans", sans-serif;
+    font-family: var(--font-tekst);
     font-weight: 700;
     font-size: 0.95rem;
     text-decoration: none;
@@ -2834,7 +2837,7 @@ header.site {
   gap: 26px;
   align-items: center;
   flex-wrap: wrap;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 700;
   color: #9fb2c4;
   font-size: 1.05rem;
@@ -2847,7 +2850,7 @@ header.site {
 .v2-promises b {
   display: block;
   color: #fff;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-size: 1rem;
 }
 .v2-promises span {
@@ -3110,7 +3113,7 @@ section.v2-after-phead {
   background: #fff;
   white-space: nowrap;
   cursor: pointer;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
 }
 .v2-chip:hover {
   border-color: var(--sky);
@@ -3336,7 +3339,7 @@ section.v2-after-phead {
   max-width: none;
 }
 .v2-about blockquote {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-size: 1.6rem;
   color: var(--ink);
   line-height: 1.3;
@@ -3356,7 +3359,7 @@ section.v2-after-phead {
 }
 .v2-facts b {
   display: block;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-size: 1.7rem;
   color: var(--ink);
 }
@@ -3713,7 +3716,7 @@ header.site .btn-gold {
   color: #fff;
   display: grid;
   place-items: center;
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 700;
   font-size: 0.85rem;
   flex: none;
@@ -3813,7 +3816,7 @@ section.v3-hero {
   gap: 8px;
   position: relative;
   text-align: left;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   cursor: pointer;
   transition:
     transform 0.25s var(--ease),
@@ -3843,7 +3846,7 @@ section.v3-hero {
   height: 18px;
 }
 .v3-pick b {
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-size: 0.95rem;
   line-height: 1.2;
 }
@@ -3940,7 +3943,7 @@ section.v3-hero {
   flex: none;
 }
 .v3-glass b {
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   display: block;
   font-size: 0.98rem;
 }
@@ -3996,7 +3999,7 @@ section.v3-marquee {
   margin-right: 44px;
 }
 .v3-mq-track .nm {
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: 1.55rem;
   color: #aab9c7;
@@ -4108,7 +4111,7 @@ section.v3-sec.v3-white {
   margin-bottom: 10px;
 }
 .v3-tile .num {
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: 3.6rem;
   line-height: 1;
@@ -4187,7 +4190,7 @@ section.v3-sec.v3-white {
   place-items: center;
   color: var(--gold-dark);
   font-weight: 800;
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-size: 0.66rem;
   text-align: center;
   line-height: 1.15;
@@ -4286,7 +4289,7 @@ section.v3-sec.v3-white {
   padding: 26px 28px;
 }
 .v3-scard .n {
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: 2.4rem;
   color: var(--gold);
@@ -4339,7 +4342,7 @@ section.v3-offer {
 }
 .v3-rim b {
   color: #fff;
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   display: block;
   margin-bottom: 4px;
 }
@@ -4406,7 +4409,7 @@ section.v3-offer {
   gap: 18px;
 }
 .v3-count b {
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-size: 2.8rem;
   color: var(--ink);
   letter-spacing: -0.04em;
@@ -4896,7 +4899,7 @@ section.v2-phead::before {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  font-family: "Work Sans", sans-serif;
+  font-family: var(--font-tekst);
   font-weight: 600;
   font-size: 0.88rem;
   transition:
@@ -4944,7 +4947,7 @@ section.v2-phead::before {
   transition: translate 0.6s var(--ease);
 }
 .v4-thermo .t {
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: 1.6rem;
   letter-spacing: -0.03em;
@@ -5104,7 +5107,7 @@ section.v2-phead::before {
   border: 2px solid var(--line);
   display: grid;
   place-items: center;
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 700;
   font-size: 0.85rem;
   color: var(--muted);
@@ -5152,7 +5155,7 @@ section.v2-phead::before {
   color: #c7d4e0;
 }
 .v4-stop.end .big {
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: 3rem;
   color: #fff;
@@ -5620,7 +5623,7 @@ img.v4-zoom {
 }
 .v4-rim b {
   display: block;
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   color: var(--ink);
   margin-bottom: 4px;
 }
@@ -5726,7 +5729,7 @@ img.v4-zoom {
 }
 .v4-ctile b {
   grid-area: b;
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   color: var(--ink);
   font-size: 1.05rem;
 }
@@ -5820,7 +5823,7 @@ img.v4-zoom {
     border: 0;
     background: var(--ink);
     color: #fff;
-    font-family: "Work Sans", sans-serif;
+    font-family: var(--font-tekst);
     font-weight: 700;
     font-size: 0.95rem;
     box-shadow: var(--sh-2);
@@ -6028,7 +6031,7 @@ img.v4-zoom {
 }
 .team-aanpak h4 {
   margin: 0 0 8px;
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-size: 1rem;
   color: var(--ink);
 }
@@ -6175,7 +6178,7 @@ section.pc-sec {
   padding: 16px 8px;
 }
 .pc-opts-n .pc-opt b {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-size: 1.5rem;
   line-height: 1.1;
 }
@@ -6413,7 +6416,7 @@ section.pc-sec {
   color: var(--gold);
 }
 .pc-price-big {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
   font-weight: 800;
   font-size: 1.65rem;
   color: #fff;
@@ -6489,7 +6492,7 @@ section.pc-sec {
 }
 .pc-lead > b {
   color: #fff;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-kop);
 }
 .pc-muted {
   color: #a9b8c6;
@@ -7343,7 +7346,7 @@ section.pc-catalog {
   color: var(--muted);
 }
 .pc-vs-prijs b {
-  font-family: "Sora", "Work Sans", sans-serif;
+  font-family: var(--font-kop);
   font-size: 1.35rem;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
@@ -7896,5 +7899,197 @@ section.pc-catalog {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+}
+
+/* ---------- lettertype: Source Serif 4 voor titels, Source Sans 3 voor tekst ---------- */
+/* Source Sans is iets kleiner dan het vorige lettertype: alles 6% groter houdt het even leesbaar */
+html {
+  font-size: 106.25%;
+}
+body {
+  font-size: 1rem;
+}
+/* de schreefletter heeft minder krappe letterafstand nodig */
+h1,
+h2,
+h3,
+.hero h1,
+.nh-hero h1,
+.v2-hero h1,
+.v2-phead h1,
+.v2-band h2,
+.v3-hero h1,
+.brand-heading {
+  letter-spacing: -0.01em;
+}
+.v3-tile .num,
+.v3-scard .n,
+.v3-count b,
+.v4-stop.end .big,
+.v4-thermo .t,
+.v3-mq-track .nm {
+  letter-spacing: -0.015em;
+}
+
+/* ---------- vermogen (kW) duidelijk in beeld: op de kaart en de detailpagina ---------- */
+.device-kw {
+  padding: 11px 12px 12px;
+  border-radius: 14px;
+  background: var(--gold-tint);
+  border: 1px solid #f1ddb6;
+}
+.kw-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.kw-kop span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+.kw-kop b {
+  font-family: var(--font-kop);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.kw-kop b em {
+  font-family: var(--font-tekst);
+  font-style: normal;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gold-text);
+}
+.kw-maten {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.kw-maten span {
+  min-width: 48px;
+  padding: 5px 8px;
+  border-radius: 9px;
+  background: #fff;
+  border: 1.5px solid var(--gold);
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.kw-maten span.max {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.kw-maten span.bereik {
+  padding: 5px 12px;
+}
+.device-kw-groot {
+  max-width: 540px;
+  margin-top: 16px;
+  padding: 14px 16px 16px;
+}
+.device-kw-groot .kw-kop b {
+  font-size: 1.75rem;
+}
+.device-kw-groot .kw-maten span {
+  min-width: 58px;
+  padding: 7px 10px;
+  font-size: 1rem;
+}
+.device-more-onder {
+  margin-top: auto;
+}
+
+/* ---------- filter op vermogen, bovenaan de linkerkolom ---------- */
+.kw-keuze {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.kw-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 7px 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.kw-btn b {
+  font-size: 0.92rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.kw-btn small {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.kw-btn:hover:not(:disabled) {
+  border-color: var(--gold);
+}
+.kw-btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.kw-btn.on {
+  background: var(--gold-tint);
+  border-color: var(--gold);
+}
+.kw-btn.on small {
+  color: var(--gold-text);
+}
+.kw-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+@media (max-width: 900px) {
+  .kw-keuze {
+    flex-basis: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 4px;
+  }
+}
+
+/* gsm: kaart met de foto links, het kW-blok iets kleiner */
+@media (max-width: 640px) {
+  .toestellen-main .device-card > .device-photo {
+    grid-row: 1 / span 6;
+  }
+  .toestellen-main .device-kw {
+    padding: 8px 9px 9px;
+  }
+  .toestellen-main .kw-kop {
+    margin-bottom: 6px;
+  }
+  .toestellen-main .kw-kop b {
+    font-size: 1.1rem;
+  }
+  .toestellen-main .kw-maten {
+    gap: 4px;
+  }
+  .toestellen-main .kw-maten span {
+    min-width: 38px;
+    padding: 3px 5px;
+    font-size: 0.78rem;
+    border-radius: 7px;
   }
 }
