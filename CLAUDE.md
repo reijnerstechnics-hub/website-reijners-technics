@@ -81,4 +81,4 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - De prijzen in `js/prijzen.js` zijn voorbeeldprijzen (`voorlopig: true`). Echte prijzen moeten van Rim komen. Toestellen die later zijn toegevoegd, zitten nog niet in het prijsadvies.
 - SEO: de site is één pagina met #adressen; de detailpagina's van toestellen maakt JavaScript, dus Google vindt ze niet apart. Er is nog geen structured data (LocalBusiness), geen `sitemap.xml` en geen `robots.txt`.
 - Er is nog geen eigen foto van een Mitsubishi Electric Diamond voor de wisselende foto's op de homepagina.
-- Huisstijl: het lettertype "C" (Source Serif + Source Sans) staat lokaal klaar, maar is nog niet online. De kleuren en lettertypes worden eerst door het team beoordeeld (zie *Huisstijl*).
+- Huisstijl: sinds 21 oktober 2026 staat het lettertype "C" (Source Serif + Source Sans) met de huidige kleuren online. De kleuren en lettertypes zijn nog in beoordeling: de voorstellen A (huidig, bijgewerkt), B (Vakwerk) en C (Helder) staan in `voorbeeld/huisstijl/`. Rim kiest.
