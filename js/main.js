@@ -331,6 +331,11 @@ function sendLead(data) {
     if (history.length > 1) {
       history.pop();
       render();
+      // de focus niet laten wegvallen: naar de gekozen dienst in stap 1
+      if (currentKey() === "dienst") {
+        var gekozen = form.querySelector('.option-grid[data-field="dienst"] .option-btn.selected') || dienstBtns[0];
+        if (gekozen) gekozen.focus();
+      }
     }
   }
   document.getElementById("calc-back").addEventListener("click", vorigeStap);
@@ -1000,19 +1005,29 @@ window.rtGoToOffer = function (d, model) {
         sl.inert = idx !== i;
       });
     }
-    // de foto's ernaast alvast laden, zodat ze niet leeg inschuiven
+    // de volgende foto alvast laden, zodat ze niet leeg inschuift
     function preload(k) {
       var im = slides[(k + slides.length) % slides.length].querySelector("img");
       if (im && im.loading === "lazy") im.loading = "eager";
     }
-    function goTo(idx) {
+    function goTo(idx, doorKlant) {
       i = (idx + slides.length) % slides.length;
       preload(i + 1);
-      preload(i - 1);
+      if (doorKlant) preload(i - 1);
       render();
     }
-    // Vanzelf verder enkel als de carrousel in beeld kan zijn, niet bij "minder beweging",
-    // en niet terwijl de bezoeker er met het toetsenbord in zit.
+    // Is de carrousel in beeld? Enkel dan schuift ze vanzelf verder en laadt ze foto's.
+    var inBeeld = !("IntersectionObserver" in window);
+    if (!inBeeld)
+      new IntersectionObserver(
+        function (entries) {
+          inBeeld = entries[0].isIntersecting;
+          if (inBeeld && slides.length > 1) preload(i + 1);
+        },
+        { rootMargin: "100px 0px" }
+      ).observe(frame);
+    // Niet vanzelf verder bij "minder beweging" en niet terwijl de bezoeker er met het
+    // toetsenbord in zit.
     var rustig = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var focusBinnen = false;
     frame.addEventListener("focusin", function () {
@@ -1025,7 +1040,7 @@ window.rtGoToOffer = function (d, model) {
       if (timer) clearInterval(timer);
       if (slides.length > 1 && !rustig)
         timer = setInterval(function () {
-          if (document.hidden || focusBinnen || frame.offsetParent === null) return;
+          if (document.hidden || focusBinnen || !inBeeld) return;
           if (document.querySelector(".v4-lb:not([hidden])")) return; // fotoviewer staat open
           goTo(i + 1);
         }, interval);
@@ -1046,7 +1061,7 @@ window.rtGoToOffer = function (d, model) {
           dot.className = "carousel-dot" + (idx === 0 ? " active" : "");
           dot.setAttribute("aria-label", "Foto " + (idx + 1) + " van " + slides.length);
           dot.addEventListener("click", function () {
-            goTo(idx);
+            goTo(idx, true);
             restart();
           });
           dotsWrap.appendChild(dot);
@@ -1055,12 +1070,12 @@ window.rtGoToOffer = function (d, model) {
       var nextBtn = frame.querySelector(".carousel-next");
       if (prevBtn)
         prevBtn.addEventListener("click", function () {
-          goTo(i - 1);
+          goTo(i - 1, true);
           restart();
         });
       if (nextBtn)
         nextBtn.addEventListener("click", function () {
-          goTo(i + 1);
+          goTo(i + 1, true);
           restart();
         });
     }

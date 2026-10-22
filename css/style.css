@@ -8208,3 +8208,8 @@ h3,
     padding-bottom: 150px;
   }
 }
+
+/* ---------- ankers (bv. #dienst-herstelling) niet onder de vaste menubalk laten verdwijnen ---------- */
+section[data-page] [id] {
+  scroll-margin-top: 96px;
+}
