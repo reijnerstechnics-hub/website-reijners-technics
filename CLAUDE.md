@@ -8,8 +8,11 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - Borreshoefstraat 12, 3650 Dilsen-Stokkem · +32 491 11 33 13 · reijnerstechnics@gmail.com · BTW BE 1021.765.138.
 - Werkgebied: Dilsen-Stokkem, Maaseik, Bree, Genk, Hasselt, Tongeren en omgeving.
 - Merken: Daikin, LG, Mitsubishi Electric, Mitsubishi Heavy Industries (MHI), Nuova en Toshiba.
-- **Niet** in het aanbod (bewust overal verwijderd): lucht/water-warmtepompen, warmtepompboilers, het merk Ariston. Voeg ze nooit opnieuw toe.
+- **Niet** in het aanbod (bewust overal verwijderd): lucht/water-warmtepompen, warmtepompboilers, het merk Ariston. Ook geen foto's van Gree of Olimpia Splendid (op 22-10-2026 van de site gehaald). Voeg ze nooit opnieuw toe.
 - Beloftes op de site: gratis plaatsbezoek, binnen 24 uur teruggebeld door Rim zelf, rechtstreeks met de installateur, u beslist pas na de offerte.
+- Rim is altijd zelf het aanspreekpunt. Fabio Lomma (eigen zaak: Lomma Technics) plaatst mee, maar is geen aanspreekpunt (Rim, 22-10-2026).
+- Rim heeft een koeltechnisch certificaat. Het nummer en een foto van het certificaat komen nooit online (kans op misbruik).
+- Prijzen die Rim bevestigde: onderhoud €150 tot €200, afhankelijk van de situatie en het aantal toestellen (22-10-2026; met of zonder btw nog niet gezegd). Alle andere bedragen op de site zijn nog niet bevestigd.
 
 ## Doel van de site
 
@@ -83,3 +86,4 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - Er is nog geen eigen foto van een Mitsubishi Electric Diamond voor de wisselende foto's op de homepagina.
 - Huisstijl: sinds 21 oktober 2026 staat het lettertype "C" (Source Serif + Source Sans) met de huidige kleuren online. De kleuren en lettertypes zijn nog in beoordeling: de voorstellen A (huidig, bijgewerkt), B (Vakwerk) en C (Helder) staan in `voorbeeld/huisstijl/`. Rim kiest.
 - Audit vóór de livegang (21 oktober 2026): `AUDIT.md` (nog niet in git) en `voorbeeld/audit/`. Verbeterplan voor Diensten, Over ons en Realisaties (22 oktober 2026): `voorbeeld/paginas/verbeterplan.md`, met een echte fout in het aanvraagformulier (D-1) en foto's met Gree en Olimpia Splendid op Realisaties (R-2). Van beide is nog niets uitgevoerd: ze wachten op Rims antwoorden en akkoord.
+- Ronde 1 van het verbeterplan (22 oktober 2026) staat op de branch `paginas-ronde-1`, nog niet gepusht: formulierfout, snelheid, merken op de foto's, Rims keuzes en kleinere fixes. De voorbeelden voor een nieuwe indeling van Diensten, Realisaties (fotoraster) en Over ons staan in `voorbeeld/ronde-1/` (README voor Rim). Rim kiest nog. Er is een `.vercelignore` bijgekomen; na de eerste push nakijken dat `/CLAUDE.md` op Vercel niet meer te openen is.
