@@ -8246,3 +8246,21 @@ section[data-page] [id] {
     margin: -11px 0;
   }
 }
+
+/* ---------- gsm: knoppen in de band onderaan netjes in twee rijen ---------- */
+@media (max-width: 480px) {
+  .v2-band-acts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+  .v2-band-acts .btn {
+    justify-content: center;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+  .v2-band-acts .btn-gold {
+    grid-column: 1 / -1;
+  }
+}

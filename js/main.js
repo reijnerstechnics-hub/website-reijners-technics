@@ -569,7 +569,11 @@ function sendLead(data) {
     if (!area) return null;
     var low = snapKw(area * 0.09),
       high = snapKw(area * 0.12);
-    var perRoom = low === high ? low.toFixed(1) + " kW" : low.toFixed(1) + " - " + high.toFixed(1) + " kW";
+    // met een komma, zoals overal op de site (2,5 kW)
+    var kom = function (x) {
+      return x.toFixed(1).replace(".", ",");
+    };
+    var perRoom = low === high ? kom(low) + " kW" : kom(low) + " - " + kom(high) + " kW";
     var n = s.ruimtes === "4+" ? 4 : parseInt(s.ruimtes, 10);
     return n && n > 1 ? perRoom + " per ruimte (bij " + roomsLabel(s.ruimtes) + ")" : perRoom;
   }
