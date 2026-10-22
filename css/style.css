@@ -4207,6 +4207,21 @@ section.v3-sec.v3-white {
   background: linear-gradient(160deg, var(--gold-tint), #fff 70%);
   border-color: #f0dcb6;
 }
+/* het gouden blok is een knop naar de aanvraag */
+.v3-tile-cta {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--gold-text);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.v3-tile.gold:hover .v3-tile-cta {
+  text-decoration: underline;
+}
+a.v3-tile:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
 .v3-tile.gold .seal {
   position: absolute;
   top: 22px;
@@ -6096,7 +6111,7 @@ img.v4-zoom:focus-visible {
   font-size: 1.25rem;
 }
 .team-role {
-  color: var(--gold-dark);
+  color: var(--gold-text);
   font-weight: 600;
   font-size: 0.9rem;
   margin: 4px 0 10px;
