@@ -410,11 +410,11 @@
     h += "</div>";
 
     h +=
-      '<p class="pc-fine">Richtprijzen incl. ' +
+      '<p class="pc-fine">Dit zijn richtprijzen, incl. ' +
       P.btw.standaard +
       "% btw (woning ouder dan 10 jaar; jonger: " +
       P.btw.nieuw +
-      "% btw), voor de toestellen en een standaardplaatsing. De exacte prijs krijgt u na het gratis plaatsbezoek.</p>";
+      "% btw), voor de toestellen en een standaardplaatsing. De echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest. Dat plaatsbezoek is gratis.</p>";
     if (P.voorlopig) h += '<div class="pc-demo">Let op: dit prijsadvies gebruikt nog voorbeeldprijzen.</div>';
 
     // aanvraag

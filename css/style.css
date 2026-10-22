@@ -5350,6 +5350,12 @@ section.v2-phead::before {
   text-decoration: underline;
   cursor: pointer;
 }
+.calc-gerust {
+  margin: 10px 0 0;
+  color: var(--body);
+  font-size: 0.9rem;
+  text-align: center;
+}
 .calc-again {
   margin: -4px 0 12px;
   padding: 10px 14px;
@@ -8212,4 +8218,16 @@ h3,
 /* ---------- ankers (bv. #dienst-herstelling) niet onder de vaste menubalk laten verdwijnen ---------- */
 section[data-page] [id] {
   scroll-margin-top: 96px;
+}
+
+/* ---------- home: richtprijs bij de keuzeknoppen ---------- */
+.v3-richtprijs {
+  margin: 16px 0 0;
+  max-width: 34em;
+  color: #dbe5ee;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+.v3-richtprijs b {
+  color: var(--gold);
 }

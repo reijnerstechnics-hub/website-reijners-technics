@@ -343,11 +343,19 @@ function sendLead(data) {
 
   // In stap 2 tonen welke dienst gekozen is, zodat de klant niet twijfelt.
   var DIENST_ZIN = { nieuw: "een nieuwe airco of warmtepomp", onderhoud: "een onderhoud", herstelling: "een herstelling" };
+  // Geruststelling onder de knop. "Gratis plaatsbezoek" klopt enkel bij een nieuw toestel:
+  // onderhoud en herstelling zijn betalend.
+  var GERUST = {
+    nieuw: "Gratis plaatsbezoek · U beslist pas na de offerte",
+    onderhoud: "Aanvragen kost niets · Rim spreekt met u een dag af",
+    herstelling: "Aanvragen kost niets · U hoort de prijs vooraf",
+  };
   function toonDienst() {
     var el = document.getElementById("calc-dienst");
     var zin = DIENST_ZIN[state.dienst];
     el.hidden = !zin;
     if (zin) el.querySelector("strong").textContent = zin;
+    document.getElementById("calc-gerust").textContent = GERUST[state.dienst] || GERUST.nieuw;
   }
 
   // stap 1: dienst kiezen (1 klik, gaat automatisch door)
