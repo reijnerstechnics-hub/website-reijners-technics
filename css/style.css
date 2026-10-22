@@ -2892,7 +2892,7 @@ header.site {
 }
 /* enkel op Over ons: het team sluit aan op het blok erboven, zonder leeg gat */
 .v2-sec.v2-alt {
-  background: #fff;
+  background: var(--paper);
   padding-top: 0;
 }
 .v2-shead {
