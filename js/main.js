@@ -998,22 +998,37 @@ window.rtGoToOffer = function (d, model) {
     var i = 0,
       every = parseInt(box.dataset.rotate, 10) || 5000,
       delay = parseInt(box.dataset.rotateDelay, 10) || 0;
+    // Een gekoppeld vak (data-rotate-koppel) wisselt mee naar dezelfde foto-nummer,
+    // bv. de buitenunit van hetzelfde merk naast de binnenunit op Home.
+    var koppel = box.dataset.rotateKoppel ? document.querySelector(box.dataset.rotateKoppel) : null;
+    var kImgs = koppel ? koppel.querySelectorAll("img.rot") : [];
+    function laad(k) {
+      load(imgs[k]);
+      load(kImgs[k]);
+    }
+    function klaar(k) {
+      return imgs[k].getAttribute("src") && (!kImgs[k] || kImgs[k].getAttribute("src"));
+    }
     // Enkel draaien (en foto's laden) als de foto in beeld kan zijn: niet op een andere pagina.
     function zichtbaar() {
       return !document.hidden && box.offsetParent !== null;
     }
-    if (zichtbaar()) load(imgs[1]);
+    if (zichtbaar()) laad(1);
     function step() {
       if (!zichtbaar()) return;
       var next = (i + 1) % imgs.length;
-      if (!imgs[next].getAttribute("src")) {
-        load(imgs[next]); // eerst laden, de volgende keer tonen
+      if (!klaar(next)) {
+        laad(next); // eerst laden, de volgende keer tonen
         return;
       }
       imgs[i].classList.remove("on");
       imgs[next].classList.add("on");
+      if (kImgs[i] && kImgs[next]) {
+        kImgs[i].classList.remove("on");
+        kImgs[next].classList.add("on");
+      }
       i = next;
-      load(imgs[(i + 1) % imgs.length]);
+      laad((i + 1) % imgs.length);
     }
     setTimeout(function () {
       setInterval(step, every);
