@@ -4121,23 +4121,23 @@ section.v3-sec.v3-white {
   padding: 0;
   border: 0;
 }
-.v3-tile.big::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(15, 29, 46, 0) 35%, rgba(15, 29, 46, 0.88));
-}
+/* tekst in een wit kader onderaan, zoals bij "Ook achter de kap netjes":
+   goed leesbaar, en het toestel op de foto blijft helemaal zichtbaar (geen donkere laag erover) */
 .v3-tile.big .tx {
   position: relative;
   z-index: 1;
-  padding: 30px;
-  color: #dfe8ef;
+  margin: 16px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 14px;
 }
 .v3-tile.big h3 {
-  color: #fff;
-  font-size: 1.7rem;
+  font-size: 1.35rem;
   line-height: 1.15;
-  margin-bottom: 10px;
+  margin: 0 0 6px;
+}
+.v3-tile.big p {
+  color: var(--body);
 }
 .v3-tile .num {
   font-family: var(--font-kop);
@@ -4782,7 +4782,7 @@ footer.v2-footer {
   }
   .v3-bento {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 280px auto auto;
+    grid-template-rows: 380px auto auto;
     gap: 10px;
   }
   .v3-tile {
@@ -4795,10 +4795,11 @@ footer.v2-footer {
     grid-row: auto;
   }
   .v3-tile.big .tx {
-    padding: 22px;
+    margin: 10px;
+    padding: 12px 14px;
   }
   .v3-tile.big h3 {
-    font-size: 1.35rem;
+    font-size: 1.15rem;
   }
   .v3-tile .num {
     font-size: 2.6rem;
@@ -7800,8 +7801,17 @@ section.pc-catalog {
   font-size: 0.78rem;
 }
 @media (max-width: 860px) {
+  /* 380 px: het toestel op de foto staat dan boven het witte tekstkader */
   .v3-bento {
-    grid-template-rows: 280px auto auto;
+    grid-template-rows: 380px auto auto;
+  }
+}
+@media (max-width: 560px) {
+  /* smalle gsm: het tekstkader wordt hoger, dus de foto iets groter en hoger zetten
+     (bovenaan valt wat plafond weg), zodat het toestel er vrij boven blijft */
+  .v3-tile.big img {
+    top: auto;
+    height: 130%;
   }
 }
 
