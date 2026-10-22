@@ -12,6 +12,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - Beloftes op de site: gratis plaatsbezoek, binnen 24 uur teruggebeld door Rim zelf, rechtstreeks met de installateur, u beslist pas na de offerte.
 - Rim is altijd zelf het aanspreekpunt. Fabio Lomma (eigen zaak: Lomma Technics) plaatst mee, maar is geen aanspreekpunt (Rim, 22-10-2026).
 - Rim heeft een koeltechnisch certificaat. Het nummer en een foto van het certificaat komen nooit online (kans op misbruik).
+- Rim plaatst al 6 jaar airco's (zijn antwoord op 22-10-2026). Herstellingen gebeuren op afspraak: er is geen storingsdienst 's avonds of in het weekend.
 - Prijzen die Rim bevestigde: onderhoud €150 tot €200, afhankelijk van de situatie en het aantal toestellen (22-10-2026; met of zonder btw nog niet gezegd). Alle andere bedragen op de site zijn nog niet bevestigd.
 
 ## Doel van de site
@@ -24,6 +25,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - Alles in het Nederlands (Vlaams). Op de site: u-vorm, korte zinnen, concreet, zoals een vakman praat.
 - Vaste woorden: binnenunit, buitenunit, single-split, multi-split, lucht/lucht-warmtepomp, plaatsbezoek, offerte, richtprijs.
 - Nooit verzinnen: geen prijzen, reviews, getuigenissen, garanties, levertijden of specificaties zonder bron.
+- Richtprijzen: Rim wil ze rond de prijzen van andere airco-installateurs (online opgezocht, met bron). Zet er altijd duidelijk bij dat het een richtprijs is en dat de echte prijs pas in de offerte komt, nadat Rim is langs geweest.
 - Antwoorden aan Rim: in eenvoudig Nederlands, zonder vakjargon. Rim is geen ontwikkelaar.
 
 ## Huisstijl (voorlopig, nog niet vastgelegd)
@@ -60,7 +62,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 3. Na elke wijziging testen op computer (1366 px), tablet (768 px) en gsm (375 px): geen foutmeldingen in de console, geen kapotte afbeeldingen, niets dat buiten het scherm valt.
 4. Lokaal committen met een duidelijke Nederlandse boodschap.
 5. Pushen naar GitHub (`reijnerstechnics-hub/website-reijners-technics`, branch `main`) **pas na Rims uitdrukkelijke "akkoord" voor die wijziging**: `git switch main && git merge --ff-only <branch> && git push origin main`. Alleen de hoofdsessie pusht; agents nooit.
-6. Afsluiten met een kort verslag voor Rim: wat er veranderd is, wat hij moet nakijken, en de vraag om akkoord.
+6. Afsluiten met een kort verslag voor Rim: wat er veranderd is, wat hij moet nakijken, en de vraag om akkoord. Geef er altijd een paar concrete tips bij om bezoekers sneller een offerte te laten aanvragen (Rims vaste wens, 22-10-2026).
 
 ## Het team (`.claude/agents/`)
 
