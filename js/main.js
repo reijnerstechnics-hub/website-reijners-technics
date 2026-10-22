@@ -197,6 +197,31 @@ function sendLead(data) {
   document.querySelectorAll(".js-wa").forEach(function (el) {
     el.setAttribute("href", waHref);
   });
+  // E-mail: hetzelfde idee, met een onderwerp en het begin van het bericht al ingevuld.
+  function mailHref(onderwerp, tekst) {
+    return "mailto:reijnerstechnics@gmail.com?subject=" + encodeURIComponent(onderwerp) + "&body=" + encodeURIComponent(tekst);
+  }
+  var mailAlgemeen = mailHref("Vraag via de website", "Hallo Rim,\n\n");
+  document.querySelectorAll(".js-mail").forEach(function (el) {
+    el.setAttribute("href", mailAlgemeen);
+  });
+  window.rtMailToestel = function (model) {
+    return mailHref("Vraag over de " + model, "Hallo Rim,\n\nik heb een vraag over de " + model + ".\n\n");
+  };
+  // Op een toestelpagina staat het toestel al in het bericht (zie window.rtWhatsAppToestel).
+  window.rtWhatsAppToestel = function (model) {
+    return "https://wa.me/" + waNumber + "?text=" + encodeURIComponent("Hallo Rim, ik heb een vraag over de " + model + ".");
+  };
+  document.addEventListener(
+    "click",
+    function (e) {
+      var a = e.target.closest("#wa-header, #wa-hero, #wa-card, #wa-float, .js-wa");
+      if (!a) return;
+      var opToestel = window.rtHuidigToestel && document.querySelector('section[data-page="toestel"].page-active');
+      a.setAttribute("href", opToestel ? window.rtWhatsAppToestel(window.rtHuidigToestel) : waHref);
+    },
+    true
+  );
 })();
 
 (function () {
@@ -206,7 +231,7 @@ function sendLead(data) {
 
   var PLACEHOLDERS = {
     "Nieuwe airco": "Bijvoorbeeld: aantal ruimtes, bestaande verwarming, gewenste periode",
-    "Nieuwe lucht/lucht-warmtepomp": "Bijvoorbeeld: aantal ruimtes, bestaande verwarming, gewenste periode",
+    "Nieuwe warmtepomp": "Bijvoorbeeld: aantal ruimtes, bestaande verwarming, gewenste periode",
     Onderhoud: "Bijvoorbeeld: merk en type toestel, wanneer het laatste onderhoud was",
     Herstelling: "Bijvoorbeeld: merk en type toestel, wat er scheelt en sinds wanneer, eventuele foutcode",
     "Iets anders": "Uw vraag of bericht",
@@ -266,7 +291,7 @@ function sendLead(data) {
   var WA_NUMBER = "32491113313";
 
   var LABELS = {
-    dienst: { nieuw: "Nieuwe airco of lucht/lucht-warmtepomp", onderhoud: "Onderhoud", herstelling: "Herstelling" },
+    dienst: { nieuw: "Nieuwe airco of warmtepomp", onderhoud: "Onderhoud", herstelling: "Herstelling" },
     grootte: {
       "<20": "kleiner dan 20 m²",
       "20-35": "20-35 m²",
@@ -342,7 +367,7 @@ function sendLead(data) {
   document.getElementById("calc-wijzig").addEventListener("click", vorigeStap);
 
   // In stap 2 tonen welke dienst gekozen is, zodat de klant niet twijfelt.
-  var DIENST_ZIN = { nieuw: "een nieuwe airco of lucht/lucht-warmtepomp", onderhoud: "een onderhoud", herstelling: "een herstelling" };
+  var DIENST_ZIN = { nieuw: "een nieuwe airco of warmtepomp", onderhoud: "een onderhoud", herstelling: "een herstelling" };
   // Geruststelling onder de knop. "Gratis plaatsbezoek" klopt enkel bij een nieuw toestel:
   // onderhoud en herstelling zijn betalend.
   var GERUST = {
@@ -805,7 +830,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en lucht/lucht-warmtepompen in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en lucht/lucht-warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.500 euro, plaatsing inbegrepen); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, lucht/lucht-warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.500 euro, plaatsing inbegrepen); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -2152,6 +2177,15 @@ function rtKwTekst(n) {
     });
     var bel = el("a", "btn v3-btn-line", "Bel Rim");
     bel.href = "tel:+32491113313";
+    // WhatsApp met het toestel al in het bericht
+    window.rtHuidigToestel = model;
+    var wa = el("a", "btn v3-btn-line", "Vraag via WhatsApp");
+    wa.href = window.rtWhatsAppToestel ? window.rtWhatsAppToestel(model) : "https://wa.me/32491113313";
+    wa.target = "_blank";
+    wa.rel = "noopener";
+    // en e-mail, ook met het toestel al ingevuld
+    var mail = el("a", "btn v3-btn-line", "Stuur een e-mail");
+    mail.href = window.rtMailToestel ? window.rtMailToestel(model) : "mailto:reijnerstechnics@gmail.com";
     acts.appendChild(offerte);
     // prijsadvies bovenaan de pagina Toestellen (enkel voor vaste airco's)
     if (card.dataset.type !== "mobiel") {
@@ -2160,6 +2194,8 @@ function rtKwTekst(n) {
       acts.appendChild(richt);
     }
     acts.appendChild(bel);
+    acts.appendChild(wa);
+    acts.appendChild(mail);
     info.appendChild(acts);
     info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Rim belt u binnen 24 uur terug · U beslist pas na de offerte"));
     top.appendChild(info);
@@ -2529,7 +2565,7 @@ function rtKwTekst(n) {
   var mode = month >= 4 && month <= 8 ? "cool" : "warm";
   var SUB = {
     cool: "Koel en stil, ook op de warmste zomerdag. Binnen 24 uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.",
-    warm: "Behaaglijk warm deze winter, met een lucht/lucht-warmtepomp: een airco die ook verwarmt. Binnen 24 uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.",
+    warm: "Behaaglijk warm deze winter, met een warmtepomp: een airco die ook verwarmt. Binnen 24 uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.",
   };
   var tempEl = document.getElementById("v4-temp");
   var lblEl = document.getElementById("v4-thlbl");

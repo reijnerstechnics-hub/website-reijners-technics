@@ -23,7 +23,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 ## Taal en toon
 
 - Alles in het Nederlands (Vlaams). Op de site: u-vorm, korte zinnen, concreet, zoals een vakman praat.
-- Vaste woorden: binnenunit, buitenunit, single-split, multi-split, lucht/lucht-warmtepomp, plaatsbezoek, offerte, richtprijs.
+- Vaste woorden: binnenunit, buitenunit, single-split, multi-split, warmtepomp (Rims keuze van 22-10-2026: nooit "lucht/lucht"; bij de eerste vermelding "een airco die ook verwarmt"), plaatsbezoek, offerte, richtprijs.
 - Nooit verzinnen: geen prijzen, reviews, getuigenissen, garanties, levertijden of specificaties zonder bron.
 - Richtprijzen: Rim wil ze rond de prijzen van andere airco-installateurs (online opgezocht, met bron). Zet er altijd duidelijk bij dat het een richtprijs is en dat de echte prijs pas in de offerte komt, nadat Rim is langs geweest.
 - Antwoorden aan Rim: in eenvoudig Nederlands, zonder vakjargon. Rim is geen ontwikkelaar.
