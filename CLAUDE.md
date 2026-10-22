@@ -83,7 +83,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 
 ## Stand van zaken (bijwerken als iets klaar is)
 
-- De prijzen in `js/prijzen.js` zijn richtprijzen, op Rims vraag afgestemd op de markt (oktober 2026; Daikin x 0,66), met `voorlopig: false` (op de branch `paginas-ronde-2`, wacht op akkoord). Toestellen die later zijn toegevoegd, zitten nog niet in het prijsadvies.
+- De prijzen in `js/prijzen.js` zijn richtprijzen, op Rims vraag afgestemd op de markt (oktober 2026; alle toestelprijzen x 0,75), met `voorlopig: false` (op de branch `paginas-ronde-2`, wacht op akkoord). Toestellen die later zijn toegevoegd, zitten nog niet in het prijsadvies.
 - SEO: de site is één pagina met #adressen; de detailpagina's van toestellen maakt JavaScript, dus Google vindt ze niet apart. Er is nog geen structured data (LocalBusiness), geen `sitemap.xml` en geen `robots.txt`.
 - Er is nog geen eigen foto van een Mitsubishi Electric Diamond voor de wisselende foto's op de homepagina.
 - Huisstijl: sinds 21 oktober 2026 staat het lettertype "C" (Source Serif + Source Sans) met de huidige kleuren online. De kleuren en lettertypes zijn nog in beoordeling: de voorstellen A (huidig, bijgewerkt), B (Vakwerk) en C (Helder) staan in `voorbeeld/huisstijl/`. Rim kiest.

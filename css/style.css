@@ -5355,6 +5355,7 @@ section.v2-phead::before {
   color: var(--body);
   font-size: 0.9rem;
   text-align: center;
+  text-wrap: balance;
 }
 .calc-again {
   margin: -4px 0 12px;
@@ -6034,7 +6035,7 @@ img.v4-zoom:focus-visible {
 .svc-facts strong {
   display: block;
   margin-top: 6px;
-  color: var(--gold-dark);
+  color: var(--gold-text); /* donkerder goud: genoeg contrast op wit */
 }
 .svc-plus {
   background: var(--gold-tint);
