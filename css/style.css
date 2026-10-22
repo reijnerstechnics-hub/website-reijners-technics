@@ -311,6 +311,33 @@ section[data-page].page-active {
   border-radius: 999px;
   box-shadow: 0 2px 8px rgba(20, 45, 70, 0.18);
 }
+/* link van een foto naar het toestel, enkel als het model zeker is */
+.slide-toestel {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ink);
+  font-family: var(--font-tekst);
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(20, 45, 70, 0.18);
+}
+.slide-toestel:hover {
+  color: var(--sky);
+}
+.slide-toestel:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
 @media (max-width: 900px) {
   .type-showcase {
     grid-template-columns: 1fr 1fr;
@@ -2350,7 +2377,7 @@ img.rot.on {
   display: grid;
   grid-template-columns: 1fr 1.4fr;
   gap: 28px;
-  align-items: center;
+  align-items: start;
   margin-bottom: 20px;
 }
 .aansl-text {
@@ -2863,8 +2890,10 @@ header.site {
   padding: 88px 0;
   background: #fff;
 }
+/* enkel op Over ons: het team sluit aan op het blok erboven, zonder leeg gat */
 .v2-sec.v2-alt {
-  background: var(--paper);
+  background: #fff;
+  padding-top: 0;
 }
 .v2-shead {
   max-width: 640px;
@@ -5303,6 +5332,32 @@ section.v2-phead::before {
   font-size: 0.9rem;
   font-weight: 600;
 }
+/* gekozen dienst in stap 2, en de melding bij een tweede aanvraag */
+.calc-dienst {
+  margin: -4px 0 12px;
+  color: var(--body);
+  font-size: 0.95rem;
+}
+.calc-dienst strong {
+  color: var(--ink);
+}
+.calc-wijzig {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sky);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.calc-again {
+  margin: -4px 0 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--surface-alt, #eef3f7);
+  color: var(--ink);
+  font-size: 0.9rem;
+}
 .calc-done-icon.v4-check {
   background: none;
   border: 0;
@@ -5390,7 +5445,8 @@ section.v2-phead::before {
 }
 .v4-svc-ph {
   margin: 0 -28px 20px;
-  height: 170px;
+  aspect-ratio: 16 / 9;
+  max-height: 240px;
   overflow: hidden;
 }
 .v4-svc-ph img {
@@ -5604,6 +5660,26 @@ img.v4-zoom {
   right: 20px;
   top: 50%;
 }
+.v4-lb-btn.p,
+.v4-lb-btn.n {
+  transform: translateY(-50%);
+}
+.v4-lb-btn:focus-visible,
+img.v4-zoom:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+img.v4-zoom:focus-visible {
+  outline-offset: -3px;
+}
+.v4-lb-count {
+  position: absolute;
+  top: 31px;
+  left: 24px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
 
 /* ---------- over ons ---------- */
 .v4-rim {
@@ -5648,7 +5724,8 @@ img.v4-zoom {
   border: 1px solid var(--line);
   box-shadow: var(--sh-1);
 }
-.v4-area h3 {
+.v4-area h3,
+.v4-area h2 {
   font-size: 1.5rem;
   margin: 10px 0 8px;
 }
@@ -5805,9 +5882,6 @@ img.v4-zoom {
   }
   .v4-strip figure:nth-child(even) {
     height: 190px;
-  }
-  .v4-svc-ph {
-    height: 150px;
   }
   .v4-filterbtn {
     display: flex;
@@ -5967,6 +6041,17 @@ img.v4-zoom {
 }
 .svc-detail > .btn {
   justify-self: start;
+}
+.svc-detail > .svc-dringend {
+  grid-column: 2;
+  margin: -4px 0 0;
+  color: var(--body);
+  font-size: 0.95rem;
+}
+.svc-dringend a {
+  color: var(--sky);
+  font-weight: 600;
+  white-space: nowrap;
 }
 @media (max-width: 760px) {
   .svc-detail {
@@ -8091,5 +8176,35 @@ h3,
     padding: 3px 5px;
     font-size: 0.78rem;
     border-radius: 7px;
+  }
+}
+
+/* ---------- gsm: tikdoelen van minstens 44 px ---------- */
+@media (max-width: 760px) {
+  .btn-sm,
+  .slide-toestel {
+    min-height: 44px;
+  }
+  .v2-crumb a {
+    display: inline-block;
+    padding: 12px 0;
+    margin: -12px 0;
+  }
+}
+
+/* ---------- realisaties: links naar de andere pagina's ---------- */
+.v4-meer {
+  margin: 28px 0 0;
+  color: var(--body);
+  font-size: 0.95rem;
+}
+.v4-meer a {
+  color: var(--sky);
+}
+
+/* ---------- tablet: de zwevende knoppen links onderaan bedekken de laatste footerregel niet ---------- */
+@media (min-width: 761px) and (max-width: 1023px) {
+  footer.v2-footer {
+    padding-bottom: 150px;
   }
 }

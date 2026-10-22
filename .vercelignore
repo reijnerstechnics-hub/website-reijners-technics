@@ -1,0 +1,11 @@
+# Werkbestanden van het team: niet mee online zetten (Vercel publiceert anders alles uit de map).
+.claude/
+.git/
+.gitattributes
+.gitignore
+.vercelignore
+CLAUDE.md
+README.md
+AUDIT.md
+voorbeeld/
+*.tmp

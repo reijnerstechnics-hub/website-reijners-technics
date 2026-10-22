@@ -187,7 +187,8 @@ function sendLead(data) {
 
 (function () {
   var waNumber = "32491113313";
-  var waText = encodeURIComponent("Hallo, ik heb interesse in het plaatsen van een airco/warmtepomp.");
+  // Neutraal: deze knoppen staan ook bij onderhoud, herstelling en vragen.
+  var waText = encodeURIComponent("Hallo Rim, ik heb een vraag via de website.");
   var waHref = "https://wa.me/" + waNumber + "?text=" + waText;
   ["wa-header", "wa-hero", "wa-card", "wa-float"].forEach(function (id) {
     var el = document.getElementById(id);
@@ -326,12 +327,23 @@ function sendLead(data) {
     history.push(key);
     render();
   }
-  document.getElementById("calc-back").addEventListener("click", function () {
+  function vorigeStap() {
     if (history.length > 1) {
       history.pop();
       render();
     }
-  });
+  }
+  document.getElementById("calc-back").addEventListener("click", vorigeStap);
+  document.getElementById("calc-wijzig").addEventListener("click", vorigeStap);
+
+  // In stap 2 tonen welke dienst gekozen is, zodat de klant niet twijfelt.
+  var DIENST_ZIN = { nieuw: "een nieuwe airco of warmtepomp", onderhoud: "een onderhoud", herstelling: "een herstelling" };
+  function toonDienst() {
+    var el = document.getElementById("calc-dienst");
+    var zin = DIENST_ZIN[state.dienst];
+    el.hidden = !zin;
+    if (zin) el.querySelector("strong").textContent = zin;
+  }
 
   // stap 1: dienst kiezen (1 klik, gaat automatisch door)
   var dienstBtns = form.querySelectorAll('.option-grid[data-field="dienst"] .option-btn');
@@ -342,6 +354,7 @@ function sendLead(data) {
       });
       btn.classList.add("selected");
       state.dienst = btn.getAttribute("data-value");
+      toonDienst();
       setTimeout(function () {
         goTo("contact");
         var n = document.getElementById("calc-naam");
@@ -462,6 +475,7 @@ function sendLead(data) {
     document.getElementById("calc-extra-onderhoud").hidden = state.dienst !== "onderhoud";
     document.getElementById("calc-extra-herstelling").hidden = state.dienst !== "herstelling";
     document.getElementById("calc-wa").setAttribute("href", waHref());
+    document.getElementById("calc-again").hidden = true;
     history = ["klaar"];
     render();
     var card = form.closest(".calc-card");
@@ -587,8 +601,29 @@ function sendLead(data) {
     sendLead(copy).then(ok).catch(fail);
   });
 
+  // Is er al een aanvraag verstuurd, dan begint een nieuwe dienstkeuze ook een nieuwe
+  // aanvraag. Naam, telefoon en gemeente blijven ingevuld; de aanvulling van de vorige
+  // aanvraag wordt leeggemaakt.
+  function nieuweAanvraag() {
+    ["ruimtes", "grootte", "probleem", "sinds", "laatsteOnderhoud", "toestel", "omschrijving"].forEach(function (k) {
+      delete state[k];
+    });
+    Array.prototype.forEach.call(form.querySelectorAll(".calc-extra .chip"), function (c) {
+      c.classList.remove("selected");
+      c.setAttribute("aria-pressed", "false");
+    });
+    Array.prototype.forEach.call(form.querySelectorAll(".calc-extra textarea, .calc-extra input"), function (el) {
+      el.value = "";
+    });
+    var st = document.getElementById("calc-extra-status");
+    st.textContent = "";
+    st.className = "calc-status";
+    document.getElementById("calc-kw-box").hidden = true;
+    document.getElementById("calc-again").hidden = false;
+  }
+
   window.rtStartOffer = function (d) {
-    if (currentKey() === "klaar") return;
+    if (currentKey() === "klaar") nieuweAanvraag();
     history = ["dienst"];
     render();
     var b = form.querySelector('.option-grid[data-field="dienst"] .option-btn[data-value="' + d + '"]');
@@ -910,17 +945,25 @@ window.rtGoToOffer = function (d, model) {
   function load(img) {
     if (img && !img.getAttribute("src") && img.dataset.src) img.setAttribute("src", img.dataset.src);
   }
+  var rustig = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.querySelectorAll("[data-rotate]").forEach(function (box) {
     var imgs = box.querySelectorAll("img.rot");
-    if (imgs.length < 2) return;
+    if (imgs.length < 2 || rustig) return;
     var i = 0,
       every = parseInt(box.dataset.rotate, 10) || 5000,
       delay = parseInt(box.dataset.rotateDelay, 10) || 0;
-    load(imgs[1]);
+    // Enkel draaien (en foto's laden) als de foto in beeld kan zijn: niet op een andere pagina.
+    function zichtbaar() {
+      return !document.hidden && box.offsetParent !== null;
+    }
+    if (zichtbaar()) load(imgs[1]);
     function step() {
-      if (document.hidden) return;
+      if (!zichtbaar()) return;
       var next = (i + 1) % imgs.length;
-      load(imgs[next]);
+      if (!imgs[next].getAttribute("src")) {
+        load(imgs[next]); // eerst laden, de volgende keer tonen
+        return;
+      }
       imgs[i].classList.remove("on");
       imgs[next].classList.add("on");
       i = next;
@@ -952,15 +995,38 @@ window.rtGoToOffer = function (d, model) {
         d.classList.toggle("active", idx === i);
       });
       if (counter) counter.textContent = i + 1 + " / " + slides.length;
+      // verborgen foto's niet voorlezen en niet met Tab bereikbaar
+      slides.forEach(function (sl, idx) {
+        sl.inert = idx !== i;
+      });
+    }
+    // de foto's ernaast alvast laden, zodat ze niet leeg inschuiven
+    function preload(k) {
+      var im = slides[(k + slides.length) % slides.length].querySelector("img");
+      if (im && im.loading === "lazy") im.loading = "eager";
     }
     function goTo(idx) {
       i = (idx + slides.length) % slides.length;
+      preload(i + 1);
+      preload(i - 1);
       render();
     }
+    // Vanzelf verder enkel als de carrousel in beeld kan zijn, niet bij "minder beweging",
+    // en niet terwijl de bezoeker er met het toetsenbord in zit.
+    var rustig = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var focusBinnen = false;
+    frame.addEventListener("focusin", function () {
+      focusBinnen = true;
+    });
+    frame.addEventListener("focusout", function () {
+      focusBinnen = false;
+    });
     function restart() {
       if (timer) clearInterval(timer);
-      if (slides.length > 1)
+      if (slides.length > 1 && !rustig)
         timer = setInterval(function () {
+          if (document.hidden || focusBinnen || frame.offsetParent === null) return;
+          if (document.querySelector(".v4-lb:not([hidden])")) return; // fotoviewer staat open
           goTo(i + 1);
         }, interval);
     }
@@ -2648,7 +2714,8 @@ function rtKwTekst(n) {
   // ---------- realisaties: foto groot bekijken ----------
   var box = null,
     list = [],
-    idx = 0;
+    idx = 0,
+    opener = null;
   function buildBox() {
     box = document.createElement("div");
     box.className = "v4-lb";
@@ -2657,7 +2724,7 @@ function rtKwTekst(n) {
     box.setAttribute("aria-modal", "true");
     box.setAttribute("aria-label", "Foto groot bekijken");
     box.innerHTML =
-      '<button type="button" class="v4-lb-btn x" aria-label="Sluiten">&times;</button><button type="button" class="v4-lb-btn p" aria-label="Vorige foto">&lsaquo;</button><figure><img alt=""><figcaption></figcaption></figure><button type="button" class="v4-lb-btn n" aria-label="Volgende foto">&rsaquo;</button>';
+      '<span class="v4-lb-count" aria-live="polite"></span><button type="button" class="v4-lb-btn x" aria-label="Sluiten">&times;</button><button type="button" class="v4-lb-btn p" aria-label="Vorige foto">&lsaquo;</button><figure><img alt=""><figcaption></figcaption></figure><button type="button" class="v4-lb-btn n" aria-label="Volgende foto">&rsaquo;</button>';
     document.body.appendChild(box);
     box.querySelector(".x").addEventListener("click", closeBox);
     box.querySelector(".p").addEventListener("click", function () {
@@ -2674,6 +2741,13 @@ function rtKwTekst(n) {
       if (e.key === "Escape") closeBox();
       if (e.key === "ArrowLeft") showAt(idx - 1);
       if (e.key === "ArrowRight") showAt(idx + 1);
+      // Tab blijft binnen de viewer (sluiten, vorige, volgende)
+      if (e.key === "Tab") {
+        var knoppen = Array.prototype.slice.call(box.querySelectorAll("button"));
+        var k = knoppen.indexOf(document.activeElement);
+        e.preventDefault();
+        knoppen[(k + (e.shiftKey ? -1 : 1) + knoppen.length) % knoppen.length].focus();
+      }
     });
     var sx = null;
     box.addEventListener(
@@ -2699,10 +2773,13 @@ function rtKwTekst(n) {
     box.querySelector("img").src = img.currentSrc || img.src;
     box.querySelector("img").alt = img.alt;
     box.querySelector("figcaption").textContent = cap ? cap.textContent : img.alt;
+    box.querySelector(".v4-lb-count").textContent = idx + 1 + " / " + list.length;
   }
   function closeBox() {
     box.hidden = true;
     document.documentElement.style.overflow = "";
+    // terug naar de foto waarmee de viewer geopend werd
+    if (opener) opener.focus({ preventScroll: true });
   }
   document.querySelectorAll(".brand-frame").forEach(function (frame) {
     var slides = Array.prototype.slice.call(frame.querySelectorAll(".carousel-slide"));
@@ -2710,13 +2787,24 @@ function rtKwTekst(n) {
       var img = sl.querySelector("img");
       if (!img) return;
       img.classList.add("v4-zoom");
-      img.addEventListener("click", function () {
+      img.tabIndex = 0;
+      img.setAttribute("role", "button");
+      img.setAttribute("aria-label", "Groot bekijken: " + img.alt);
+      function open() {
         if (!box) buildBox();
+        opener = img;
         list = slides;
         showAt(i);
         box.hidden = false;
         document.documentElement.style.overflow = "hidden";
         box.querySelector(".x").focus();
+      }
+      img.addEventListener("click", open);
+      img.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
       });
     });
   });
