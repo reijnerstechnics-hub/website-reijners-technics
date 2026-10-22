@@ -8232,3 +8232,17 @@ section[data-page] [id] {
 .v3-richtprijs b {
   color: var(--gold);
 }
+.v3-richtprijs a {
+  color: #fff;
+  font-weight: 600;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  /* grotere tikzone, zonder dat de tekst verschuift */
+  .v3-richtprijs a {
+    display: inline-block;
+    padding: 11px 0;
+    margin: -11px 0;
+  }
+}

@@ -697,18 +697,21 @@ window.rtGoToOffer = function (d, model) {
 (function () {
   var bubble = document.getElementById("welcome-bubble");
   if (!bubble) return;
-  var KEY = "rt-welcome-dismissed";
+  // Op gsm niet tonen: het venster bedekt daar de knoppen en het formulier.
+  if (window.matchMedia && window.matchMedia("(max-width: 760px)").matches) return;
+  // Maar één keer per bezoeker: wie het al zag, krijgt het niet opnieuw.
+  var KEY = "rt-welcome-gezien";
   var tries = 0;
   function dismissed() {
     try {
-      return sessionStorage.getItem(KEY) === "1";
+      return localStorage.getItem(KEY) === "1";
     } catch (e) {
       return false;
     }
   }
   function remember() {
     try {
-      sessionStorage.setItem(KEY, "1");
+      localStorage.setItem(KEY, "1");
     } catch (e) {}
   }
   function isShown() {
@@ -754,6 +757,7 @@ window.rtGoToOffer = function (d, model) {
     }
     bubble.classList.toggle("above-chat", chatVisible());
     document.getElementById("wb-ask").hidden = !chatVisible();
+    remember();
     bubble.hidden = false;
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
