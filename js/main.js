@@ -107,13 +107,29 @@
     }
   });
 
-  // Menuknop (hamburger) op de gsm
+  // Menuknop (hamburger) op de gsm. Sluit ook met Escape, met een tik naast het menu
+  // en bij het kiezen van een link. De klasse rt-menu-open verbergt intussen de balk onderaan.
   var navToggle = document.getElementById("nav-toggle");
   if (navToggle) {
-    navToggle.addEventListener("click", function () {
-      var nav = document.getElementById("site-nav");
-      var open = nav.classList.toggle("open");
+    var siteNav = document.getElementById("site-nav");
+    var zetMenu = function (open) {
+      siteNav.classList.toggle("open", open);
       navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      document.body.classList.toggle("rt-menu-open", open);
+    };
+    navToggle.addEventListener("click", function () {
+      zetMenu(!siteNav.classList.contains("open"));
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && siteNav.classList.contains("open")) {
+        zetMenu(false);
+        navToggle.focus();
+      }
+    });
+    document.addEventListener("click", function (e) {
+      if (!siteNav.classList.contains("open")) return;
+      if (navToggle.contains(e.target)) return;
+      if (!siteNav.contains(e.target) || e.target.closest("a")) zetMenu(false);
     });
   }
 
@@ -258,6 +274,13 @@ function sendLead(data) {
       status.className = "form-status err";
       return;
     }
+    // zelfde controle als in het formulier op Home: minstens 8 cijfers
+    if (data.telefoon.replace(/\D/g, "").length < 8) {
+      status.textContent = "Kijk uw telefoonnummer even na, dan kan Rim u terugbellen.";
+      status.className = "form-status err";
+      form.telefoon.focus();
+      return;
+    }
 
     submitBtn.disabled = true;
     status.textContent = "Bezig met versturen...";
@@ -276,7 +299,7 @@ function sendLead(data) {
         if (window.rtLeadDone) window.rtLeadDone(data.naam);
       })
       .catch(function () {
-        done(false, "Versturen lukte niet. Probeer het opnieuw of gebruik WhatsApp hiernaast.");
+        done(false, "Versturen lukte niet. Probeer het opnieuw, of bel of stuur een WhatsApp naar +32 491 11 33 13.");
       });
   });
 })();
@@ -381,6 +404,9 @@ function sendLead(data) {
     el.hidden = !zin;
     if (zin) el.querySelector("strong").textContent = zin;
     document.getElementById("calc-gerust").textContent = GERUST[state.dienst] || GERUST.nieuw;
+    // een toestel gekozen op Toestellen hoort enkel bij een nieuwe airco, niet bij onderhoud of herstelling
+    var mEl = document.getElementById("calc-model");
+    if (mEl) mEl.hidden = !(window.rtModel && state.dienst === "nieuw");
   }
 
   // stap 1: dienst kiezen (1 klik, gaat automatisch door)
@@ -479,7 +505,7 @@ function sendLead(data) {
       naam: naam,
       telefoon: telefoon,
       gemeente: gemeente,
-      model: window.rtModel || "",
+      model: state.dienst === "nieuw" ? window.rtModel || "" : "",
       source: "aanvraagformulier",
       submittedAt: new Date().toISOString(),
     };
@@ -1536,6 +1562,7 @@ function rtKwTekst(n) {
       .normalize("NFD")
       .replace(/[̀-ͯ]/g, "")
       .replace(/(\d)[.,](\d)/g, "$1,$2")
+      .replace(/(\d)(kw)\b/g, "$1 $2")
       .replace(/\s+/g, " ");
   }
   cards.forEach(function (c) {
@@ -1596,7 +1623,7 @@ function rtKwTekst(n) {
     kanaal: ["kanaal"], kanaalunit: ["kanaal"], kanaalunits: ["kanaal"], inbouw: ["kanaal"], inbouwunit: ["kanaal"], duct: ["kanaal"],
     plafond: ["plafond", "cassette"], plafondmodel: ["plafond"], plafondmodellen: ["plafond"],
     zuil: ["zuil"], zuilmodel: ["zuil"],
-    monoblock: ["monoblock"], monoblok: ["monoblock"],
+    monoblock: ["monoblock"], monoblok: ["monoblock"], zonderbuitenunit: ["monoblock", "mobiel"],
     mobiel: ["mobiel"], mobiele: ["mobiel"],
   };
   function past(card) {
@@ -1604,7 +1631,7 @@ function rtKwTekst(n) {
   }
   function pastBij(card, q) {
     if (!q) return true;
-    var woorden = norm(q).trim().split(" ");
+    var woorden = norm(q).replace(/zonder buiten(unit|deel)s?/g, "zonderbuitenunit").trim().split(" ");
     for (var i = 0; i < woorden.length; i++) {
       var w = woorden[i];
       if (SOORT_WOORDEN.hasOwnProperty(w)) {
@@ -1897,7 +1924,8 @@ function rtKwTekst(n) {
         var inNaam = woorden.every(function (w) {
           return c._titel.indexOf(w) !== -1;
         });
-        return { card: c, score: (c.dataset.type === "buiten" ? 0 : 2) + (inNaam ? 1 : 0), i: i };
+        var t = c.dataset.type;
+        return { card: c, score: (t === "buiten" ? 0 : t === "mobiel" || t === "monoblock" ? 1 : 2) * 2 + (inNaam ? 1 : 0), i: i };
       })
       .sort(function (a, b) {
         return b.score - a.score || a.i - b.i;
@@ -1957,7 +1985,7 @@ function rtKwTekst(n) {
     kanaal: "Kanaal- of inbouwunit",
     plafond: "Plafondmodel",
     zuil: "Zuilmodel",
-    monoblock: "Zonder buitenunit",
+    monoblock: "Monoblock",
     mobiel: "Mobiele airco",
     buiten: "Buitenunit",
   };
@@ -1986,7 +2014,7 @@ function rtKwTekst(n) {
     vloer:
       "Een vloermodel staat laag tegen de muur, bijvoorbeeld onder een raam. Handig als er boven geen plaats is, of in een slaapkamer onder een schuin dak. Bij verwarmen komt de warme lucht dicht bij de vloer, waar u ze het meest voelt.",
     cassette:
-      "Een cassette wordt ingebouwd in een verlaagd plafond. Alleen het rooster blijft zichtbaar en de lucht gaat naar meerdere kanten tegelijk. Geschikt voor grotere ruimtes zoals een leefruimte, winkel of kantoor.",
+      "Een cassette wordt ingebouwd in een verlaagd plafond. Alleen het rooster blijft zichtbaar. Geschikt voor grotere ruimtes zoals een leefruimte, winkel of kantoor.",
     kanaal:
       "Een kanaal- of inbouwunit zit volledig uit het zicht, in een verlaagd plafond, een kast of een technische ruimte. De lucht komt via roosters de kamer in. Dit vraagt wat meer voorbereiding, die we tijdens het plaatsbezoek samen bekijken.",
     monoblock:
@@ -2132,21 +2160,26 @@ function rtKwTekst(n) {
   // ---------- detailpagina ----------
   function vermogenTabel(card) {
     if (["wand", "vloer", "cassette", "kanaal", "plafond", "zuil", "monoblock"].indexOf(card.dataset.type) === -1) return null;
-    // de maten uit data-kw, anders de getallen uit de rij Koelvermogen
+    // de maten uit data-kw, anders de getallen uit de rij Koelvermogen.
+    // Bij een bereik in data-kw (bv. "2,5-14,0") geen tabel maar één zin: de rij Koelvermogen
+    // bevat dan ook getallen die geen maat zijn (bv. de grens voor 3-fase).
     var kwi = rtKw(card);
-    var nums = (kwi && kwi.maten.length
-      ? kwi.maten
-      : (spec(card, ["Koelvermogen"]).match(/\d+,\d/g) || []).map(function (n) {
-          return parseFloat(n.replace(",", "."));
-        })
-    )
-      .filter(function (n, i, a) {
-        return n >= 1.4 && n <= 16 && a.indexOf(n) === i;
-      })
-      .sort(function (a, b) {
-        return a - b;
-      });
-    if (!nums.length) return null;
+    var bereik = kwi && !kwi.maten.length && kwi.bereik;
+    var nums = bereik
+      ? []
+      : (kwi && kwi.maten.length
+          ? kwi.maten
+          : (spec(card, ["Koelvermogen"]).match(/\d+,\d/g) || []).map(function (n) {
+              return parseFloat(n.replace(",", "."));
+            })
+        )
+          .filter(function (n, i, a) {
+            return n >= 1.4 && n <= 16 && a.indexOf(n) === i;
+          })
+          .sort(function (a, b) {
+            return a - b;
+          });
+    if (!bereik && !nums.length) return null;
     var box = el("div", "td-box");
     box.appendChild(el("h3", null, "Welk vermogen heb ik nodig?"));
     box.appendChild(
@@ -2156,6 +2189,17 @@ function rtKwTekst(n) {
         "Als vuistregel rekenen we 90 tot 120 watt per m², afhankelijk van de isolatie, de hoogte van het plafond en de ramen. Het exacte vermogen bepalen we samen tijdens het gratis plaatsbezoek."
       )
     );
+    if (bereik) {
+      box.appendChild(
+        el(
+          "p",
+          null,
+          "Dit toestel bestaat van " + rtKwTekst(bereik[0]) + " tot " + rtKwTekst(bereik[1]) + " kW: van ca. " +
+            Math.round(bereik[0] / 0.12) + " tot " + Math.round(bereik[1] / 0.09) + " m²."
+        )
+      );
+      return box;
+    }
     var t = el("table", "td-kw");
     var head = el("tr");
     head.appendChild(el("th", null, "Vermogen"));
@@ -2413,7 +2457,7 @@ function rtKwTekst(n) {
   function naarResultaten(q) {
     sluit();
     input.blur();
-    if (q) window.rtToonZoek(q);
+    window.rtToonZoek(q || "");
     ga(q ? "#toestellen-lijst" : "#toestellen");
   }
 
@@ -2468,6 +2512,9 @@ function rtKwTekst(n) {
       var geen = el("div", "hz-geen", "Geen toestel gevonden voor “" + q + "”. ");
       var merken = el("a", null, "Bekijk alle merken");
       merken.href = "#toestellen";
+      merken.addEventListener("click", function () {
+        window.rtToonZoek("");
+      });
       geen.appendChild(merken);
       box.appendChild(geen);
     }
@@ -2757,7 +2804,20 @@ function rtKwTekst(n) {
     mini.setAttribute("aria-hidden", show ? "false" : "true");
     var a = mini.querySelector("a");
     if (a) a.tabIndex = show ? 0 : -1;
+    // gsm: geen gouden knop "Aanvraag starten" in de balk onderaan zolang er een formulier in beeld is
+    var formulier =
+      inView(document.getElementById("calculator")) ||
+      inView(document.querySelector("section.page-active #lead-form")) ||
+      inView(document.querySelector("section.page-active .pc-vs-lead"));
+    document.body.classList.toggle("rt-form-in-beeld", !!formulier);
   }
+  // gsm: tijdens het typen de hele balk onderaan weg (ze schuift anders boven het toetsenbord over het veld)
+  document.addEventListener("focusin", function (e) {
+    if (e.target.matches && e.target.matches("input, textarea, select")) document.body.classList.add("rt-typt");
+  });
+  document.addEventListener("focusout", function (e) {
+    if (e.target.matches && e.target.matches("input, textarea, select")) document.body.classList.remove("rt-typt");
+  });
   var ticking = false;
   function onScroll() {
     if (ticking) return;
@@ -2808,7 +2868,7 @@ function rtKwTekst(n) {
     "SEER / SCOP": "Hoe zuinig het toestel is over een heel seizoen: SEER bij koelen, SCOP bij verwarmen. Hoe hoger, hoe zuiniger.",
     "EER / COP": "Hoe zuinig het toestel is op één moment: EER bij koelen, COP bij verwarmen. Hoe hoger, hoe zuiniger.",
     Energielabel: "Van A+++ (zuinigst) naar lager, apart voor koelen en verwarmen.",
-    "Geluidsniveau binnen": "In dB(A). Fluisteren is ongeveer 30 dB(A); de stilste binnenunits draaien vanaf 19 dB(A).",
+    "Geluidsniveau binnen": "In dB(A). Fluisteren is ongeveer 30 dB(A); de stilste binnenunits op deze site draaien vanaf ongeveer 18 dB(A).",
     "Geluidsniveau buiten": "In dB(A), gemeten aan de buitenunit.",
     Koudemiddel: "Het middel in het toestel dat de warmte verplaatst. R32 is het gangbare koudemiddel in nieuwe toestellen.",
   };
@@ -2944,4 +3004,14 @@ function rtKwTekst(n) {
       d.classList.add("in");
     });
   };
+  // "Nog een bericht sturen": het bedankvlak weg, zodat het formulier weer bruikbaar is
+  var opnieuw = document.getElementById("v4-lead-again");
+  if (opnieuw)
+    opnieuw.addEventListener("click", function () {
+      var d = document.getElementById("v4-lead-done");
+      d.hidden = true;
+      d.classList.remove("in");
+      var naamVeld = document.querySelector("#lead-form [name=naam]");
+      if (naamVeld) naamVeld.focus();
+    });
 })();

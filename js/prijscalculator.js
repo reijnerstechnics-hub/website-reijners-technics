@@ -367,7 +367,7 @@
     h += '<button type="button" class="pc-back" data-act="edit">Antwoorden aanpassen</button></div>';
     h +=
       '<p class="pc-vs-intro">Voor ' +
-      (list.length === 1 ? "1 kamer van " + esc(list[0].sizeLbl) : list.length + " kamers") +
+      (list.length === 1 ? "1 kamer (" + esc(list[0].sizeLbl) + ")" : list.length + " kamers") +
       ", toestellen en plaatsing inbegrepen. Kies het voorstel dat u aanspreekt; Rim bespreekt het graag met u.</p>";
 
     h += '<div class="pc-vs-grid">';
@@ -500,6 +500,13 @@
       st.className = "calc-status err";
       return;
     }
+    // zelfde controle als in het formulier op Home: minstens 8 cijfers
+    if (tel.replace(/\D/g, "").length < 8) {
+      st.textContent = "Kijk uw telefoonnummer even na, dan kan Rim u terugbellen.";
+      st.className = "calc-status err";
+      document.getElementById("pc-tel").focus();
+      return;
+    }
     var res = results[state.gekozen];
     if (!res || typeof sendLead !== "function") return;
     var btn = root.querySelector('[data-act="send"]');
@@ -533,13 +540,13 @@
       submittedAt: new Date().toISOString(),
     })
       .then(function () {
+        // het prijsadvies toont zijn eigen bedankt-tekst; het contactformulier blijft vrij
         state.sent = true;
         render();
-        if (window.rtLeadDone) window.rtLeadDone(naam);
       })
       .catch(function () {
         btn.disabled = false;
-        st.innerHTML = 'Versturen lukte niet. Probeer het opnieuw of bel <a href="tel:+32491113313">0491 11 33 13</a>.';
+        st.innerHTML = 'Versturen lukte niet. Probeer het opnieuw of bel <a href="tel:+32491113313">+32 491 11 33 13</a>.';
         st.className = "calc-status err";
       });
   }
