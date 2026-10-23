@@ -48,6 +48,7 @@
     var toggle = document.getElementById("nav-toggle");
     if (nav) nav.classList.remove("open");
     if (toggle) toggle.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("rt-menu-open");
   }
 
   // Zoekt uit bij welke pagina (en welk onderdeel) een #link hoort.
@@ -281,6 +282,13 @@ function sendLead(data) {
       form.telefoon.focus();
       return;
     }
+    // het e-mailadres mag leeg blijven, maar als het er staat, moet het kloppen (Formspree weigert anders)
+    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      status.textContent = "Kijk uw e-mailadres even na, of laat het leeg.";
+      status.className = "form-status err";
+      form.email.focus();
+      return;
+    }
 
     submitBtn.disabled = true;
     status.textContent = "Bezig met versturen...";
@@ -290,7 +298,10 @@ function sendLead(data) {
       submitBtn.disabled = false;
       status.textContent = msg;
       status.className = "form-status " + (ok ? "ok" : "err");
-      if (ok) form.reset();
+      if (ok) {
+        form.reset();
+        form.type.dispatchEvent(new Event("change"));
+      }
     }
 
     sendLead(data)
@@ -3011,6 +3022,11 @@ function rtKwTekst(n) {
       var d = document.getElementById("v4-lead-done");
       d.hidden = true;
       d.classList.remove("in");
+      var st = document.getElementById("form-status");
+      if (st) {
+        st.textContent = "";
+        st.className = "form-status";
+      }
       var naamVeld = document.querySelector("#lead-form [name=naam]");
       if (naamVeld) naamVeld.focus();
     });
