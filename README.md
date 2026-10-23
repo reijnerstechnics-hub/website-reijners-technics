@@ -41,6 +41,11 @@ Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via What
 - **Wisselende foto's** rechts bovenaan: de `<img class="rot">` in het blok met `data-rotate="5000"` (elke 5 seconden een andere foto). Daar staan eigen foto's van de duurdere modellen (LG Artcool, LG Deluxe H-serie, Daikin Stylish). Met `style="object-position: ..."` kies je welk deel van een foto zichtbaar blijft.
   - Het kleine fotootje ernaast (`#v3-sub-rot`) wisselt mee via `data-rotate-koppel="#v3-sub-rot"`: bij elke binnenunit hoort een buitenunit van hetzelfde merk. Zet er daarom altijd **evenveel** foto's in als in het grote vak, **in dezelfde volgorde**. Anders blijft het kleine fotootje op een verkeerd merk hangen.
   - Het kleine fotootje gebruikt kleine versies van 400 × 300 (`k-<naam>.webp`). Die maak je met `maakKlein([...])` in `voorbeeld/ronde-1/fotos-verwerken.html`.
+  - Twee reeksen per seizoen, met `data-seizoen` op elke foto (beide vakken):
+    - `warm` geldt van oktober tot april: hout, baksteen en de open haard;
+    - `cool` geldt van mei tot september: licht en fris, geen blauwe muren tegen de blauwe achtergrond.
+    - De site kiest de reeks volgens de maand, net zoals de tekst "Koelen/Verwarmen". Klikt de bezoeker op Koelen of Verwarmen, dan wisselen de foto's mee (event `rt-seizoen` in `js/main.js`).
+    - Elke reeks heeft in beide vakken evenveel foto's, in dezelfde volgorde. De eerste `warm`-foto staat in de HTML met `src` en `class="rot on"`.
 
 ## Toestellen
 

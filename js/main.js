@@ -992,16 +992,51 @@ window.rtGoToOffer = function (d, model) {
     if (img && !img.getAttribute("src") && img.dataset.src) img.setAttribute("src", img.dataset.src);
   }
   var rustig = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Seizoen zoals bovenaan Home (zie "seizoen" verderop): van mei tot september koelen ("cool"),
+  // anders verwarmen ("warm"). Foto's met data-seizoen tonen enkel in hun seizoen; de knop
+  // Koelen/Verwarmen meldt een wissel met het event "rt-seizoen".
+  var maand = new Date().getMonth();
+  var seizoen = maand >= 4 && maand <= 8 ? "cool" : "warm";
+  var reeksKiezers = [];
   document.querySelectorAll("[data-rotate]").forEach(function (box) {
-    var imgs = box.querySelectorAll("img.rot");
-    if (imgs.length < 2 || rustig) return;
     var i = 0,
       every = parseInt(box.dataset.rotate, 10) || 5000,
       delay = parseInt(box.dataset.rotateDelay, 10) || 0;
     // Een gekoppeld vak (data-rotate-koppel) wisselt mee naar dezelfde foto-nummer,
     // bv. de buitenunit van hetzelfde merk naast de binnenunit op Home.
     var koppel = box.dataset.rotateKoppel ? document.querySelector(box.dataset.rotateKoppel) : null;
-    var kImgs = koppel ? koppel.querySelectorAll("img.rot") : [];
+    var imgs = [],
+      kImgs = [];
+    function reeks(vak) {
+      if (!vak) return [];
+      return [].filter.call(vak.querySelectorAll("img.rot"), function (img) {
+        return !img.dataset.seizoen || img.dataset.seizoen === seizoen;
+      });
+    }
+    // Neemt de foto's van het huidige seizoen en toont de eerste; bij een wissel pas als die geladen is.
+    function kiesReeks(meteen) {
+      var doel = seizoen,
+        nieuw = reeks(box),
+        kNieuw = reeks(koppel);
+      if (!nieuw.length) return;
+      load(nieuw[0]);
+      load(kNieuw[0]);
+      function toon() {
+        if (doel !== seizoen) return; // intussen alweer gewisseld
+        [box, koppel].forEach(function (vak) {
+          if (!vak) return;
+          [].forEach.call(vak.querySelectorAll("img.rot"), function (img) {
+            img.classList.toggle("on", img === nieuw[0] || img === kNieuw[0]);
+          });
+        });
+        imgs = nieuw;
+        kImgs = kNieuw;
+        i = 0;
+        if (zichtbaar()) laad(1);
+      }
+      if (meteen || nieuw[0].complete) toon();
+      else nieuw[0].addEventListener("load", toon, { once: true });
+    }
     function laad(k) {
       load(imgs[k]);
       load(kImgs[k]);
@@ -1013,7 +1048,9 @@ window.rtGoToOffer = function (d, model) {
     function zichtbaar() {
       return !document.hidden && box.offsetParent !== null;
     }
-    if (zichtbaar()) laad(1);
+    kiesReeks(true);
+    if (box.querySelector("img.rot[data-seizoen]")) reeksKiezers.push(kiesReeks);
+    if (imgs.length < 2 || rustig) return;
     function step() {
       if (!zichtbaar()) return;
       var next = (i + 1) % imgs.length;
@@ -1033,6 +1070,13 @@ window.rtGoToOffer = function (d, model) {
     setTimeout(function () {
       setInterval(step, every);
     }, delay);
+  });
+  document.addEventListener("rt-seizoen", function (e) {
+    if (e.detail === seizoen) return;
+    seizoen = e.detail;
+    reeksKiezers.forEach(function (kies) {
+      kies(false);
+    });
   });
 })();
 
@@ -2206,12 +2250,8 @@ function rtKwTekst(n) {
     var mail = el("a", "btn v3-btn-line", "Stuur een e-mail");
     mail.href = window.rtMailToestel ? window.rtMailToestel(model) : "mailto:reijnerstechnics@gmail.com";
     acts.appendChild(offerte);
-    // prijsadvies bovenaan de pagina Toestellen (enkel voor vaste airco's)
-    if (card.dataset.type !== "mobiel") {
-      var richt = el("a", "btn v3-btn-line", "Richtprijs berekenen");
-      richt.href = "#prijs";
-      acts.appendChild(richt);
-    }
+    // Geen knop "Richtprijs berekenen" meer (Rim, 23-10-2026): wie hier klikt, wil de prijs van dit
+    // toestel, niet de vragen van het prijsadvies.
     acts.appendChild(bel);
     acts.appendChild(wa);
     acts.appendChild(mail);
@@ -2615,6 +2655,8 @@ function rtKwTekst(n) {
     mode = next;
     body.classList.toggle("rt-warm", mode === "warm");
     body.classList.toggle("rt-cool", mode === "cool");
+    // de wisselende foto's bovenaan kiezen hun reeks (warme of koele foto's) mee
+    document.dispatchEvent(new CustomEvent("rt-seizoen", { detail: mode }));
     document.querySelectorAll(".v4-mode button").forEach(function (b) {
       b.setAttribute("aria-pressed", b.getAttribute("data-m") === mode ? "true" : "false");
     });
