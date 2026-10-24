@@ -37,7 +37,7 @@ Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via What
 
 ## Homepagina
 
-- **Zoekbalk** bovenaan: zoekt in alle toestellen van de pagina *Toestellen*. Terwijl de bezoeker typt, verschijnen de vijf best passende toestellen (klik = detailpagina); Enter of *Zoeken* toont alle resultaten in de lijst op de pagina *Toestellen*. De voorbeelden onder de zoekbalk (`data-q`) pas je aan in `index.html`; de werking staat in het blok *HOME: ZOEKBALK* in `js/main.js`.
+- **Zoekbalk** bovenaan: zoekt in alle toestellen van de pagina *Toestellen*. Terwijl de bezoeker typt, verschijnen de vijf best passende toestellen (klik = detailpagina); Enter of *Zoeken* toont alle resultaten in de lijst op de pagina *Toestellen*, vanaf het zoekveld. Een vermogen ("3,5" of "3,5 kW") zoekt in de maten uit `data-kw`, niet in de tekst. De voorbeelden onder de zoekbalk (`data-q`) pas je aan in `index.html`; de werking staat in het blok *HOME: ZOEKBALK* in `js/main.js`.
 - **Wisselende foto's** rechts bovenaan: de `<img class="rot">` in het blok met `data-rotate="5000"` (elke 5 seconden een andere foto). Daar staan eigen foto's van de duurdere modellen (LG Artcool, LG Deluxe H-serie, Daikin Stylish). Met `style="object-position: ..."` kies je welk deel van een foto zichtbaar blijft.
   - Het kleine fotootje ernaast (`#v3-sub-rot`) wisselt mee via `data-rotate-koppel="#v3-sub-rot"`: bij elke binnenunit hoort een buitenunit van hetzelfde merk. Zet er daarom altijd **evenveel** foto's in als in het grote vak, **in dezelfde volgorde**. Anders blijft het kleine fotootje op een verkeerd merk hangen.
   - Het kleine fotootje gebruikt kleine versies van 400 × 300 (`k-<naam>.webp`). Die maak je met `maakKlein([...])` in `voorbeeld/ronde-1/fotos-verwerken.html`.
@@ -88,6 +88,19 @@ Heeft een toestel in `prijzen.js` een prijs voor een set (binnen- en buitenunit)
 - een kolom "Richtprijs" in de tabel "Welk vermogen heb ik nodig?" ("op aanvraag" als er voor dat vermogen geen setprijs is).
 
 De berekening is dezelfde als in het prijsadvies voor één kamer met een eigen buitenunit: set + plaatsing + standaardleiding, plus btw en marge, afgerond op 50 euro (`richtprijs` in het blok *TOESTELLEN* van `js/main.js`). Pas je die berekening in `js/prijscalculator.js` aan, pas ze dan ook daar aan. Toestellen zonder prijs in `prijzen.js` tonen geen richtprijs, en met `voorlopig: true` verdwijnen de richtprijzen van de toestelpagina's. Daarom laadt `index.html` `js/prijzen.js` vóór `js/main.js`.
+
+### Vermogen kiezen op de toestelpagina
+
+Bestaat een toestel in meer dan één maat, dan zijn de maten in het kW-blok van de detailpagina knoppen (`kwBlok` en `kiesKw` in `js/main.js`). Kiest de bezoeker een maat, dan:
+
+- toont het richtprijsblok de prijs voor die maat ("Op aanvraag" als er geen setprijs is);
+- staat onder de knoppen voor hoe groot een kamer die maat ongeveer is;
+- licht die rij op in de tabel "Welk vermogen heb ik nodig?";
+- gaat het vermogen mee in de offerte ("Gekozen toestel: Daikin Perfera (3,5 kW)"), in de WhatsApp-tekst en in de e-mail.
+
+Nog eens op dezelfde maat tikken zet de keuze af. Een tik op een maat op een kaart in de lijst opent het toestel met die maat al gekozen. Staat de filter *Vermogen* aan, dan staat op de kaarten de passende maat donker en kiest de detailpagina die maat zelf (`rtKwVoorKeuze`). De keuze per toestel blijft bewaard tot de pagina herladen wordt, ook na de terugknop.
+
+Tikt de bezoeker een kleur aan, dan gaat die ook mee, bv. "Daikin Emura (zwart, 3,5 kW)". Op een toestelpagina vragen ook de knop *Offerte aanvragen* bovenaan en de balk onderaan op de gsm een offerte voor dat toestel. Elders beginnen die knoppen een gewone aanvraag, zonder toestel.
 
 ## Online zetten
 

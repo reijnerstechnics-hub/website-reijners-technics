@@ -180,8 +180,8 @@
 
   // Let op: de toestelpagina's rekenen voor één kamer op dezelfde manier (richtprijs in js/main.js).
   function calculate(m) {
-    var items = roomList().map(function (r) {
-      return { naam: r.naam, kw: r.m2 * KW_PER_M2 };
+    var items = roomList().map(function (r, i) {
+      return { naam: r.naam, kw: r.m2 * KW_PER_M2, i: i };
     });
     var res = { model: m, units: unitsFor(m, items), mat: 0, inst: 0, pipe: 0 };
     res.units.forEach(function (u) {
@@ -491,13 +491,24 @@
     if (auto) setTimeout(next, 220);
   });
 
+  // Enter springt naar het volgende veld; op het laatste veld wordt verstuurd (zoals op Home)
+  root.addEventListener("keydown", function (e) {
+    var velden = ["pc-naam", "pc-tel", "pc-gem"];
+    var i = velden.indexOf(e.target.id);
+    if (e.key !== "Enter" || i === -1) return;
+    e.preventDefault();
+    if (i < velden.length - 1) document.getElementById(velden[i + 1]).focus();
+    else send();
+  });
+
   function send() {
     var st = document.getElementById("pc-status");
     var naam = document.getElementById("pc-naam").value.trim(),
       tel = document.getElementById("pc-tel").value.trim(),
       gem = document.getElementById("pc-gem").value.trim();
-    if (!naam || !tel) {
-      st.textContent = "Vul uw naam en telefoonnummer in, dan kan Rim u terugbellen.";
+    // zoals in het formulier op Home: ook de gemeente, zodat Rim weet of het in zijn regio is
+    if (!naam || !tel || !gem) {
+      st.textContent = "Vul uw naam, telefoonnummer en gemeente in.";
       st.className = "calc-status err";
       return;
     }
@@ -528,12 +539,24 @@
           return r.naam + ": " + r.sizeLbl;
         })
         .join(" | "),
+      // per buitenunit het vermogen per kamer, in de volgorde van de kamers
+      // (de berekening zet ze op vermogen), bv. "(Kamer 1: 2,0 kW + Kamer 2: 3,5 kW)"
       opstelling:
         opstelling(res) +
         " (" +
         res.units
           .map(function (u) {
-            return u.kw.map(kwTxt).join(" + ");
+            return u.items
+              .map(function (it, j) {
+                return { i: it.i, tekst: it.naam + ": " + kwTxt(u.kw[j]) };
+              })
+              .sort(function (a, b) {
+                return a.i - b.i;
+              })
+              .map(function (x) {
+                return x.tekst;
+              })
+              .join(" + ");
           })
           .join(" | ") +
         ")",

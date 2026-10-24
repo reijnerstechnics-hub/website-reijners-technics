@@ -550,6 +550,7 @@ header.site {
   display: flex;
   align-items: center;
   gap: 10px;
+  text-decoration: none; /* bovenaan is het logo een link naar Home */
 }
 .logo-mark {
   display: block;
@@ -7055,6 +7056,10 @@ section.pc-catalog {
   margin: 6px 0 14px;
   color: var(--body);
 }
+.zoek-leeg .zoek-leeg-ook {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
 @media (max-width: 640px) {
   .zoek-info {
     display: none;
@@ -8107,7 +8112,8 @@ h3,
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
-.kw-maten span.max {
+/* donker = de keuze van de bezoeker: op de kaart de maat die past bij de filter Vermogen */
+.kw-maten span.on {
   background: var(--ink);
   border-color: var(--ink);
   color: #fff;

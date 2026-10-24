@@ -27,7 +27,7 @@
     </div>
   </div>
   <div class="wrap nav">
-    <div class="brand"><img class="logo-mark" alt="Reijners Technics" width="42" height="32" src="assets/img/s-e0539ea0c67d.webp"><span>Reijners Technics</span></div>
+    <a class="brand" href="#home" aria-label="Reijners Technics, naar de startpagina"><img class="logo-mark" alt="" width="42" height="32" src="assets/img/s-e0539ea0c67d.webp"><span>Reijners Technics</span></a>
     <nav class="links" id="site-nav">
       <a href="#home" data-page="home" class="active">Home</a>
       <a href="#diensten" data-page="diensten">Diensten</a>
@@ -138,7 +138,7 @@
     <div class="v3-bento">
       <div class="v3-tile big rv"><img src="assets/img/g-s-28547dfdbbfa.webp" alt="Wit wandmodel strak tegen een witte muur, onder een balk" loading="lazy"><div class="tx"><h3>Nette plaatsing, tot in het detail</h3><p>Rechte leidingen, een strakke doorvoer en een toestel dat mooi in het interieur past.</p></div></div>
       <div class="v3-tile rv"><div class="num"><span data-count="24">24</span><em>uur</em></div><h3>Snel teruggebeld</h3><p>Na uw aanvraag belt Rim u zelf terug.</p></div>
-      <a class="v3-tile ph rv" href="#realisaties"><img src="assets/img/g-n88.webp" alt="Open multi-split-buitenunit met een eigen, netjes geïsoleerde leiding per binnenunit" loading="lazy"><div class="cap"><h3>Ook achter de kap netjes</h3><p>Zo sluiten we aan &rarr;</p></div></a>
+      <a class="v3-tile ph rv" href="#aansluitingen"><img src="assets/img/g-n88.webp" alt="Open multi-split-buitenunit met een eigen, netjes geïsoleerde leiding per binnenunit" loading="lazy"><div class="cap"><h3>Ook achter de kap netjes</h3><p>Zo sluiten we aan &rarr;</p></div></a>
       <div class="v3-tile dark rv"><h3>6 merken, eerlijk advies</h3><p>We kiezen samen het toestel dat bij uw ruimte past.</p><div class="brands"><span>Nuova</span><span>LG</span><span>Mitsubishi Electric</span><span>MHI</span><span>Daikin</span><span>Toshiba</span></div></div>
       <a class="v3-tile gold rv" href="#calculator" data-start-dienst="nieuw" aria-label="Gratis plaatsbezoek aanvragen"><div class="seal">GRATIS<br>BEZOEK</div><h3>Gratis plaatsbezoek</h3><p>Vrijblijvend. U beslist pas als u de offerte hebt.</p><span class="v3-tile-cta">Vraag het nu aan <span aria-hidden="true">&rarr;</span></span></a>
     </div>
@@ -455,7 +455,7 @@
         </div>
         <div class="svc-facts">
           <div><span>Merken</span><p>Daikin, LG, Mitsubishi Electric, Mitsubishi Heavy Industries (MHI), Nuova en Toshiba. <a href="#toestellen" style="color:var(--sky);">Bekijk alle toestellen</a></p></div>
-          <div><span>Richtprijs</span><p><strong>&euro;1.500 tot &euro;3.000 voor één kamer.</strong> Plaatsing en 6% btw inbegrepen, voor een woning ouder dan 10 jaar (jonger: 21% btw). Twee kamers op één buitenunit: ongeveer &euro;3.000 tot &euro;5.000. Een designmodel kost meer. Dit is een richtprijs: de echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest. <a href="#prijs" style="color:var(--sky);">Bereken een richtprijs voor uw woning</a></p></div>
+          <div><span>Richtprijs</span><p><strong>Meestal &euro;1.500 tot &euro;3.000 voor één kamer.</strong> Plaatsing en 6% btw inbegrepen, voor een woning ouder dan 10 jaar (jonger: 21% btw). Twee kamers op één buitenunit: ongeveer &euro;3.000 tot &euro;5.000. Een designmodel kost meer. Dit is een richtprijs: de echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest. <a href="#prijs" style="color:var(--sky);">Bereken een richtprijs voor uw woning</a></p></div>
         </div>
         <div class="svc-plus">
           <h4>Voordelen</h4>
@@ -649,7 +649,7 @@
 
     <!-- MERKKEUZE: eerst een merk kiezen, daarna verschijnen de toestellen.
          De werking staat in js/main.js (blok TOESTELLEN: MERK EN CATEGORIE). -->
-    <div class="toestel-zoek" role="search">
+    <div class="toestel-zoek" id="zoek-toestellen" role="search">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <label class="sr-only" for="toestel-zoek">Zoek een toestel</label>
       <input type="search" id="toestel-zoek" placeholder="Zoek bv. Perfera, cassette of 3,5 kW" autocomplete="off" enterkeyhint="search">
@@ -673,7 +673,8 @@
       <div class="toestellen-main">
     <div class="zoek-leeg" hidden>
       <b>Geen toestellen gevonden.</b>
-      <p>Probeer een andere zoekterm, of vraag het gewoon aan Rim: hij kent ook modellen die hier niet staan.</p>
+      <p>Probeer een andere zoekterm, of vraag het gewoon aan Rim.</p>
+      <p class="zoek-leeg-ook">Onderhoud of herstelling van een ander merk, zoals Samsung of Fujitsu? Ook dat doet Rim: <a href="#calculator" data-start-dienst="onderhoud">onderhoud aanvragen</a> of <a href="#calculator" data-start-dienst="herstelling">herstelling aanvragen</a>.</p>
       <button type="button" class="btn btn-sm v3-btn-line zoek-wis">Toon alle toestellen</button>
     </div>
 
@@ -2491,7 +2492,7 @@
       </div>
     </div>
 
-    <h2 class="brand-heading" style="margin-top:44px;">Zo sluiten we aan</h2>
+    <h2 class="brand-heading" id="aansluitingen" style="margin-top:44px;">Zo sluiten we aan</h2>
     <div class="aansl-grid">
       <div class="aansl-text">
         <p>Op deze foto's staat het toestel open. U ziet hoe we de stroomkabel en de koelleidingen aansluiten en isoleren.</p>

@@ -462,6 +462,8 @@ function sendLead(data) {
   function buildWaText(s) {
     var lines = ["Hallo, ik heb op de website een aanvraag gedaan:"];
     lines.push("- " + label("dienst", s.dienst));
+    // het toestel (met vermogen en kleur) dat de bezoeker op een toestelpagina koos
+    if (s.dienst === "nieuw" && window.rtModel) lines.push("- Toestel: " + window.rtModel);
     if (s.ruimtes) lines.push("- Ruimtes: " + roomsLabel(s.ruimtes));
     if (s.grootte) lines.push("- Oppervlakte per ruimte: " + label("grootte", s.grootte));
     if (s.probleem && s.probleem.length)
@@ -676,6 +678,8 @@ function sendLead(data) {
       dienst: state.dienst,
       source: "aanvraagformulier-aanvulling",
     };
+    // ook hier het gekozen toestel, zodat Rim de twee mails niet zelf moet koppelen
+    if (state.dienst === "nieuw" && window.rtModel) copy.model = window.rtModel;
     for (var k in extra) copy[k] = extra[k];
     sendLead(copy).then(ok).catch(fail);
   });
@@ -758,6 +762,25 @@ window.rtGoToOffer = function (d, model) {
       window.rtGoToOffer(btn.getAttribute("data-start-dienst"), btn.getAttribute("data-model") || "");
     });
   });
+  // Gewone links naar het formulier (knop bovenaan, balk onderaan, "Start uw aanvraag"):
+  // op een toestelpagina vragen ze een offerte voor dat toestel, met het gekozen vermogen.
+  // Elders gaat het om een gewone aanvraag: dan geen toestel dat de bezoeker eerder bekeek.
+  document.addEventListener(
+    "click",
+    function (e) {
+      var a = e.target.closest('a[href="#calculator"]:not([data-start-dienst])');
+      if (!a) return;
+      if (window.rtHuidigToestel && document.querySelector('section[data-page="toestel"].page-active')) {
+        e.preventDefault();
+        window.rtGoToOffer("nieuw", window.rtHuidigToestel);
+        return;
+      }
+      window.rtModel = "";
+      var m = document.getElementById("calc-model");
+      if (m) m.hidden = true;
+    },
+    true
+  );
 })();
 
 (function () {
@@ -1515,6 +1538,21 @@ function rtKw(card) {
 function rtKwTekst(n) {
   return n.toFixed(1).replace(".", ",");
 }
+// De maat die past bij een keuze in de filter Vermogen (k: { van, tot, label }): de enige
+// maat binnen die keuze, of bij meer maten die het dichtst bij de keuze ligt ("3,5 kW" -> 3,5).
+// Die maat staat donker op de kaart en is al gekozen op de detailpagina.
+function rtKwVoorKeuze(maten, k) {
+  if (!k) return null;
+  var binnen = maten.filter(function (n) {
+    return n >= k.van && n < k.tot;
+  });
+  if (binnen.length < 2) return binnen.length ? binnen[0] : null;
+  var doel = parseFloat(k.label.replace(",", ".")); // "Meer dan 7,5 kW" geeft geen getal
+  if (isNaN(doel)) return null;
+  return binnen.sort(function (a, b) {
+    return Math.abs(a - doel) - Math.abs(b - doel);
+  })[0];
+}
 (function () {
   var section = document.getElementById("alle-toestellen");
   var lijst = document.getElementById("toestellen-lijst");
@@ -1640,12 +1678,29 @@ function rtKwTekst(n) {
   function past(card) {
     return pastBij(card, state.q);
   }
+  // Bestaat het toestel in dit vermogen? (een maat uit data-kw, of binnen het bereik)
+  function heeftKw(card, n) {
+    var kw = rtKw(card);
+    if (!kw) return card._zoek.indexOf(rtKwTekst(n)) !== -1;
+    return (
+      kw.maten.some(function (m) {
+        return Math.abs(m - n) < 0.01;
+      }) ||
+      (!!kw.bereik && n >= kw.bereik[0] && n <= kw.bereik[1])
+    );
+  }
   function pastBij(card, q) {
     if (!q) return true;
     var woorden = norm(q).replace(/zonder buiten(unit|deel)s?/g, "zonderbuitenunit").trim().split(" ");
     for (var i = 0; i < woorden.length; i++) {
       var w = woorden[i];
-      if (SOORT_WOORDEN.hasOwnProperty(w)) {
+      // Een vermogen ("3,5", "3,5 kW" of "5 kW") zoekt in de maten van het toestel, niet in de
+      // tekst: daar zit "3,5" ook in "13,5", en niet elk toestel schrijft zijn maten zo.
+      var vermogen = /^\d+(,\d+)?$/.test(w) && (w.indexOf(",") !== -1 || woorden[i + 1] === "kw") ? parseFloat(w.replace(",", ".")) : 0;
+      if (vermogen) {
+        if (!heeftKw(card, vermogen)) return false;
+        if (woorden[i + 1] === "kw") i++;
+      } else if (SOORT_WOORDEN.hasOwnProperty(w)) {
         if (SOORT_WOORDEN[w].indexOf(card.dataset.type) === -1) return false;
       } else if (w === "multi" || w === "multisplit" || w === "multi-split") {
         if (!heeft(card, "multi")) return false;
@@ -1800,9 +1855,16 @@ function rtKwTekst(n) {
     // kaarten tonen of verbergen, lege groepen ook verbergen
     var test = zoekCat(state.cat).test;
     var zichtbaar = 0;
+    var kwNu = kwKeuze(state.kw);
     cards.forEach(function (c) {
       c.hidden = !(vanMerk(c) && past(c) && test(c) && pastKw(c));
       if (!c.hidden) zichtbaar++;
+      // de maat die bij de filter Vermogen past, staat donker (zo opent ook de detailpagina)
+      var kw = rtKw(c);
+      var donker = kw && rtKwVoorKeuze(kw.maten, kwNu);
+      c.querySelectorAll(".kw-maten [data-kw]").forEach(function (m) {
+        m.classList.toggle("on", parseFloat(m.dataset.kw) === donker);
+      });
     });
     section.querySelectorAll(".brand-sub").forEach(function (sub) {
       var devices = sub.nextElementSibling;
@@ -1828,7 +1890,10 @@ function rtKwTekst(n) {
       leeg.querySelector("b").textContent = doorKw ? "Geen toestellen met dit vermogen." : "Geen toestellen gevonden.";
       leeg.querySelector("p").textContent = doorKw
         ? "Bij deze keuze is er geen toestel " + kwKeuze(state.kw).zin + ". Kies een ander vermogen of merk, of vraag het gewoon aan Rim."
-        : "Probeer een andere zoekterm, of vraag het gewoon aan Rim: hij kent ook modellen die hier niet staan.";
+        : "Probeer een andere zoekterm, of vraag het gewoon aan Rim.";
+      // bij een zoekterm zonder resultaat (bv. "samsung"): Rim onderhoudt en herstelt ook andere merken
+      var ook = leeg.querySelector(".zoek-leeg-ook");
+      if (ook) ook.hidden = doorKw;
       if (wis) wis.textContent = doorKw ? "Toon alle vermogens" : "Toon alle toestellen";
     }
 
@@ -1954,17 +2019,23 @@ function rtKwTekst(n) {
   // rtToonZoek: de zoekopdracht klaarzetten in de lijst op de pagina Toestellen
   window.rtToonZoek = function (q) {
     if (zoek) zoek.value = q;
+    // een nieuwe zoekopdracht vanaf Home begint zonder oude filters: anders toont de lijst
+    // minder toestellen dan de suggesties beloofden
+    state.kw = null;
+    state.cat = "alle";
     zoekNaar(q);
   };
 
   // links met data-merk elders op de site (menu onder "Toestellen", detailpagina).
   // De algemene navigatie opent daarna zelf de pagina Toestellen en scrolt
-  // naar de lijst (#toestellen-lijst).
+  // naar de lijst (#toestellen-lijst). Enkel het kruimelpad (data-houd) houdt de
+  // gekozen soort en het vermogen; "Alle toestellen van ..." en het menu tonen alles.
   document.addEventListener(
     "click",
     function (e) {
       var a = e.target.closest("a[data-merk]");
       if (!a) return;
+      if (!a.hasAttribute("data-houd")) state.kw = null;
       window.rtKiesMerk(a.dataset.merk, a.hasAttribute("data-houd"));
       var dd = a.closest(".nav-dd");
       if (dd) dd.classList.add("dicht");
@@ -2115,7 +2186,7 @@ function rtKwTekst(n) {
         m.type = "button";
         m.setAttribute("aria-pressed", "false");
         m.setAttribute("aria-label", rtKwTekst(n) + " kW");
-      } else m = el("span", n === kw.max && kw.maten.length > 1 ? "max" : null, rtKwTekst(n));
+      } else m = el("span", null, rtKwTekst(n)); // donker ("on") als de maat past bij de filter Vermogen
       m.dataset.kw = n;
       maten.appendChild(m);
     });
@@ -2355,21 +2426,10 @@ function rtKwTekst(n) {
     return (metPrijs ? "Kies een vermogen voor de richtprijs. " : "") + "Twijfelt u? Het juiste vermogen bepalen we samen bij het gratis plaatsbezoek.";
   }
   // Is er bij het openen al een vermogen gekozen? Eerst wat de bezoeker voor dit toestel koos
-  // (op de kaart of op de detailpagina), anders de filter Vermogen in de lijst: de maat die
-  // daarbij past (zijn er meer, dan die het dichtst bij de filter ligt, bv. 3,5 bij "3,5 kW").
+  // (op de kaart of op de detailpagina), anders de maat die past bij de filter Vermogen.
   function startKw(id, maten) {
     if (kwPerToestel.hasOwnProperty(id)) return kwPerToestel[id];
-    var f = window.rtKwFilter && window.rtKwFilter();
-    if (!f) return null;
-    var binnen = maten.filter(function (n) {
-      return n >= f.van && n < f.tot;
-    });
-    if (binnen.length < 2) return binnen.length ? binnen[0] : null;
-    var doel = parseFloat(f.label.replace(",", ".")); // "3,5 kW" -> 3.5; "Meer dan 7,5 kW" -> geen getal
-    if (isNaN(doel)) return null;
-    return binnen.sort(function (a, b) {
-      return Math.abs(a - doel) - Math.abs(b - doel);
-    })[0];
+    return rtKwVoorKeuze(maten, window.rtKwFilter && window.rtKwFilter());
   }
 
   function bouw(card) {
@@ -2444,7 +2504,7 @@ function rtKwTekst(n) {
     offerte.type = "button";
     offerte.appendChild(el("span", "ar", "→"));
     offerte.addEventListener("click", function () {
-      window.rtGoToOffer("nieuw", metKw());
+      window.rtGoToOffer("nieuw", metKeuze());
     });
     var bel = el("a", "btn v3-btn-line", "Bel Rim");
     bel.href = "tel:+32491113313";
@@ -2503,11 +2563,18 @@ function rtKwTekst(n) {
     detail.appendChild(body);
 
     // Een vermogen kiezen: de knop wordt donker, de richtprijs en de rij in de tabel passen
-    // zich aan, en het vermogen gaat mee in de offerte, WhatsApp en e-mail.
-    // Nog eens op hetzelfde vermogen tikken zet de keuze af.
+    // zich aan, en het vermogen gaat mee in de offerte, WhatsApp en e-mail. Een kleur die de
+    // bezoeker koos, gaat ook mee. Nog eens op hetzelfde vermogen tikken zet de keuze af.
     var gekozen = null;
-    function metKw() {
-      return gekozen ? model + " (" + rtKwTekst(gekozen) + " kW)" : model;
+    var kleur = "";
+    function metKeuze() {
+      var keuze = [kleur, gekozen ? rtKwTekst(gekozen) + " kW" : ""].filter(Boolean);
+      return keuze.length ? model + " (" + keuze.join(", ") + ")" : model;
+    }
+    function werkBij() {
+      window.rtHuidigToestel = metKeuze();
+      if (window.rtWhatsAppToestel) wa.href = window.rtWhatsAppToestel(metKeuze());
+      if (window.rtMailToestel) mail.href = window.rtMailToestel(metKeuze());
     }
     function kiesKw(n) {
       gekozen = n;
@@ -2519,10 +2586,23 @@ function rtKwTekst(n) {
       detail.querySelectorAll(".td-kw tr[data-kw]").forEach(function (tr) {
         tr.classList.toggle("on", parseFloat(tr.dataset.kw) === n);
       });
-      window.rtHuidigToestel = metKw();
-      if (window.rtWhatsAppToestel) wa.href = window.rtWhatsAppToestel(metKw());
-      if (window.rtMailToestel) mail.href = window.rtMailToestel(metKw());
+      werkBij();
     }
+    // De kleur: de eerste kleurknop hoort bij de standaardfoto. Telt mee als de bezoeker een
+    // kleur aantikt (hier of al op de kaart in de lijst), bv. "Daikin Emura (zwart, 3,5 kW)".
+    var kleuren = media.querySelectorAll(".color-swatch");
+    function kleurNaam(sw) {
+      return (sw.getAttribute("aria-label") || "").replace(/\s*\(.*\)/, "").toLowerCase();
+    }
+    Array.prototype.forEach.call(kleuren, function (sw) {
+      sw.addEventListener("click", function () {
+        kleur = kleurNaam(sw);
+        werkBij();
+      });
+    });
+    var actieveKleur = media.querySelector(".color-swatch.active");
+    if (actieveKleur && actieveKleur !== kleuren[0]) kleur = kleurNaam(actieveKleur);
+    werkBij();
     if (kwKnoppen.length) {
       Array.prototype.forEach.call(kwKnoppen, function (b) {
         b.addEventListener("click", function () {
@@ -2650,11 +2730,12 @@ function rtKwTekst(n) {
     a.click();
     document.body.removeChild(a);
   }
+  // De resultaten tonen vanaf het zoekveld op Toestellen: zo ziet de bezoeker ook zijn zoekterm.
   function naarResultaten(q) {
     sluit();
     input.blur();
     window.rtToonZoek(q || "");
-    ga(q ? "#toestellen-lijst" : "#toestellen");
+    ga(q ? "#zoek-toestellen" : "#toestellen");
   }
 
   function sluit() {
@@ -2701,7 +2782,7 @@ function rtKwTekst(n) {
     });
     if (gevonden.length > MAX) {
       var alle = el("a", "hz-alle", "Bekijk alle " + gevonden.length + " resultaten ");
-      alle.href = "#toestellen-lijst";
+      alle.href = "#zoek-toestellen";
       alle.appendChild(el("span", "ar", "→"));
       box.appendChild(alle);
     } else if (!gevonden.length) {
@@ -2712,16 +2793,21 @@ function rtKwTekst(n) {
         window.rtToonZoek("");
       });
       geen.appendChild(merken);
-      // Rim onderhoudt en herstelt ook andere merken (zijn antwoord van 24-10-2026)
-      var ander = el("p", "hz-geen-ook", "Onderhoud of herstelling van een ander merk, zoals Samsung of Fujitsu? Ook dat doet Rim. ");
-      var vraag = el("a", null, "Vraag het aan");
-      vraag.href = "#calculator";
-      vraag.addEventListener("click", function (e) {
-        e.preventDefault();
-        input.blur();
-        window.rtGoToOffer("");
+      // Rim onderhoudt en herstelt ook andere merken (zijn antwoord van 24-10-2026).
+      // Twee links, zodat het formulier meteen de juiste dienst kiest.
+      var ander = el("p", "hz-geen-ook", "Onderhoud of herstelling van een ander merk, zoals Samsung of Fujitsu? Ook dat doet Rim: ");
+      [["onderhoud", "onderhoud aanvragen"], ["herstelling", "herstelling aanvragen"]].forEach(function (d, i) {
+        var vraag = el("a", null, d[1]);
+        vraag.href = "#calculator";
+        vraag.addEventListener("click", function (e) {
+          e.preventDefault();
+          input.blur();
+          window.rtGoToOffer(d[0]);
+        });
+        if (i) ander.appendChild(document.createTextNode(" of "));
+        ander.appendChild(vraag);
       });
-      ander.appendChild(vraag);
+      ander.appendChild(document.createTextNode("."));
       geen.appendChild(ander);
       box.appendChild(geen);
     }

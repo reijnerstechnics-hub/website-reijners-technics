@@ -20,8 +20,10 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - Rim plaatst al 6 jaar airco's (zijn antwoord op 22-10-2026). Herstellingen gebeuren op afspraak: er is geen storingsdienst 's avonds of in het weekend.
 - Prijzen die Rim bevestigde:
   - onderhoud €150 tot €200 **exclusief btw**, afhankelijk van de situatie en het aantal toestellen (22 en 24-10-2026);
+  - herstelling €100 tot €150 voor de verplaatsing en het eerste uur, **exclusief btw** (Rims antwoord "zonder", 24-10-2026);
   - "vanaf €1.500" voor één kamer is met plaatsing en **6% btw** (woning ouder dan 10 jaar; jonger: 21%), Rims "ja" van 24-10-2026.
-  - Alle andere bedragen op de site zijn nog niet bevestigd, ook herstelling €100 tot €150 ("btw inbegrepen" staat er nog bij).
+  - Alle andere bedragen op de site zijn nog niet bevestigd.
+  - Let op: voor particulieren hoort een prijs normaal mét btw op de site. Rim vraagt zijn boekhouder welk tarief geldt voor onderhoud en herstelling; daarna komt de prijs met btw erbij.
 
 ## Doel van de site
 
@@ -43,16 +45,18 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
   - Pas na zijn keuze komt de huisstijl hier vast te staan.
   - Tot dan gebruik je bij ander werk de huidige stijl. Wissel niet op eigen houtje.
 - **Nu in gebruik** (bovenaan `css/style.css`):
-  - donkerblauw `--ink` #16283d, goud `--gold` #e3a63e, lichtgoud `--gold-tint`, donker goud voor kleine tekst `--gold-text` #7a5417, blauw `--sky` #3e7fb0, achtergrond `--paper` #f6f9fb;
+  - donkerblauw `--ink` #16283d, goud `--gold` #e3a63e, lichtgoud `--gold-tint`, donker goud voor kleine tekst `--gold-text` #7a5417, blauw `--sky` #326d9a, grijs `--muted` #5f6e7b, achtergrond `--paper` #f6f9fb;
+  - kleine tekst is sinds 24-10-2026 donkerder, voor een goede leesbaarheid (Rims keuze uit `voorbeeld/kleur-tekst/`): kleine gouden tekst op een lichte achtergrond krijgt `--gold-text`, `--gold` dient voor vlakken, knoppen en tekst op donker;
   - Source Serif 4 voor titels (`--font-kop`) en Source Sans 3 voor tekst (`--font-tekst`), via Google Fonts in `index.html`.
 - **Nu op de site, maar mag in een voorstel anders:**
   - een gouden knop voor de hoofdactie;
   - toestelkaarten met een label op de foto (Binnen- + buitenunit / Zonder buitenunit / Buitenunit);
-  - het kW-blok (lichtgoud, "tot 7,1 kW" en elke maat als knopje).
+  - het kW-blok (lichtgoud, "tot 7,1 kW" en elke maat als knopje; op de toestelpagina kiest de bezoeker er een vermogen mee).
 - **Wat wel vastligt:**
   - de site mag er niet uitzien alsof ze door AI gemaakt is: geen lettertypes die je op elke AI-site ziet (Sora, Inter, Poppins), geen overdreven verlopen of glaseffecten;
   - eigen foto's van echte plaatsingen gaan voor op stockfoto's;
-  - alles moet goed leesbaar zijn, ook op gsm, met voldoende contrast.
+  - alles moet goed leesbaar zijn, ook op gsm, met voldoende contrast;
+  - wat eruitziet als een knop, moet ook iets doen. Anders geef je het een andere vorm (Rim, 24-10-2026: de kW-maten op de toestelpagina leken knopjes maar deden niets).
 
 ## Technische opbouw (kort)
 
@@ -104,11 +108,30 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
   - geen knop "Richtprijs berekenen" meer op de toestelpagina's (Rim: wie daar klikt, wil de prijs van dat toestel);
   - de verbeteringen van de grote controle van 23 oktober en Instagram @reijnerstechnics. Een dubbele foto (g-n39) is weg: de teller op Home staat op 71. Het verslag voor Rim met de open punten ("Later" en de vragen) staat in `voorbeeld/controle-2026-10-23/verslag.md`.
 - Nog open (niet dringend): de wissel bovenaan op Home laadt ook nieuwe foto's als de bezoeker al verder gescrold is.
-- 24 oktober 2026, op branch `antwoorden-rim`, **nog niet online** (wacht op Rims akkoord):
+- Sinds 24 oktober 2026 ook online (Rims akkoord):
   - Rims antwoorden: onderhoud exclusief btw, "6% btw" bij "vanaf €1.500", BV en RPR onderaan en in de privacyverklaring, beloftes zonder bron weg, onderhoud en herstelling ook voor andere merken (Diensten en de zoekbalk);
   - een richtprijs per toestel op de toestelpagina's: "vanaf €..." en een kolom Richtprijs in "Welk vermogen heb ik nodig?", met dezelfde berekening als het prijsadvies (zie README);
   - de kolom Contact in de voettekst over de volle breedte op tablet en gsm.
-- Voorstel donkerdere kleine tekst (grijs, blauw, goud, merkenbalk) voor een betere leesbaarheid: `voorbeeld/kleur-tekst/` (`voorstel.css`, `vergelijking.png`). Rim kiest.
+- 24 oktober 2026, op branch `verbeteringen-24-10`, **nog niet online** (wacht op Rims akkoord):
+  - vermogen kiezen op de toestelpagina (Rims melding: "kW aanpassen gaat niet"): de maten zijn knoppen, met de richtprijs voor die maat; het vermogen gaat mee in de offerte, WhatsApp en e-mail (zie README);
+  - de donkerdere kleine tekst (Rims keuze: het voorstel uit `voorbeeld/kleur-tekst/`);
+  - herstelling €100 tot €150 exclusief btw;
+  - de grote controle als klant (Rims vraag, tester, 24-10): geen blokkerende fouten. Hersteld:
+    - zoeken op vermogen ("3,5 kW") zoekt in de maten;
+    - een oude filter Vermogen hangt niet meer vast bij een nieuwe zoekopdracht of bij "Alle toestellen van ...";
+    - het gekozen toestel staat ook in de WhatsApp-tekst en in de aanvulling;
+    - geen oud toestel meer in het formulier. Op een toestelpagina vraagt elke offerteknop (ook bovenaan en in de balk onderaan) een offerte voor dat toestel, met vermogen en gekozen kleur;
+    - het logo gaat naar Home;
+    - bij een zoekterm zonder resultaat (bv. Samsung) ook op Toestellen de zin over andere merken, met "onderhoud aanvragen" en "herstelling aanvragen";
+    - op Diensten "Meestal €1.500 tot €3.000";
+    - de tegel "Ook achter de kap netjes" gaat naar "Zo sluiten we aan";
+    - in het prijsadvies springt Enter naar het volgende veld, is de gemeente verplicht en staan de kamers in de mail in de juiste volgorde;
+    - op de kaarten in de lijst is de donkere maat die van de filter Vermogen (vroeger de grootste maat).
+  - Nog open uit die controle (later, niet dringend):
+    - tikdoelen kleiner dan 44 px op gsm: tekstlinks, de voorbeelden onder de zoekbalk, Koelen/Verwarmen, de pijltjes van de fotokaders;
+    - op tablet liggen de zwevende bel- en WhatsApp-knoppen over de tekst;
+    - 36 productfoto's zijn niet 600 × 600; de Nuova Infinity AI Smart is 300 × 300 en wazig op de computer;
+    - de prijsnotatie verschilt: "€ 2.450 – 3.050" op de toestelpagina, "€ 2.450 – € 3.050" in het prijsadvies.
 - Promotieplan voor Instagram en andere kanalen, met voorbeeldberichten en reels: `voorbeeld/social/index.html` (prijzen bijgewerkt op 24-10-2026).
 - Huisstijl: sinds 21 oktober 2026 staat het lettertype "C" (Source Serif + Source Sans) met de huidige kleuren online. De kleuren en lettertypes zijn nog in beoordeling: de voorstellen A (huidig, bijgewerkt), B (Vakwerk) en C (Helder) staan in `voorbeeld/huisstijl/`. Rim kiest.
 - Audit vóór de livegang (21 oktober 2026): `AUDIT.md` (nog niet in git) en `voorbeeld/audit/`. Verbeterplan voor Diensten, Over ons en Realisaties (22 oktober 2026): `voorbeeld/paginas/verbeterplan.md`, met een echte fout in het aanvraagformulier (D-1) en foto's met Gree en Olimpia Splendid op Realisaties (R-2). Van beide is nog niets uitgevoerd: ze wachten op Rims antwoorden en akkoord.
