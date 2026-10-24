@@ -112,7 +112,8 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
   - Rims antwoorden: onderhoud exclusief btw, "6% btw" bij "vanaf €1.500", BV en RPR onderaan en in de privacyverklaring, beloftes zonder bron weg, onderhoud en herstelling ook voor andere merken (Diensten en de zoekbalk);
   - een richtprijs per toestel op de toestelpagina's: "vanaf €..." en een kolom Richtprijs in "Welk vermogen heb ik nodig?", met dezelfde berekening als het prijsadvies (zie README);
   - de kolom Contact in de voettekst over de volle breedte op tablet en gsm.
-- 24 oktober 2026, op branch `verbeteringen-24-10`, **nog niet online** (wacht op Rims akkoord):
+- 24 oktober 2026, op branch `prijs-op-kaarten`, **nog niet online** (wacht op Rims akkoord): de richtprijs op de kaartjes in de toestellenlijst ("vanaf € ..."; met de filter Vermogen de prijs voor die maat), met één uitleg bovenaan de lijst (Rims "ja").
+- Ook sinds 24 oktober 2026 online (Rims tweede akkoord van die dag):
   - vermogen kiezen op de toestelpagina (Rims melding: "kW aanpassen gaat niet"): de maten zijn knoppen, met de richtprijs voor die maat; het vermogen gaat mee in de offerte, WhatsApp en e-mail (zie README);
   - de donkerdere kleine tekst (Rims keuze: het voorstel uit `voorbeeld/kleur-tekst/`);
   - herstelling €100 tot €150 exclusief btw;

@@ -1859,13 +1859,18 @@ function rtKwVoorKeuze(maten, k) {
     cards.forEach(function (c) {
       c.hidden = !(vanMerk(c) && past(c) && test(c) && pastKw(c));
       if (!c.hidden) zichtbaar++;
-      // de maat die bij de filter Vermogen past, staat donker (zo opent ook de detailpagina)
+      // de maat die bij de filter Vermogen past, staat donker (zo opent ook de detailpagina),
+      // en de richtprijs op de kaart is die van die maat
       var kw = rtKw(c);
       var donker = kw && rtKwVoorKeuze(kw.maten, kwNu);
       c.querySelectorAll(".kw-maten [data-kw]").forEach(function (m) {
         m.classList.toggle("on", parseFloat(m.dataset.kw) === donker);
       });
+      if (window.rtKaartPrijs) window.rtKaartPrijs(c, donker);
     });
+    // uitleg bij de richtprijzen, enkel als er een kaart met een prijs te zien is
+    var noot = lijst.querySelector(".lijst-noot");
+    if (noot) noot.hidden = !lijst.querySelector(".device-card:not([hidden]) .device-prijs");
     section.querySelectorAll(".brand-sub").forEach(function (sub) {
       var devices = sub.nextElementSibling;
       if (devices && devices.classList.contains("devices")) {
@@ -2333,6 +2338,29 @@ function rtKwVoorKeuze(maten, k) {
     toon(null);
     return { box: box, toon: toon };
   }
+
+  // ---------- richtprijs op de kaarten in de lijst (Rim, 24-10-2026) ----------
+  // "vanaf € ..." zoals op de detailpagina. Staat de filter Vermogen aan, dan de prijs voor de
+  // donkere maat (de lijst roept daarvoor window.rtKaartPrijs aan).
+  function kaartPrijs(card, kw) {
+    var box = card.querySelector(".device-prijs");
+    if (!box) return;
+    var model = card.querySelector(".device-cta").dataset.model;
+    var p = kw && richtprijs(model, kw);
+    box.firstChild.textContent = kw ? "Richtprijs voor " + rtKwTekst(kw) + " kW" : "Richtprijs";
+    box.lastChild.textContent = !kw ? "vanaf " + euro.format(vanafPrijs(model).prijs.lo) : p ? euro.format(p.lo) + " – " + getal.format(p.hi) : "Op aanvraag";
+  }
+  cards.forEach(function (card) {
+    var cta = card.querySelector(".device-cta");
+    if (!cta || !vanafPrijs(cta.dataset.model)) return;
+    var box = el("div", "device-prijs");
+    box.appendChild(el("span"));
+    box.appendChild(el("b"));
+    var kw = card.querySelector(".device-kw");
+    card.insertBefore(box, kw ? kw.nextSibling : card.querySelector(".device-keys, .device-more"));
+    kaartPrijs(card, null);
+  });
+  window.rtKaartPrijs = kaartPrijs;
 
   // ---------- detailpagina ----------
   function vermogenTabel(card, model) {

@@ -87,6 +87,8 @@ Heeft een toestel in `prijzen.js` een prijs voor een set (binnen- en buitenunit)
 - een blok "Richtprijs vanaf € ..." voor het kleinste vermogen, net boven de knoppen;
 - een kolom "Richtprijs" in de tabel "Welk vermogen heb ik nodig?" ("op aanvraag" als er voor dat vermogen geen setprijs is).
 
+Ook de kaart in de lijst toont dan "Richtprijs vanaf € ..." (`kaartPrijs` in `js/main.js`). Staat de filter *Vermogen* aan, dan staat er de prijs voor de donkere maat. De uitleg (plaatsing, btw, offerte) staat één keer bovenaan de lijst (`.lijst-noot` in `index.html`), en enkel als er een kaart met een prijs te zien is.
+
 De berekening is dezelfde als in het prijsadvies voor één kamer met een eigen buitenunit: set + plaatsing + standaardleiding, plus btw en marge, afgerond op 50 euro (`richtprijs` in het blok *TOESTELLEN* van `js/main.js`). Pas je die berekening in `js/prijscalculator.js` aan, pas ze dan ook daar aan. Toestellen zonder prijs in `prijzen.js` tonen geen richtprijs, en met `voorlopig: true` verdwijnen de richtprijzen van de toestelpagina's. Daarom laadt `index.html` `js/prijzen.js` vóór `js/main.js`.
 
 ### Vermogen kiezen op de toestelpagina
