@@ -15,7 +15,7 @@
   --font-tekst: "Source Sans 3", "Segoe UI", Arial, sans-serif;
   --ink: #16283d;
   --body: #3d4c5a;
-  --muted: #6b7a87;
+  --muted: #5f6e7b;
   --paper: #f6f9fb;
   --surface: #ffffff;
   --surface-alt: #eef3f7;
@@ -24,7 +24,7 @@
   --gold-dark: #c98826;
   --gold-tint: #fcf1dd;
   --gold-text: #7a5417;
-  --sky: #3e7fb0;
+  --sky: #326d9a;
   --sky-tint: #e4eef5;
   --focus: #3e7fb0;
 }
@@ -72,7 +72,7 @@ svg {
   font-size: 0.78rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--gold-dark);
+  color: var(--gold-text);
   display: flex;
   align-items: flex-start;
   gap: 9px;
@@ -152,7 +152,7 @@ section[data-page].page-active {
   font-size: 0.76rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--gold-dark);
+  color: var(--gold-text);
   display: block;
   margin-bottom: 8px;
 }
@@ -184,7 +184,7 @@ section[data-page].page-active {
   font-size: 0.78rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--gold-dark);
+  color: var(--gold-text);
   padding: 16px 18px 0;
 }
 .carousel-viewport {
@@ -442,7 +442,7 @@ section[data-page].page-active {
   cursor: pointer;
 }
 .faq-q:hover {
-  color: var(--gold-dark);
+  color: var(--gold-text);
 }
 .faq-icon {
   flex-shrink: 0;
@@ -450,7 +450,7 @@ section[data-page].page-active {
   height: 22px;
   border-radius: 50%;
   background: var(--gold-tint);
-  color: var(--gold-dark);
+  color: var(--gold-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1047,7 +1047,7 @@ section.alt {
   font-family: var(--font-kop);
   font-weight: 800;
   font-size: clamp(2.1rem, 5vw, 2.8rem);
-  color: var(--gold-dark);
+  color: var(--gold-text);
   line-height: 1;
 } /* niet meer gebruikt, kan later opgeruimd */
 .calc-price-label {
@@ -1147,7 +1147,7 @@ section.alt {
   color: var(--sky);
 }
 .calc-status.err {
-  color: var(--gold-dark);
+  color: var(--gold-text);
 }
 .dienst-grid {
   grid-template-columns: repeat(3, 1fr);
@@ -1298,7 +1298,7 @@ section.alt {
 }
 .service .idx {
   font-family: var(--font-tekst);
-  color: var(--gold-dark);
+  color: var(--gold-text);
   font-size: 0.8rem;
 }
 .service h3 {
@@ -1543,7 +1543,7 @@ section.alt {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--gold-dark);
+  color: var(--gold-text);
 }
 .device-card h3 {
   font-size: 1.1rem;
@@ -1777,7 +1777,7 @@ textarea {
   color: var(--sky);
 }
 .form-status.err {
-  color: var(--gold-dark);
+  color: var(--gold-text);
 }
 
 footer {
@@ -2695,7 +2695,7 @@ header.site {
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--gold-dark);
+  color: var(--gold-text);
   font-weight: 600;
 }
 
@@ -3721,7 +3721,7 @@ header.site .btn-gold {
   font-size: 0.76rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--gold-dark);
+  color: var(--gold-text);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -4031,7 +4031,7 @@ section.v3-marquee {
   font-family: var(--font-kop);
   font-weight: 800;
   font-size: 1.55rem;
-  color: #aab9c7;
+  color: #7d8c99;
   white-space: nowrap;
   letter-spacing: -0.02em;
 }
@@ -5180,7 +5180,7 @@ section.v2-phead::before {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--gold-dark);
+  color: var(--gold-text);
 }
 .v4-stop h3 {
   font-size: 1.15rem;
@@ -6211,7 +6211,7 @@ section.pc-sec {
   font-size: 0.76rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--gold-dark);
+  color: var(--gold-text);
   font-weight: 600;
 }
 .pc-q {
@@ -6383,7 +6383,7 @@ section.pc-sec {
   font-size: 0.74rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--gold-dark);
+  color: var(--gold-text);
   font-weight: 600;
   margin-bottom: 10px;
 }
@@ -6851,7 +6851,7 @@ section.pc-catalog {
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--gold-dark);
+  color: var(--gold-text);
 }
 .merk-alle {
   margin: 16px 0 0;
@@ -7406,7 +7406,7 @@ section.pc-catalog {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--gold-dark);
+  color: var(--gold-text);
 }
 .pc-vs-head .pc-badge {
   margin: 0;
@@ -8127,6 +8127,46 @@ h3,
   min-width: 58px;
   padding: 7px 10px;
   font-size: 1rem;
+}
+/* op de detailpagina zijn de maten knoppen: de bezoeker kiest een vermogen (Rim, 24 oktober 2026) */
+.device-kw-groot .kw-maten button {
+  min-width: 58px;
+  min-height: 44px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: #fff;
+  border: 1.5px solid var(--gold);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.device-kw-groot .kw-maten button:hover {
+  border-color: var(--ink);
+}
+.device-kw-groot .kw-maten button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.device-kw-groot .kw-maten button[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.kw-uitleg {
+  margin: 10px 0 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--body);
+}
+.td-kw tr.on td {
+  background: var(--gold-tint);
+  font-weight: 700;
 }
 .device-more-onder {
   margin-top: auto;
