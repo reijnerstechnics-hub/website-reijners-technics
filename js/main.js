@@ -871,7 +871,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.500 euro, plaatsing inbegrepen); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.500 euro, plaatsing en 6% btw inbegrepen voor een woning ouder dan 10 jaar; onderhoud 150 tot 200 euro, exclusief btw); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -2168,8 +2168,65 @@ function rtKwTekst(n) {
     if (a) a.click();
   });
 
+  // ---------- richtprijs per toestel (Rim, 24-10-2026) ----------
+  // Dezelfde berekening als het prijsadvies (calculate in js/prijscalculator.js) voor één kamer
+  // met een eigen buitenunit: set + plaatsing + standaardleiding, met btw en de marge uit
+  // js/prijzen.js, afgerond op 50 euro. Enkel voor toestellen met een setprijs in js/prijzen.js.
+  var euro = new Intl.NumberFormat("nl-BE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+  var getal = new Intl.NumberFormat("nl-BE", { maximumFractionDigits: 0 });
+  function prijsToestel(model) {
+    if (typeof RT_PRIJZEN === "undefined" || RT_PRIJZEN.voorlopig) return null;
+    for (var i = 0; i < RT_PRIJZEN.toestellen.length; i++) if (RT_PRIJZEN.toestellen[i].model === model) return RT_PRIJZEN.toestellen[i];
+    return null;
+  }
+  function richtprijs(model, kw) {
+    var t = prijsToestel(model);
+    var rij = t && t.prijzen[kw.toFixed(1)];
+    if (!rij || rij[0] == null) return null;
+    var P = RT_PRIJZEN;
+    var I = P.installatie;
+    var excl = rij[0] + I.buitenunit + I.binnenunit + Math.max(0, I.standaardLeiding - I.leidingInbegrepen) * I.perMeter;
+    var incl = excl * (1 + P.btw.standaard / 100);
+    return {
+      lo: Math.floor((incl * (1 - P.marge.min / 100)) / 50) * 50,
+      hi: Math.ceil((incl * (1 + P.marge.max / 100)) / 50) * 50,
+    };
+  }
+  // het kleinste vermogen met een setprijs
+  function vanafPrijs(model) {
+    var t = prijsToestel(model);
+    if (!t) return null;
+    var maten = Object.keys(t.prijzen)
+      .map(parseFloat)
+      .sort(function (a, b) {
+        return a - b;
+      });
+    for (var i = 0; i < maten.length; i++) {
+      var p = richtprijs(model, maten[i]);
+      if (p) return { kw: maten[i], prijs: p, meer: maten.length - i > 1 };
+    }
+    return null;
+  }
+  function prijsBlok(model) {
+    var v = vanafPrijs(model);
+    if (!v) return null;
+    var box = el("div", "td-prijs");
+    box.appendChild(el("span", "td-prijs-lbl", "Richtprijs"));
+    box.appendChild(el("b", "td-prijs-bedrag", "vanaf " + euro.format(v.prijs.lo)));
+    box.appendChild(
+      el(
+        "p",
+        null,
+        "Voor " + rtKwTekst(v.kw) + " kW, met plaatsing en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar)." +
+          (v.meer ? " De prijs per vermogen ziet u verderop." : "") +
+          " De echte prijs krijgt u in de offerte, na het gratis plaatsbezoek."
+      )
+    );
+    return box;
+  }
+
   // ---------- detailpagina ----------
-  function vermogenTabel(card) {
+  function vermogenTabel(card, model) {
     if (["wand", "vloer", "cassette", "kanaal", "plafond", "zuil", "monoblock"].indexOf(card.dataset.type) === -1) return null;
     // de maten uit data-kw, anders de getallen uit de rij Koelvermogen.
     // Bij een bereik in data-kw (bv. "2,5-14,0") geen tabel maar één zin: de rij Koelvermogen
@@ -2211,18 +2268,42 @@ function rtKwTekst(n) {
       );
       return box;
     }
-    var t = el("table", "td-kw");
+    // met een kolom richtprijs als er voor dit toestel prijzen zijn
+    var metPrijs = nums.some(function (n) {
+      return richtprijs(model, n);
+    });
+    var t = el("table", "td-kw" + (metPrijs ? " td-kw-prijs" : ""));
     var head = el("tr");
     head.appendChild(el("th", null, "Vermogen"));
-    head.appendChild(el("th", null, "Richtwaarde ruimte"));
+    head.appendChild(el("th", null, metPrijs ? "Ruimte" : "Richtwaarde ruimte"));
+    if (metPrijs) head.appendChild(el("th", null, "Richtprijs"));
     t.appendChild(head);
     nums.forEach(function (n) {
       var tr = el("tr");
       tr.appendChild(el("td", null, n.toFixed(1).replace(".", ",") + " kW"));
-      tr.appendChild(el("td", null, "ca. " + Math.round(n / 0.12) + " - " + Math.round(n / 0.09) + " m²"));
+      if (metPrijs) {
+        // compacter, zodat de drie kolommen ook op een smalle gsm op één regel passen
+        var ruimte = el("td");
+        ruimte.appendChild(el("span", "td-kw-ca", "ca. "));
+        ruimte.appendChild(el("span", "td-kw-m2", Math.round(n / 0.12) + "-" + Math.round(n / 0.09) + " m²"));
+        tr.appendChild(ruimte);
+        var p = richtprijs(model, n);
+        tr.appendChild(el("td", p ? null : "td-kw-geen", p ? euro.format(p.lo) + " – " + getal.format(p.hi) : "op aanvraag"));
+      } else {
+        tr.appendChild(el("td", null, "ca. " + Math.round(n / 0.12) + " - " + Math.round(n / 0.09) + " m²"));
+      }
       t.appendChild(tr);
     });
     box.appendChild(t);
+    if (metPrijs)
+      box.appendChild(
+        el(
+          "p",
+          "td-kw-noot",
+          "Richtprijs met plaatsing en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar; jonger: " + RT_PRIJZEN.btw.nieuw +
+            "% btw). De echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest."
+        )
+      );
     return box;
   }
 
@@ -2286,6 +2367,8 @@ function rtKwTekst(n) {
       keys.appendChild(el("span", null, t));
     });
     if (keys.children.length) info.appendChild(keys);
+    var prijs = prijsBlok(model);
+    if (prijs) info.appendChild(prijs);
     var acts = el("div", "td-acts");
     var offerte = el("button", "btn btn-gold", "Offerte voor dit model ");
     offerte.type = "button";
@@ -2332,7 +2415,7 @@ function rtKwTekst(n) {
     body.appendChild(specs);
 
     var side = el("div", "td-side");
-    var kw = vermogenTabel(card);
+    var kw = vermogenTabel(card, model);
     if (kw) side.appendChild(kw);
     var weet = el("div", "td-box");
     weet.appendChild(el("h3", null, "Goed om te weten"));
@@ -2527,6 +2610,17 @@ function rtKwTekst(n) {
         window.rtToonZoek("");
       });
       geen.appendChild(merken);
+      // Rim onderhoudt en herstelt ook andere merken (zijn antwoord van 24-10-2026)
+      var ander = el("p", "hz-geen-ook", "Onderhoud of herstelling van een ander merk, zoals Samsung of Fujitsu? Ook dat doet Rim. ");
+      var vraag = el("a", null, "Vraag het aan");
+      vraag.href = "#calculator";
+      vraag.addEventListener("click", function (e) {
+        e.preventDefault();
+        input.blur();
+        window.rtGoToOffer("");
+      });
+      ander.appendChild(vraag);
+      geen.appendChild(ander);
       box.appendChild(geen);
     }
     box.hidden = false;

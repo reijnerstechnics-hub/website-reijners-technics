@@ -6,15 +6,22 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 
 - Reijners Technics, zaakvoerder Rim Reijners: installateur van airco's (lucht/lucht-warmtepompen). Plaatsing, onderhoud en herstelling.
 - Borreshoefstraat 12, 3650 Dilsen-Stokkem · +32 491 11 33 13 · reijnerstechnics@gmail.com · BTW BE 1021.765.138.
+- Rechtsvorm: Reijners Technics **BV** (besloten vennootschap sinds 1-4-2025, volgens de KBO). RPR Antwerpen, afdeling Tongeren-Borgloon: de bevoegde rechtbank voor Dilsen-Stokkem volgens territoriale-bevoegdheid.just.fgov.be. Beide staan onderaan de site en in de privacyverklaring (Rims vraag, 24-10-2026).
+- Instagram: @reijnerstechnics (op de site sinds 23-10-2026). Er is nog geen Facebookpagina.
+- Eigen webadres (bv. reijnerstechnics.be): pas als Rims eigen foto's volledig op de site staan (Rim, 24-10-2026). Tot dan enkel het vercel.app-adres.
 - Werkgebied: Dilsen-Stokkem, Maaseik, Bree, Genk, Hasselt, Tongeren en omgeving.
-- Merken: Daikin, LG, Mitsubishi Electric, Mitsubishi Heavy Industries (MHI), Nuova en Toshiba.
+- Merken: Daikin, LG, Mitsubishi Electric, Mitsubishi Heavy Industries (MHI), Nuova en Toshiba. Onderhoud en herstelling doet Rim ook voor andere merken, zoals Samsung of Fujitsu (24-10-2026).
 - **Niet** in het aanbod (bewust overal verwijderd): lucht/water-warmtepompen, warmtepompboilers, het merk Ariston. Ook geen foto's van Gree of Olimpia Splendid (op 22-10-2026 van de site gehaald). Voeg ze nooit opnieuw toe.
 - Beloftes op de site: gratis plaatsbezoek, binnen 24 uur teruggebeld door Rim zelf, rechtstreeks met de installateur, u beslist pas na de offerte.
+- Op Rims vraag weggehaald (24-10-2026), want zonder bron: "Nazorg gegarandeerd", "u behoudt uw garantie", "geen wachttijden", "Binnen 1 tot 2 dagen klaar", "20-30% besparing" en "5-10 jaar langer". Zet ze niet terug.
 - Rim is altijd zelf het aanspreekpunt. Fabio Lomma (eigen zaak: Lomma Technics) plaatst mee, maar is geen aanspreekpunt (Rim, 22-10-2026).
 - De foto van Rim en Fabio samen wil Rim niet op de site (22-10-2026). Er komt ook geen fotootje van Fabio uit die foto: zijn kaartje op Over ons houdt de letters "FL". De bewerkte versies in `voorbeeld/ronde-1/nieuw/` gebruik je niet.
 - Rim heeft een koeltechnisch certificaat. Het nummer en een foto van het certificaat komen nooit online (kans op misbruik).
 - Rim plaatst al 6 jaar airco's (zijn antwoord op 22-10-2026). Herstellingen gebeuren op afspraak: er is geen storingsdienst 's avonds of in het weekend.
-- Prijzen die Rim bevestigde: onderhoud €150 tot €200, afhankelijk van de situatie en het aantal toestellen (22-10-2026; met of zonder btw nog niet gezegd). Alle andere bedragen op de site zijn nog niet bevestigd.
+- Prijzen die Rim bevestigde:
+  - onderhoud €150 tot €200 **exclusief btw**, afhankelijk van de situatie en het aantal toestellen (22 en 24-10-2026);
+  - "vanaf €1.500" voor één kamer is met plaatsing en **6% btw** (woning ouder dan 10 jaar; jonger: 21%), Rims "ja" van 24-10-2026.
+  - Alle andere bedragen op de site zijn nog niet bevestigd, ook herstelling €100 tot €150 ("btw inbegrepen" staat er nog bij).
 
 ## Doel van de site
 
@@ -36,7 +43,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
   - Pas na zijn keuze komt de huisstijl hier vast te staan.
   - Tot dan gebruik je bij ander werk de huidige stijl. Wissel niet op eigen houtje.
 - **Nu in gebruik** (bovenaan `css/style.css`):
-  - donkerblauw `--ink` #16283d, goud `--gold` #e3a63e, lichtgoud `--gold-tint`, blauw `--sky` #3e7fb0, achtergrond `--paper` #f6f9fb;
+  - donkerblauw `--ink` #16283d, goud `--gold` #e3a63e, lichtgoud `--gold-tint`, donker goud voor kleine tekst `--gold-text` #7a5417, blauw `--sky` #3e7fb0, achtergrond `--paper` #f6f9fb;
   - Source Serif 4 voor titels (`--font-kop`) en Source Sans 3 voor tekst (`--font-tekst`), via Google Fonts in `index.html`.
 - **Nu op de site, maar mag in een voorstel anders:**
   - een gouden knop voor de hoofdactie;
@@ -89,11 +96,20 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - Er is nog geen eigen foto van een Mitsubishi Electric Diamond voor de wisselende foto's op de homepagina. Een Mitsubishi Electric-paar kan er pas bij met een foto van een binnenunit die niet de hele breedte vult: de foto van het wandmodel tegen de houten wand (g-s-f5c477ad326e) is te breed voor het hoge kader.
 - Sinds 22 oktober 2026 ook online (Rims akkoord):
   - op Home wisselen de grote en de kleine foto bovenaan samen: telkens een binnen- en een buitenunit van hetzelfde merk, met kleine versies `k-...webp` voor het kleine fotootje (zie README);
-  - 8 nieuwe eigen foto's op Realisaties (g-n86 t/m g-n93), de teller op Home staat op 72. De genummerde lijst om de gemeente per foto te vragen staat in `voorbeeld/ronde-1/fotos-nummers.txt` (1 t/m 72); de antwoorden van Rim ontbreken nog;
+  - 8 nieuwe eigen foto's op Realisaties (g-n86 t/m g-n93). De genummerde lijst om de gemeente per foto te vragen staat in `voorbeeld/ronde-1/fotos-nummers.txt` (1 t/m 72, g-n39 staat er als weggehaald bij); de antwoorden van Rim ontbreken nog;
   - het blok "Nette plaatsing" op Home heeft een wit tekstkader, zodat het toestel op de foto helemaal zichtbaar blijft (Rims vraag).
-- Nog open uit de test van 22 oktober 2026 (niet dringend):
-  - de functie onder de namen op Over ons (`.team-role`, goud #c98826 op wit) heeft te weinig contrast (3:1). Voorgesteld aan Rim: de donkere goudkleur `--gold-text`;
-  - de wissel bovenaan op Home laadt ook nieuwe foto's als de bezoeker al verder gescrold is.
+- Sinds 23 oktober 2026 ook online (Rims akkoord):
+  - Home: de eerste foto bovenaan is het Daikin-vloermodel; het gouden blok "Gratis plaatsbezoek" is een knop; de functie onder de namen op Over ons staat in donker goud (`--gold-text`);
+  - seizoensfoto's bovenaan Home: warme foto's van oktober tot april, frisse van mei tot september (`data-seizoen`, zie README);
+  - geen knop "Richtprijs berekenen" meer op de toestelpagina's (Rim: wie daar klikt, wil de prijs van dat toestel);
+  - de verbeteringen van de grote controle van 23 oktober en Instagram @reijnerstechnics. Een dubbele foto (g-n39) is weg: de teller op Home staat op 71. Het verslag voor Rim met de open punten ("Later" en de vragen) staat in `voorbeeld/controle-2026-10-23/verslag.md`.
+- Nog open (niet dringend): de wissel bovenaan op Home laadt ook nieuwe foto's als de bezoeker al verder gescrold is.
+- 24 oktober 2026, op branch `antwoorden-rim`, **nog niet online** (wacht op Rims akkoord):
+  - Rims antwoorden: onderhoud exclusief btw, "6% btw" bij "vanaf €1.500", BV en RPR onderaan en in de privacyverklaring, beloftes zonder bron weg, onderhoud en herstelling ook voor andere merken (Diensten en de zoekbalk);
+  - een richtprijs per toestel op de toestelpagina's: "vanaf €..." en een kolom Richtprijs in "Welk vermogen heb ik nodig?", met dezelfde berekening als het prijsadvies (zie README);
+  - de kolom Contact in de voettekst over de volle breedte op tablet en gsm.
+- Voorstel donkerdere kleine tekst (grijs, blauw, goud, merkenbalk) voor een betere leesbaarheid: `voorbeeld/kleur-tekst/` (`voorstel.css`, `vergelijking.png`). Rim kiest.
+- Promotieplan voor Instagram en andere kanalen, met voorbeeldberichten en reels: `voorbeeld/social/index.html` (prijzen bijgewerkt op 24-10-2026).
 - Huisstijl: sinds 21 oktober 2026 staat het lettertype "C" (Source Serif + Source Sans) met de huidige kleuren online. De kleuren en lettertypes zijn nog in beoordeling: de voorstellen A (huidig, bijgewerkt), B (Vakwerk) en C (Helder) staan in `voorbeeld/huisstijl/`. Rim kiest.
 - Audit vóór de livegang (21 oktober 2026): `AUDIT.md` (nog niet in git) en `voorbeeld/audit/`. Verbeterplan voor Diensten, Over ons en Realisaties (22 oktober 2026): `voorbeeld/paginas/verbeterplan.md`, met een echte fout in het aanvraagformulier (D-1) en foto's met Gree en Olimpia Splendid op Realisaties (R-2). Van beide is nog niets uitgevoerd: ze wachten op Rims antwoorden en akkoord.
 - Ronde 1 van het verbeterplan staat sinds 22 oktober 2026 online (Rims akkoord): formulierfout, snelheid, merken op de foto's, Rims keuzes en kleinere fixes. De voorbeelden voor een nieuwe indeling van Diensten, Realisaties (fotoraster) en Over ons staan in `voorbeeld/ronde-1/` (README voor Rim). Rim kiest nog. De `.vercelignore` werkt: CLAUDE.md, .claude/ en .gitattributes geven op Vercel 404. Ronde 2 staat sinds 22 oktober 2026 ook online (Rims akkoord): richtprijzen rond de markt op Diensten, Home en in het prijsadvies, 6 jaar ervaring, herstelling op afspraak, vraag "Wat kost een airco?", geruststelling onder de knop, de link "Bereken uw richtprijs" op Home, het welkomstvenster maar één keer per bezoeker en niet op gsm, gewoon "warmtepomp" (geen lucht/lucht), en WhatsApp en e-mail met het toestel al ingevuld (toestelpagina's) plus een knop E-mail in de banden.

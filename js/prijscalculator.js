@@ -178,6 +178,7 @@
     return out;
   }
 
+  // Let op: de toestelpagina's rekenen voor één kamer op dezelfde manier (richtprijs in js/main.js).
   function calculate(m) {
     var items = roomList().map(function (r) {
       return { naam: r.naam, kw: r.m2 * KW_PER_M2 };

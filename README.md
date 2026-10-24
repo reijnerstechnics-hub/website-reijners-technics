@@ -80,6 +80,15 @@ Alles staat in `js/prijzen.js` (exclusief btw):
 
 Zolang daar `voorlopig: true` staat, ziet de klant de melding dat het om voorbeeldprijzen gaat. De werking zelf staat in `js/prijscalculator.js`. Foto en uitleg komen van de toestelkaarten; een toestel in `prijzen.js` hoort bij de kaart met dezelfde `data-model`.
 
+### Richtprijs per toestel
+
+Heeft een toestel in `prijzen.js` een prijs voor een set (binnen- en buitenunit), dan toont zijn detailpagina (`#toestel-...`):
+
+- een blok "Richtprijs vanaf € ..." voor het kleinste vermogen, net boven de knoppen;
+- een kolom "Richtprijs" in de tabel "Welk vermogen heb ik nodig?" ("op aanvraag" als er voor dat vermogen geen setprijs is).
+
+De berekening is dezelfde als in het prijsadvies voor één kamer met een eigen buitenunit: set + plaatsing + standaardleiding, plus btw en marge, afgerond op 50 euro (`richtprijs` in het blok *TOESTELLEN* van `js/main.js`). Pas je die berekening in `js/prijscalculator.js` aan, pas ze dan ook daar aan. Toestellen zonder prijs in `prijzen.js` tonen geen richtprijs, en met `voorlopig: true` verdwijnen de richtprijzen van de toestelpagina's. Daarom laadt `index.html` `js/prijzen.js` vóór `js/main.js`.
+
 ## Online zetten
 
 Upload de volledige map naar de webhost, zodat `index.html` in de hoofdmap staat. Laat weg wat enkel voor het werken aan de site dient: `.git`, `.claude`, `CLAUDE.md` en `voorbeeld`. Werkt ook met Netlify, Vercel, Cloudflare Pages of GitHub Pages zonder extra instellingen.

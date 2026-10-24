@@ -7986,6 +7986,11 @@ section.pc-catalog {
   color: var(--sky);
   font-weight: 700;
 }
+.hz-geen-ook {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
 @media (max-width: 480px) {
   .hz-bar {
     padding-left: 14px;
@@ -8556,4 +8561,82 @@ section[data-page="realisaties"] .v4-strip {
 .v4-insta span {
   font-size: 0.92rem;
   color: var(--body);
+}
+
+/* ---------- richtprijs per toestel op de detailpagina (Rim, 24 oktober 2026) ---------- */
+.td-prijs {
+  max-width: 540px;
+  margin-top: 20px;
+  padding: 14px 16px 15px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.td-prijs-lbl {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+.td-prijs-bedrag {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-kop);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.td-prijs p {
+  margin: 8px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--body);
+}
+.td-kw-prijs th + th,
+.td-kw-prijs td + td {
+  padding-left: 10px;
+}
+.td-kw-prijs th:last-child,
+.td-kw-prijs td:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+.td-kw-prijs td:last-child {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.td-kw-m2 {
+  white-space: nowrap;
+}
+.td-kw-prijs td.td-kw-geen {
+  font-weight: 600;
+  color: var(--body);
+}
+.td-box .td-kw-noot {
+  margin: 12px 0 0;
+  font-size: 0.82rem;
+}
+@media (max-width: 400px) {
+  .td-side .td-box {
+    padding: 18px 16px;
+  }
+  .td-kw-prijs {
+    font-size: 0.84rem;
+  }
+}
+@media (max-width: 360px) {
+  .td-kw-ca {
+    display: none;
+  }
+}
+
+/* voettekst op tablet en gsm: de kolom Contact over de volle breedte, zodat het e-mailadres
+   en de BV-vermelding niet middenin een woord breken (24 oktober 2026) */
+@media (max-width: 860px) {
+  .v2-fcols > div:last-child {
+    grid-column: 1 / -1;
+  }
 }
