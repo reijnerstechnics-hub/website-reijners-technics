@@ -1104,9 +1104,20 @@ window.rtGoToOffer = function (d, model) {
     function klaar(k) {
       return imgs[k].getAttribute("src") && (!kImgs[k] || kImgs[k].getAttribute("src"));
     }
-    // Enkel draaien (en foto's laden) als de foto in beeld kan zijn: niet op een andere pagina.
+    // Enkel draaien (en foto's laden) als de foto in beeld is: niet op een andere pagina, en
+    // niet als de bezoeker al voorbij de foto gescrold is (dan laadt de wissel geen foto's).
+    var inBeeld = !("IntersectionObserver" in window);
+    if (!inBeeld)
+      new IntersectionObserver(
+        function (entries) {
+          inBeeld = entries[0].isIntersecting;
+          // komt de foto in beeld, dan de volgende alvast laden
+          if (inBeeld && imgs.length > 1) laad((i + 1) % imgs.length);
+        },
+        { rootMargin: "100px 0px" }
+      ).observe(box);
     function zichtbaar() {
-      return !document.hidden && box.offsetParent !== null;
+      return !document.hidden && box.offsetParent !== null && inBeeld;
     }
     kiesReeks(true);
     if (box.querySelector("img.rot[data-seizoen]")) reeksKiezers.push(kiesReeks);
