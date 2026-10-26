@@ -1,0 +1,6 @@
+# Reijners Technics: alle zoekmachines mogen de hele site lezen.
+# EIGEN DOMEIN: vervang het adres van de sitemap zodra de site op reijnerstechnics.be staat.
+User-agent: *
+Allow: /
+
+Sitemap: https://website-reijners-technics.vercel.app/sitemap.xml

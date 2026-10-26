@@ -4,7 +4,8 @@
 
 param([string]$Root = (Get-Location).Path, [int]$Port = 8080)
 $types = @{ '.html'='text/html; charset=utf-8'; '.css'='text/css; charset=utf-8'; '.js'='application/javascript; charset=utf-8';
-  '.webp'='image/webp'; '.png'='image/png'; '.jpg'='image/jpeg'; '.svg'='image/svg+xml'; '.ico'='image/x-icon'; '.json'='application/json'; '.txt'='text/plain' }
+  '.webp'='image/webp'; '.png'='image/png'; '.jpg'='image/jpeg'; '.svg'='image/svg+xml'; '.ico'='image/x-icon'; '.json'='application/json'; '.txt'='text/plain';
+  '.xml'='application/xml; charset=utf-8'; '.webmanifest'='application/manifest+json' }
 $l = New-Object System.Net.HttpListener
 $l.Prefixes.Add("http://localhost:$Port/")
 $l.Start()
