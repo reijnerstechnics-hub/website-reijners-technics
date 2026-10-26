@@ -33,12 +33,12 @@ Het aanvraagformulier op de startpagina en het contactformulier versturen hun ge
 var FORMSPREE_URL = "https://formspree.io/f/mdeakpaq";
 ```
 
-Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via WhatsApp te sturen.
+Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via WhatsApp te sturen. Een foutmelding is rood (`--err`) en lege verplichte velden krijgen de klasse `is-leeg` (rode rand) tot de bezoeker typt.
 
 ## Homepagina
 
 - **Zoekbalk** bovenaan: zoekt in alle toestellen van de pagina *Toestellen*. Terwijl de bezoeker typt, verschijnen de vijf best passende toestellen (klik = detailpagina); Enter of *Zoeken* toont alle resultaten in de lijst op de pagina *Toestellen*, vanaf het zoekveld. Een vermogen ("3,5" of "3,5 kW") zoekt in de maten uit `data-kw`, niet in de tekst. De voorbeelden onder de zoekbalk (`data-q`) pas je aan in `index.html`; de werking staat in het blok *HOME: ZOEKBALK* in `js/main.js`.
-- **Wisselende foto's** rechts bovenaan: de `<img class="rot">` in het blok met `data-rotate="5000"` (elke 5 seconden een andere foto). Daar staan eigen foto's van de duurdere modellen (LG Artcool, LG Deluxe H-serie, Daikin Stylish). Met `style="object-position: ..."` kies je welk deel van een foto zichtbaar blijft.
+- **Wisselende foto's** rechts bovenaan: de `<img class="rot">` in het blok met `data-rotate="5000"` (elke 5 seconden een andere foto; enkel als het vak in beeld is, anders laadt en wisselt er niets). Daar staan eigen foto's van de duurdere modellen (LG Artcool, LG Deluxe H-serie, Daikin Stylish). Met `style="object-position: ..."` kies je welk deel van een foto zichtbaar blijft.
   - Het kleine fotootje ernaast (`#v3-sub-rot`) wisselt mee via `data-rotate-koppel="#v3-sub-rot"`: bij elke binnenunit hoort een buitenunit van hetzelfde merk. Zet er daarom altijd **evenveel** foto's in als in het grote vak, **in dezelfde volgorde**. Anders blijft het kleine fotootje op een verkeerd merk hangen.
   - Het kleine fotootje gebruikt kleine versies van 400 × 300 (`k-<naam>.webp`). Die maak je met `maakKlein([...])` in `voorbeeld/ronde-1/fotos-verwerken.html`.
   - Twee reeksen per seizoen, met `data-seizoen` op elke foto (beide vakken):
@@ -49,7 +49,7 @@ Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via What
 
 ## Toestellen
 
-Op de pagina *Toestellen* kiest de bezoeker eerst een merk (of zoekt op naam), daarna in de linkerkolom het vermogen dat hij nodig heeft en/of een soort toestel. Elk toestel is één kaart (`<div class="device-card">`) in het blok van zijn merk in `index.html` (`#toestellen-daikin`, `#toestellen-lg`, ...). Uit diezelfde kaart maakt de site ook de detailpagina (`#toestel-<naam>`), dus een toestel staat maar op één plaats.
+Op de pagina *Toestellen* kiest de bezoeker eerst een merk (of zoekt op naam), daarna in de linkerkolom het vermogen dat hij nodig heeft en/of een soort toestel. Tijdens een zoekopdracht staat boven de lijst wat hij zocht, met de knop *Alle toestellen tonen*, en tonen de merktegels het aantal gevonden per merk; een merk kiezen wist de zoekterm. De filter *Vermogen* heeft aaneensluitende maten ("tot 2,5 kW · tot 28 m²", "3,5 kW · 28-39 m²", ...), zodat ook een kleine kamer ergens past. De hulpkaart "Twijfelt u tussen modellen?" staat één keer, in het laatste zichtbare merkblok. Elk toestel is één kaart (`<div class="device-card">`) in het blok van zijn merk in `index.html` (`#toestellen-daikin`, `#toestellen-lg`, ...). Uit diezelfde kaart maakt de site ook de detailpagina (`#toestel-<naam>`), dus een toestel staat maar op één plaats.
 
 Een kaart heeft vier kenmerken:
 
@@ -103,6 +103,13 @@ Bestaat een toestel in meer dan één maat, dan zijn de maten in het kW-blok van
 Nog eens op dezelfde maat tikken zet de keuze af. Een tik op een maat op een kaart in de lijst opent het toestel met die maat al gekozen. Staat de filter *Vermogen* aan, dan staat op de kaarten de passende maat donker en kiest de detailpagina die maat zelf (`rtKwVoorKeuze`). De keuze per toestel blijft bewaard tot de pagina herladen wordt, ook na de terugknop.
 
 Tikt de bezoeker een kleur aan, dan gaat die ook mee, bv. "Daikin Emura (zwart, 3,5 kW)". Op een toestelpagina vragen ook de knop *Offerte aanvragen* bovenaan en de balk onderaan op de gsm een offerte voor dat toestel. Elders beginnen die knoppen een gewone aanvraag, zonder toestel.
+
+## Voor Google
+
+- `robots.txt` en `sitemap.xml` (enkel het echte adres: de #-adressen zijn voor Google geen pagina's), `site.webmanifest` en de iconen in `assets/img/` (`favicon-32.png`, `icoon-192.png`, `icoon-512.png`, `apple-touch-icon.png`) plus `favicon.ico`.
+- In de `<head>` van `index.html`: de canonical, Open Graph en Twitter-cards (deelfoto `assets/img/deelfoto-reijners-technics.jpg`, 1200 × 630) en de structured data (JSON-LD, HVACBusiness + WebSite) met enkel gegevens uit `CLAUDE.md`. Nakijken na het online zetten: https://search.google.com/test/rich-results.
+- `404.html` toont Vercel zelf bij een onbestaand adres. `vercel.json` zet drie veilige headers.
+- **Eigen domein:** vervang `https://website-reijners-technics.vercel.app` in `index.html` (head, commentaar EIGEN DOMEIN), `sitemap.xml` en `robots.txt`.
 
 ## Online zetten
 

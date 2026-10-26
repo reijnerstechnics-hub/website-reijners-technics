@@ -23,6 +23,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
   - herstelling €100 tot €150 voor de verplaatsing en het eerste uur, **exclusief btw** (Rims antwoord "zonder", 24-10-2026);
   - "vanaf €1.500" voor één kamer is met plaatsing en **6% btw** (woning ouder dan 10 jaar; jonger: 21%), Rims "ja" van 24-10-2026.
   - Alle andere bedragen op de site zijn nog niet bevestigd.
+  - Rims regel voor de richtprijzen van toestellen (26-10-2026): zijn inkoopprijs uit zijn prijslijst bij Nova Air plus een redelijk percentage, duidelijk als richtprijs; de inkoopprijzen blijven privé (zie Stand van zaken, 26 oktober).
   - Let op: voor particulieren hoort een prijs normaal mét btw op de site. Rim vraagt zijn boekhouder welk tarief geldt voor onderhoud en herstelling; daarna komt de prijs met btw erbij.
 
 ## Doel van de site
@@ -73,7 +74,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 2. Bij ontwerpkeuzes, of als Rim om een voorbeeld vraagt: eerst een voorbeeld in `voorbeeld/` of screenshots, en Rim laten kiezen.
 3. Na elke wijziging testen op computer (1366 px), tablet (768 px) en gsm (375 px): geen foutmeldingen in de console, geen kapotte afbeeldingen, niets dat buiten het scherm valt.
 4. Lokaal committen met een duidelijke Nederlandse boodschap.
-5. Pushen naar GitHub (`reijnerstechnics-hub/website-reijners-technics`, branch `main`) **pas na Rims uitdrukkelijke "akkoord" voor die wijziging**: `git switch main && git merge --ff-only <branch> && git push origin main`. Alleen de hoofdsessie pusht; agents nooit.
+5. Pushen naar GitHub (`reijnerstechnics-hub/website-reijners-technics`, branch `main`) **pas na Rims uitdrukkelijke "akkoord" voor die wijziging**: `git switch main && git merge --ff-only <branch> && git push origin main`. Alleen de hoofdsessie pusht; agents nooit. Doe vóór elke nieuwe branch en vóór elke push `git fetch origin` en kijk of `origin/main` veranderd is: op 26-10-2026 pushte een andere sessie (cloud, "Hoofdagent") rechtstreeks naar `main`, buiten deze werkwijze om.
 6. Afsluiten met een kort verslag voor Rim: wat er veranderd is, wat hij moet nakijken, en de vraag om akkoord. Geef er altijd een paar concrete tips bij om bezoekers sneller een offerte te laten aanvragen (Rims vaste wens, 22-10-2026).
 
 ## Het team (`.claude/agents/`)
@@ -96,7 +97,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 ## Stand van zaken (bijwerken als iets klaar is)
 
 - De prijzen in `js/prijzen.js` zijn richtprijzen, op Rims vraag afgestemd op de markt (oktober 2026; alle toestelprijzen x 0,75), met `voorlopig: false`, online sinds 22-10-2026. Toestellen die later zijn toegevoegd, zitten nog niet in het prijsadvies.
-- SEO: de site is één pagina met #adressen; de detailpagina's van toestellen maakt JavaScript, dus Google vindt ze niet apart. Er is nog geen structured data (LocalBusiness), geen `sitemap.xml` en geen `robots.txt`.
+- SEO: de site is één pagina met #adressen; de detailpagina's van toestellen maakt JavaScript, dus Google vindt ze niet apart. Sinds 26-10-2026 (branch `verbeteringen-26-10`) zijn er wel `robots.txt`, `sitemap.xml` (één adres), structured data (HVACBusiness, in de head), Open Graph met een eigen deelfoto, vierkante iconen, `404.html` en `vercel.json` (zie README, "Voor Google"). Bij een eigen domein: het adres vervangen (commentaar EIGEN DOMEIN in de head). Echte aparte pagina's per dienst en per toestel zijn de volgende grote stap (eerst Rims akkoord).
 - Er is nog geen eigen foto van een Mitsubishi Electric Diamond voor de wisselende foto's op de homepagina. Een Mitsubishi Electric-paar kan er pas bij met een foto van een binnenunit die niet de hele breedte vult: de foto van het wandmodel tegen de houten wand (g-s-f5c477ad326e) is te breed voor het hoge kader.
 - Sinds 22 oktober 2026 ook online (Rims akkoord):
   - op Home wisselen de grote en de kleine foto bovenaan samen: telkens een binnen- en een buitenunit van hetzelfde merk, met kleine versies `k-...webp` voor het kleine fotootje (zie README);
@@ -107,12 +108,21 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
   - seizoensfoto's bovenaan Home: warme foto's van oktober tot april, frisse van mei tot september (`data-seizoen`, zie README);
   - geen knop "Richtprijs berekenen" meer op de toestelpagina's (Rim: wie daar klikt, wil de prijs van dat toestel);
   - de verbeteringen van de grote controle van 23 oktober en Instagram @reijnerstechnics. Een dubbele foto (g-n39) is weg: de teller op Home staat op 71. Het verslag voor Rim met de open punten ("Later" en de vragen) staat in `voorbeeld/controle-2026-10-23/verslag.md`.
-- Nog open (niet dringend): de wissel bovenaan op Home laadt ook nieuwe foto's als de bezoeker al verder gescrold is.
+- Opgelost op 26-10-2026 (branch `verbeteringen-26-10`): de wissel bovenaan op Home laadt en wisselt enkel als het fotovak in beeld is.
 - Sinds 24 oktober 2026 ook online (Rims akkoord):
   - Rims antwoorden: onderhoud exclusief btw, "6% btw" bij "vanaf €1.500", BV en RPR onderaan en in de privacyverklaring, beloftes zonder bron weg, onderhoud en herstelling ook voor andere merken (Diensten en de zoekbalk);
   - een richtprijs per toestel op de toestelpagina's: "vanaf €..." en een kolom Richtprijs in "Welk vermogen heb ik nodig?", met dezelfde berekening als het prijsadvies (zie README);
   - de kolom Contact in de voettekst over de volle breedte op tablet en gsm.
-- 24 oktober 2026, op branch `prijs-op-kaarten`, **nog niet online** (wacht op Rims akkoord): de richtprijs op de kaartjes in de toestellenlijst ("vanaf € ..."; met de filter Vermogen de prijs voor die maat), met één uitleg bovenaan de lijst (Rims "ja").
+- Sinds 24 oktober 2026 ook online (Rims derde akkoord van die dag): de richtprijs op de kaartjes in de toestellenlijst ("vanaf € ..."; met de filter Vermogen de prijs voor die maat), met één uitleg bovenaan de lijst.
+- **26 oktober 2026, prijzen.** Om 16:07 pushte een andere sessie (cloud, git-gebruiker reijnerstechnics-hub, "test via Hoofdagent") rechtstreeks naar `main`: "Geen prijzen meer op de site (1/4)", enkel de teksten op Home, Diensten, FAQ en Toestellen. Dat staat live, terwijl de toestelpagina's, de kaartjes en het prijsadvies nog richtprijzen tonen: de site spreekt zichzelf tegen. Rims beslissing (26-10, in de hoofdsessie): **de prijzen blijven**, maar de richtprijs wordt voortaan zijn eigen inkoopprijs uit zijn prijslijst bij Nova Air (nova-air.be, enkel zichtbaar na zijn login) plus een redelijk percentage (voorstel 30 %), overal duidelijk als "richtprijs". De inkoopprijzen zelf komen NOOIT in een bestand dat online staat (`js/prijzen.js` is publiek): de lijst en het percentage horen in `voorbeeld/prijslijst/` (buiten git), en in `prijzen.js` komen enkel de berekende richtprijzen. Daarna de prijsteksten van Home, Diensten en de FAQ terugzetten met de nieuwe bedragen. Branch `prijzen-toshiba-cassette-kanaal` (webshopprijzen voor Toshiba, cassettes en kanaalunits, 25-10) vervalt zodra Rims lijst er is; de extra plaatsing per soort (`installatie.extraPerSoort`) en de code uit die branch blijven bruikbaar.
+- 26 oktober 2026, op branch `verbeteringen-26-10`, **nog niet online** (wacht op Rims akkoord), op Rims vraag "ga zo ver als je kunt":
+  - Google: zie SEO hierboven;
+  - gsm: alle tikdoelen minstens 44 px; tablet en computer: de zwevende bel- en WhatsApp-knop rechts onderaan (schermfoto's voor en na in `voorbeeld/ui-2026-10-26/`);
+  - klantenblik (`ux-adviseur`, 18 punten, schermfoto's in `voorbeeld/ux-2026-10-26/`), hersteld: een zoekterm staat zichtbaar boven de lijst met een wisknop en een merk kiezen wist hem; de hulpkaart "Twijfelt u" één keer; aaneensluitende maten in de filter Vermogen ("tot 2,5 kW · tot 28 m²") en "voor een kamer tot ... m²" bij de kleinste maat; rode foutmeldingen met een rode rand om lege velden; prijsadvies "Ons voorstel" tot de klant kiest en "(kleinste maat van dit model)"; "Kleur" bij de kleurbolletjes; tellers zonder animatie; welkomstvenster enkel vanaf 1024 px; minibalk niet op Toestellen;
+  - productfoto's: zie de inventaris in `voorbeeld/fotos-2026-10-26/` (toestellenbeheerder);
+  - voorbeelden voor Rim (hij kiest): Home bovenaan (keuzeknoppen vóór de zoekbalk) en een kortere pagina Diensten, in `voorbeeld/home-en-diensten-2026-10-26/`.
+  - Nog te doen uit de klantenblik (tekstschrijver, in `index.html`): één naam voor de startknop ("Start uw aanvraag" / "Aanvraag starten" / "Start aanvraag" ...), "Uw installateur uit Dilsen-Stokkem" in de bovenste strook, "marketing-gelul" → "verkooppraatjes", SEER/SCOP en R32 kort uitleggen, Contact: één keuze "Nieuwe airco" (geen aparte "warmtepomp"), de merkpillen op Home als links naar de lijst en de gemeentepillen als gewone tekst, de zin op Diensten over het probleem beschrijven bij een herstelling.
+  - Enkel Rim kan antwoorden: de gemeente per foto op Realisaties, hoelang een plaatsbezoek duurt en hoe snel de offerte volgt, of Fabio meekomt, of "gecertificeerd koeltechnicus" op Over ons mag (zonder nummer), en of er klanten zijn die een korte uitspraak of Google-review willen geven.
 - Ook sinds 24 oktober 2026 online (Rims tweede akkoord van die dag):
   - vermogen kiezen op de toestelpagina (Rims melding: "kW aanpassen gaat niet"): de maten zijn knoppen, met de richtprijs voor die maat; het vermogen gaat mee in de offerte, WhatsApp en e-mail (zie README);
   - de donkerdere kleine tekst (Rims keuze: het voorstel uit `voorbeeld/kleur-tekst/`);
@@ -128,11 +138,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
     - de tegel "Ook achter de kap netjes" gaat naar "Zo sluiten we aan";
     - in het prijsadvies springt Enter naar het volgende veld, is de gemeente verplicht en staan de kamers in de mail in de juiste volgorde;
     - op de kaarten in de lijst is de donkere maat die van de filter Vermogen (vroeger de grootste maat).
-  - Nog open uit die controle (later, niet dringend):
-    - tikdoelen kleiner dan 44 px op gsm: tekstlinks, de voorbeelden onder de zoekbalk, Koelen/Verwarmen, de pijltjes van de fotokaders;
-    - op tablet liggen de zwevende bel- en WhatsApp-knoppen over de tekst;
-    - 36 productfoto's zijn niet 600 × 600; de Nuova Infinity AI Smart is 300 × 300 en wazig op de computer;
-    - de prijsnotatie verschilt: "€ 2.450 – 3.050" op de toestelpagina, "€ 2.450 – € 3.050" in het prijsadvies.
+  - Nog open uit die controle (later, niet dringend): de prijsnotatie verschilt: "€ 2.450 – 3.050" op de toestelpagina, "€ 2.450 – € 3.050" in het prijsadvies. (De tikdoelen, de zwevende knoppen en de productfoto's zijn op 26-10 aangepakt, zie hieronder.)
 - Promotieplan voor Instagram en andere kanalen, met voorbeeldberichten en reels: `voorbeeld/social/index.html` (prijzen bijgewerkt op 24-10-2026).
 - Huisstijl: sinds 21 oktober 2026 staat het lettertype "C" (Source Serif + Source Sans) met de huidige kleuren online. De kleuren en lettertypes zijn nog in beoordeling: de voorstellen A (huidig, bijgewerkt), B (Vakwerk) en C (Helder) staan in `voorbeeld/huisstijl/`. Rim kiest.
 - Audit vóór de livegang (21 oktober 2026): `AUDIT.md` (nog niet in git) en `voorbeeld/audit/`. Verbeterplan voor Diensten, Over ons en Realisaties (22 oktober 2026): `voorbeeld/paginas/verbeterplan.md`, met een echte fout in het aanvraagformulier (D-1) en foto's met Gree en Olimpia Splendid op Realisaties (R-2). Van beide is nog niets uitgevoerd: ze wachten op Rims antwoorden en akkoord.
