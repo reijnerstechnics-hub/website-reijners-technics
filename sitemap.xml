@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- De site is één pagina (index.html). De #adressen (#diensten, #toestellen, ...) zijn geen aparte pagina's en horen hier niet in.
+     EIGEN DOMEIN: vervang het adres zodra de site op reijnerstechnics.be staat. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://website-reijners-technics.vercel.app/</loc>
+    <lastmod>2026-10-26</lastmod>
+  </url>
+</urlset>
