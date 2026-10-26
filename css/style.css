@@ -7801,14 +7801,6 @@ section.pc-catalog {
     font-size: 0.9rem;
   }
 }
-/* tot 1440px breed staat de zwevende bel/WhatsApp-knop links onderaan over de kolom:
-   de kolom stopt daarboven en scrolt zelf */
-@media (min-width: 901px) and (max-width: 1440px) {
-  .toestellen-sidebar {
-    max-height: calc(100vh - 250px);
-  }
-}
-
 /* ---------- home: tegel met de merken (6 merken passen zonder af te knippen) ---------- */
 .v3-bento {
   grid-template-rows: minmax(240px, auto) minmax(240px, auto);
@@ -8710,5 +8702,122 @@ section[data-page="realisaties"] .v4-strip {
 @media (max-width: 860px) {
   .v2-fcols > div:last-child {
     grid-column: 1 / -1;
+  }
+}
+
+/* ---------- gsm: tikdoelen van minstens 44 px (open punt uit de controle van 24 oktober) ----------
+   Tekstlinks in een zin krijgen ruimte rond de tekst (padding) en halen die ruimte met een
+   negatieve marge weer uit de regel: de tekst blijft even groot en op dezelfde plaats. Alleen de
+   voorbeelden onder de zoekbalk en de lijsten in de voettekst staan iets verder uit elkaar. */
+@media (max-width: 760px) {
+  /* de maten in het kW-blok op de kaarten in de lijst: een tik opent het toestel met die maat */
+  .toestellen-main .kw-maten span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 6px;
+  }
+  .toestellen-main .kw-maten span.bereik {
+    padding: 0 10px;
+  }
+  /* "Bekijk details" op de kaart */
+  .toestellen-main .device-more {
+    padding: 11px 0;
+    margin: -11px 0;
+  }
+  .toestellen-main .device-more-onder {
+    margin-top: auto;
+  }
+  /* het telefoonnummer in de bovenste strook (de strook zelf blijft 32 px hoog) */
+  .v2-topstrip a {
+    padding: 12px 4px;
+    margin: -12px -4px;
+  }
+  /* "Of bekijk de toestellen van alle merken samen" */
+  .merk-alle button {
+    min-height: 44px;
+    padding: 10px 8px;
+  }
+  /* Koelen / Verwarmen bovenaan Home */
+  .v4-mode button {
+    min-height: 44px;
+  }
+  /* de voorbeelden onder de zoekbalk op Home: de twee regels iets verder uit elkaar, zodat het
+     tikvlak van de ene regel niet over de tekst van de andere ligt */
+  .hz-tip {
+    line-height: 2.4;
+  }
+  .hz-tip button {
+    padding: 6px 0;
+    margin: -6px 0;
+  }
+  /* de pijltjes van de fotokaders op Realisaties */
+  .carousel-arrow {
+    width: 44px;
+    height: 44px;
+  }
+  /* "Alle toestellen van ..." op de toestelpagina */
+  .td-alle {
+    padding: 9px 0 10px;
+    margin-top: 7px;
+  }
+  /* telefoon, e-mail en Instagram op de contactkaart en in de voettekst; de regels van de
+     voettekst 5 px verder uit elkaar, zodat de tikvlakken elkaars tekst niet raken */
+  .v2-footer li {
+    margin: 11px 0;
+  }
+  .contact-card .row a,
+  .v2-footer li a {
+    display: inline-block;
+    padding: 11px 0;
+    margin: -11px 0;
+  }
+  .contact-card .row a.ig-link,
+  .v2-footer li a.ig-link {
+    display: inline-flex;
+  }
+  /* "Privacyverklaring" onderaan */
+  .v2-fbottom a {
+    padding: 12px 0;
+    margin: -12px 0 0;
+  }
+}
+/* de merken in het gsm-menu (onder Toestellen); het menu bestaat tot 840 px */
+@media (max-width: 840px) {
+  nav.links .nav-dd-menu a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* ---------- tablet en computer: de zwevende bel- en WhatsApp-knop rechts onderaan ----------
+   Links onderaan lagen ze over het begin van de tekst (tablet) en over de filterkolom op
+   Toestellen (computer). Rechts staan ze naast de inhoud; het welkomstvenster schuift erboven.
+   Op gsm (tot 640 px) blijft de balk onderaan zoals ze was. */
+@media (min-width: 641px) {
+  .floating-contact {
+    left: auto;
+    right: 20px;
+  }
+  .welcome-bubble {
+    bottom: 146px; /* 20 px rand + twee knoppen van 52 px + 10 px ertussen + 12 px lucht */
+  }
+  /* enkel in de versie met de chatknop (rechts onderaan): knoppen en venster erboven */
+  body:has(#ai-chat:not([hidden])) .floating-contact {
+    bottom: 88px;
+  }
+  body:has(#ai-chat:not([hidden])) .welcome-bubble,
+  body:has(#ai-chat:not([hidden])) .welcome-bubble.above-chat {
+    bottom: 214px;
+  }
+}
+/* van 1200 tot 1263 px breed staat de rechterrand van de inhoud ("Privacyverklaring" in de voettekst)
+   onder de knoppen: dezelfde ruimte onderaan als tot 1199 px (O-12) */
+@media (min-width: 1200px) and (max-width: 1263px) {
+  footer.v2-footer {
+    padding-bottom: 150px;
   }
 }
