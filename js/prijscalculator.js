@@ -212,7 +212,8 @@
   // ANTWOORDEN VAN DE KLANT
   // =====================================================================
   function leeg() {
-    return { step: "aantal", n: null, sizes: [], wens: null, gekozen: null, sent: false };
+    // doorKlant: heeft de klant zelf een voorstel aangetikt? Zolang niet, heet het "Ons voorstel".
+    return { step: "aantal", n: null, sizes: [], wens: null, gekozen: null, doorKlant: false, sent: false };
   }
   var state = leeg();
   try {
@@ -393,8 +394,16 @@
       h += '<h3 class="pc-vs-naam">' + esc(m.cfg.naam) + "</h3>";
       h += '<p class="pc-vs-why">' + esc(m.desc || niveau.uitleg) + "</p>";
       h += '<div class="pc-vs-prijs"><small>Richtprijs</small><b>' + eur(res.lo) + " &ndash; " + eur(res.hi) + "</b></div>";
+      // één kamer en het toestel bestaat niet kleiner: dan staat erbij dat het de kleinste maat is
+      var kleinste = "";
+      if (list.length === 1 && kws.length === 1) {
+        var maten = m.sizes.filter(function (s) {
+          return price(m, s, 0) != null;
+        });
+        if (kMin === maten[0] && kMin > list[0].m2 * KW_PER_M2 + 0.3) kleinste = " (kleinste maat van dit model)";
+      }
       h += '<ul class="pc-vs-info"><li>' + esc(opstelling(res)) + "</li>";
-      h += "<li>" + (kws.length > 1 ? "Binnenunits van " : "Vermogen ") + kwTxt(kMin) + (kMax > kMin ? " tot " + kwTxt(kMax) : "") + "</li></ul>";
+      h += "<li>" + (kws.length > 1 ? "Binnenunits van " : "Vermogen ") + kwTxt(kMin) + (kMax > kMin ? " tot " + kwTxt(kMax) : "") + kleinste + "</li></ul>";
       h +=
         '<button type="button" class="btn ' +
         (on ? "btn-gold" : "v3-btn-line") +
@@ -403,7 +412,7 @@
         '" aria-pressed="' +
         on +
         '">' +
-        (on ? "&#10003; Gekozen" : "Kies dit voorstel") +
+        (on ? (state.doorKlant ? "&#10003; Gekozen" : "&#10003; Ons voorstel") : "Kies dit voorstel") +
         "</button>";
       if (m.slug) h += '<a class="pc-vs-meer" href="#toestel-' + esc(m.slug) + '">Meer over dit toestel</a>';
       h += "</div>";
@@ -425,7 +434,8 @@
       h += '<b>Bedankt! Rim belt u binnen 24 uur terug.</b><span class="pc-muted">Dan plannen we samen het gratis plaatsbezoek.</span>';
     } else {
       h +=
-        "<div><b>Uw keuze: " +
+        "<div><b>" +
+        (state.doorKlant ? "Uw keuze: " : "Ons voorstel: ") +
         esc(P.niveaus[state.gekozen].titel) +
         " &middot; " +
         esc(gk.model.cfg.merk + " " + gk.model.cfg.naam) +
@@ -475,9 +485,11 @@
     } else if (t.hasAttribute("data-wens")) {
       state.wens = t.getAttribute("data-wens");
       state.gekozen = null;
+      state.doorKlant = false;
       auto = true;
     } else if (t.hasAttribute("data-kies")) {
       state.gekozen = t.getAttribute("data-kies");
+      state.doorKlant = true;
       save();
       render();
       var lead = root.querySelector(".pc-vs-lead");

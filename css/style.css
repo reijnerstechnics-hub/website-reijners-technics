@@ -8821,3 +8821,70 @@ section[data-page="realisaties"] .v4-strip {
     padding-bottom: 150px;
   }
 }
+
+/* ---------- klantenblik 26 oktober 2026: zoekbalk boven de lijst, foutmeldingen, kleine dingen ---------- */
+/* tijdens een zoekopdracht staat boven de lijst wat de bezoeker zocht, met een knop om dat te wissen */
+.zoek-actief {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin: 0 0 16px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--sky-tint);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.zoek-actief span {
+  font-weight: 600;
+}
+.zoek-actief button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--sky);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.zoek-actief button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+/* een foutmelding is rood, en het lege veld ook: dan is het geen tip meer */
+:root {
+  --err: #b3261e;
+}
+.calc-status.err,
+.form-status.err {
+  color: var(--err);
+}
+.field input.is-leeg,
+.field textarea.is-leeg,
+input.is-leeg {
+  border-color: var(--err);
+  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.12);
+}
+/* prijsadvies: de richtprijs op één regel, ook op een smalle gsm */
+.pc-vs-prijs b {
+  white-space: nowrap;
+}
+@media (max-width: 400px) {
+  .pc-vs-prijs b {
+    font-size: 1.15rem;
+  }
+}
+/* "Kleur" bij de kleurbolletjes op de toestelpagina */
+.td-media .kleur-lbl {
+  align-self: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}

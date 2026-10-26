@@ -245,6 +245,10 @@ function sendLead(data) {
   var form = document.getElementById("lead-form");
   var status = document.getElementById("form-status");
   if (!form) return;
+  // de rode rand van een leeg veld verdwijnt zodra de bezoeker typt
+  form.addEventListener("input", function (e) {
+    if (e.target.classList) e.target.classList.remove("is-leeg");
+  });
 
   var PLACEHOLDERS = {
     "Nieuwe airco": "Bijvoorbeeld: aantal ruimtes, bestaande verwarming, gewenste periode",
@@ -273,6 +277,11 @@ function sendLead(data) {
     if (!data.naam || !data.telefoon) {
       status.textContent = "Vul uw naam en telefoonnummer in, dan kan Rim u terugbellen.";
       status.className = "form-status err";
+      // de lege velden krijgen een rode rand; het eerste krijgt de focus
+      [form.naam, form.telefoon].forEach(function (veld) {
+        veld.classList.toggle("is-leeg", !veld.value.trim());
+      });
+      (data.naam ? form.telefoon : form.naam).focus();
       return;
     }
     // zelfde controle als in het formulier op Home: minstens 8 cijfers
@@ -407,7 +416,7 @@ function sendLead(data) {
   var GERUST = {
     nieuw: "Gratis plaatsbezoek · U beslist pas na de offerte",
     onderhoud: "Aanvragen kost niets · Rim spreekt met u een dag af",
-    herstelling: "Aanvragen kost niets · U hoort de prijs vooraf",
+    herstelling: "Aanvragen kost niets · Daarna kunt u zeggen wat er scheelt · U hoort de prijs vooraf",
   };
   function toonDienst() {
     var el = document.getElementById("calc-dienst");
@@ -444,6 +453,7 @@ function sendLead(data) {
     var el = document.getElementById(id);
     if (el)
       el.addEventListener("input", function () {
+        el.classList.remove("is-leeg");
         var st = document.getElementById("calc-contact-status");
         if (st.className.indexOf("err") !== -1) {
           st.textContent = "";
@@ -499,6 +509,15 @@ function sendLead(data) {
     if (!naam || !telefoon || !gemeente) {
       statusEl.textContent = "Vul uw naam, telefoonnummer en gemeente in.";
       statusEl.className = "calc-status err";
+      // de lege velden krijgen een rode rand; het eerste krijgt de focus
+      var eerste = null;
+      ["calc-naam", "calc-telefoon", "calc-gemeente"].forEach(function (id) {
+        var veld = document.getElementById(id);
+        var leegVeld = !veld.value.trim();
+        veld.classList.toggle("is-leeg", leegVeld);
+        if (leegVeld && !eerste) eerste = veld;
+      });
+      if (eerste) eerste.focus();
       return;
     }
     if (digits.length < 8) {
@@ -787,7 +806,8 @@ window.rtGoToOffer = function (d, model) {
   var bubble = document.getElementById("welcome-bubble");
   if (!bubble) return;
   // Op gsm niet tonen: het venster bedekt daar de knoppen en het formulier.
-  if (window.matchMedia && window.matchMedia("(max-width: 760px)").matches) return;
+  // niet op gsm en tablet: daar valt het venster over de knoppen en de tekst
+  if (window.matchMedia && window.matchMedia("(max-width: 1023px)").matches) return;
   // Maar één keer per bezoeker: wie het al zag, krijgt het niet opnieuw.
   var KEY = "rt-welcome-gezien";
   var tries = 0;
@@ -1573,6 +1593,23 @@ function rtKwVoorKeuze(maten, k) {
   var zoekInfo = section.querySelector(".zoek-info");
   var leeg = lijst.querySelector(".zoek-leeg");
   var cards = Array.prototype.slice.call(section.querySelectorAll(".device-card"));
+  // Balk boven de lijst tijdens een zoekopdracht: wat de bezoeker zocht, hoeveel er gevonden is
+  // en een knop om de zoekopdracht te wissen (anders bleef een oude zoekterm onzichtbaar filteren).
+  var actief = document.createElement("div");
+  actief.className = "zoek-actief";
+  actief.hidden = true;
+  var actiefTekst = document.createElement("span");
+  var actiefWis = document.createElement("button");
+  actiefWis.type = "button";
+  actiefWis.textContent = "Alle toestellen tonen";
+  actiefWis.addEventListener("click", function () {
+    if (zoek) zoek.value = "";
+    zoekNaar("");
+  });
+  actief.appendChild(actiefTekst);
+  actief.appendChild(actiefWis);
+  var hoofd = lijst.querySelector(".toestellen-main");
+  if (hoofd) hoofd.insertBefore(actief, hoofd.firstChild);
 
   // Binnen elk merk de kaarten altijd in dezelfde volgorde zetten, per soort
   // (zie RT_SOORTEN). Een nieuwe kaart mag dus overal in het merkblok staan.
@@ -1722,14 +1759,15 @@ function rtKwVoorKeuze(maten, k) {
     return true;
   }
 
-  // Filter op vermogen: welk vermogen hebt u ongeveer nodig? De oppervlakte
-  // volgt dezelfde vuistregel als op de detailpagina (90 tot 120 W per m²).
+  // Filter op vermogen: welk vermogen hebt u ongeveer nodig? De oppervlakte volgt dezelfde
+  // vuistregel als op de detailpagina (90 tot 120 W per m²), aaneensluitend zodat elke kamer
+  // ergens past: ook een kleine slaapkamer valt onder "tot 2,5 kW".
   var KW_KEUZES = [
-    { id: "2", label: "2,5 kW", sub: "± 21-28 m²", zin: "van ongeveer 2,5 kW", van: 0, tot: 2.95 },
-    { id: "3", label: "3,5 kW", sub: "± 29-39 m²", zin: "van ongeveer 3,5 kW", van: 2.95, tot: 3.95 },
-    { id: "5", label: "5 kW", sub: "± 42-56 m²", zin: "van ongeveer 5 kW", van: 3.95, tot: 5.45 },
-    { id: "7", label: "7 kW", sub: "± 58-78 m²", zin: "van ongeveer 7 kW", van: 5.45, tot: 7.55 },
-    { id: "groot", label: "Meer dan 7,5 kW", sub: "grote ruimtes", zin: "van meer dan 7,5 kW", van: 7.55, tot: 999 },
+    { id: "2", label: "tot 2,5 kW", sub: "tot 28 m²", zin: "tot 2,5 kW", van: 0, tot: 2.95 },
+    { id: "3", label: "3,5 kW", sub: "28-39 m²", zin: "van ongeveer 3,5 kW", van: 2.95, tot: 3.95 },
+    { id: "5", label: "5 kW", sub: "39-56 m²", zin: "van ongeveer 5 kW", van: 3.95, tot: 5.45 },
+    { id: "7", label: "7 kW", sub: "56-78 m²", zin: "van ongeveer 7 kW", van: 5.45, tot: 7.55 },
+    { id: "groot", label: "Meer dan 7,5 kW", sub: "meer dan 78 m²", zin: "van meer dan 7,5 kW", van: 7.55, tot: 999 },
   ];
   function kwKeuze(id) {
     for (var i = 0; i < KW_KEUZES.length; i++) if (KW_KEUZES[i].id === id) return KW_KEUZES[i];
@@ -1758,6 +1796,7 @@ function rtKwVoorKeuze(maten, k) {
     var n = cards.filter(function (c) {
       return c.dataset.brand === t.dataset.merk && c.dataset.type !== "buiten";
     }).length;
+    t.dataset.aantal = n;
     t.querySelector(".merk-n").textContent = n + (n === 1 ? " model" : " modellen");
   });
 
@@ -1894,11 +1933,26 @@ function rtKwVoorKeuze(maten, k) {
       blk.hidden = !blk.querySelector(".device-card:not([hidden])");
     });
 
-    if (state.q && zoekInfo) {
-      zoekInfo.textContent = zichtbaar
-        ? zichtbaar + (zichtbaar === 1 ? " toestel gevonden" : " toestellen gevonden")
-        : "Geen toestellen gevonden";
+    // tijdens een zoekopdracht: de balk boven de lijst, en op de merktegels het aantal gevonden
+    if (zoekInfo) zoekInfo.textContent = "";
+    actief.hidden = !state.q;
+    if (state.q) {
+      actiefTekst.textContent =
+        (zichtbaar ? zichtbaar + (zichtbaar === 1 ? " toestel" : " toestellen") : "Geen toestellen") + " voor “" + state.q + "”";
     }
+    section.querySelectorAll(".merk-tegel").forEach(function (t) {
+      var n = state.q
+        ? cards.filter(function (c) {
+            return c.dataset.brand === t.dataset.merk && past(c);
+          }).length
+        : +t.dataset.aantal;
+      t.querySelector(".merk-n").textContent = state.q ? n + " gevonden" : n + (n === 1 ? " model" : " modellen");
+    });
+    // de hulpkaart "Twijfelt u tussen modellen?" maar één keer: in het laatste zichtbare merkblok
+    var helps = section.querySelectorAll(".brand-block:not([hidden]) .v4-help");
+    helps.forEach(function (h, i) {
+      h.hidden = i !== helps.length - 1;
+    });
     if (leeg) {
       leeg.hidden = zichtbaar > 0;
       // niets gevonden door het vermogen (en niet door een zoekterm)
@@ -1928,6 +1982,11 @@ function rtKwVoorKeuze(maten, k) {
   // merk kiezen. houdCat: de gekozen categorie bewaren (bv. terug vanuit een toestel)
   window.rtKiesMerk = function (merk, houdCat) {
     if (state.merk !== merk || !houdCat) state.cat = "alle";
+    // een merk kiezen is een nieuwe keuze: een oude zoekterm filtert dan niet meer mee
+    if (!houdCat && state.q) {
+      state.q = "";
+      if (zoek) zoek.value = "";
+    }
     state.merk = merk;
     merkVoorZoeken = undefined;
     render();
@@ -2433,13 +2492,13 @@ function rtKwVoorKeuze(maten, k) {
       if (metPrijs) {
         // compacter, zodat de drie kolommen ook op een smalle gsm op één regel passen
         var ruimte = el("td");
-        ruimte.appendChild(el("span", "td-kw-ca", "ca. "));
-        ruimte.appendChild(el("span", "td-kw-m2", Math.round(n / 0.12) + "-" + Math.round(n / 0.09) + " m²"));
+        if (n !== nums[0]) ruimte.appendChild(el("span", "td-kw-ca", "ca. "));
+        ruimte.appendChild(el("span", "td-kw-m2", (n === nums[0] ? "tot " : Math.round(n / 0.12) + "-") + Math.round(n / 0.09) + " m²"));
         tr.appendChild(ruimte);
         var p = richtprijs(model, n);
         tr.appendChild(el("td", p ? null : "td-kw-geen", p ? euro.format(p.lo) + " – " + getal.format(p.hi) : "op aanvraag"));
       } else {
-        tr.appendChild(el("td", null, "ca. " + Math.round(n / 0.12) + " - " + Math.round(n / 0.09) + " m²"));
+        tr.appendChild(el("td", null, "ca. " + (n === nums[0] ? "tot " : Math.round(n / 0.12) + " - ") + Math.round(n / 0.09) + " m²"));
       }
       t.appendChild(tr);
     });
@@ -2456,11 +2515,22 @@ function rtKwVoorKeuze(maten, k) {
     return box;
   }
 
+  // Voor welke kamer een vermogen past (90 tot 120 W per m²). De kleinste maat van een toestel
+  // past ook in een kleinere kamer, dus daar staat "tot": een slaapkamer van 12 m² hoort er ook bij.
+  function ruimteTekst(n, kleinste) {
+    return kleinste
+      ? "voor een kamer tot " + Math.round(n / 0.09) + " m²"
+      : "voor een kamer van " + Math.round(n / 0.12) + " tot " + Math.round(n / 0.09) + " m²";
+  }
+  function kleinsteMaat(card) {
+    var kw = rtKw(card);
+    return kw && kw.maten.length ? Math.min.apply(null, kw.maten) : null;
+  }
   // de zin onder de kW-knoppen: hoe u kiest, of voor welke kamer het gekozen vermogen past
   function kwZin(card, n, metPrijs) {
     var t = card.dataset.type;
     if (t === "buiten") return "Welk vermogen past, hangt af van de binnenunits. Dat rekenen we voor u uit.";
-    if (n) return "Ongeveer voor een kamer van " + Math.round(n / 0.12) + " tot " + Math.round(n / 0.09) + " m².";
+    if (n) return "Ongeveer " + ruimteTekst(n, n === kleinsteMaat(card)) + ".";
     if (t === "mobiel") return "Twijfelt u? Rim helpt u graag kiezen.";
     return (metPrijs ? "Kies een vermogen voor de richtprijs. " : "") + "Twijfelt u? Het juiste vermogen bepalen we samen bij het gratis plaatsbezoek.";
   }
@@ -2507,6 +2577,9 @@ function rtKwVoorKeuze(maten, k) {
       img.alt = merkNaam + " " + naam;
     }
     media.appendChild(foto);
+    // "Kleur" bij de kleurbolletjes, zodat duidelijk is wat ze doen
+    var bolletjes = foto.querySelector(".color-swatches");
+    if (bolletjes) bolletjes.insertBefore(el("span", "kleur-lbl", "Kleur"), bolletjes.firstChild);
     top.appendChild(media);
 
     var info = el("div", "td-info");
@@ -2936,17 +3009,11 @@ function rtKwVoorKeuze(maten, k) {
     rvObs.observe(el);
   });
 
+  // De cijfers staan er meteen: een optellende teller toont even "0 merken" (en oogt als een
+  // standaard AI-site), dus geen animatie meer (klantenblik, 26-10-2026).
   function countUp(el) {
     var end = parseInt(el.getAttribute("data-count"), 10);
-    if (!end) return;
-    var t0 = null;
-    function step(t) {
-      if (!t0) t0 = t;
-      var p = Math.min(1, (t - t0) / 1200);
-      el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3)));
-      if (p < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
+    if (end) el.textContent = end;
   }
   var cObs = new IntersectionObserver(
     function (entries) {
@@ -3131,7 +3198,9 @@ function rtKwVoorKeuze(maten, k) {
       inView(document.querySelector("section.page-active #lead-form")) ||
       inView(document.querySelector("section.v2-bandsec.page-active")) ||
       inView(document.querySelector("footer"));
-    var show = !!past && !busy;
+    // niet op Toestellen en de toestelpagina's: daar hangt de balk over de kaarten en de knoppen
+    var pagina = first ? first.dataset.page : "";
+    var show = !!past && !busy && pagina !== "toestellen" && pagina !== "toestel";
     mini.classList.toggle("show", show);
     mini.setAttribute("aria-hidden", show ? "false" : "true");
     var a = mini.querySelector("a");
@@ -3195,6 +3264,12 @@ function rtKwVoorKeuze(maten, k) {
       e.preventDefault();
       window.rtGoToOffer("nieuw", "");
     });
+  });
+  // de hulpkaart maar één keer tonen (bij "alle merken" stond ze zes keer); render() in het
+  // blok TOESTELLEN houdt dat bij als de bezoeker een merk kiest
+  var helpkaarten = document.querySelectorAll(".v4-help");
+  helpkaarten.forEach(function (h, i) {
+    h.hidden = i !== helpkaarten.length - 1;
   });
   var TIPS = {
     "SEER / SCOP": "Hoe zuinig het toestel is over een heel seizoen: SEER bij koelen, SCOP bij verwarmen. Hoe hoger, hoe zuiniger.",
