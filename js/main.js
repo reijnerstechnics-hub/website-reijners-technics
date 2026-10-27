@@ -914,7 +914,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.500 euro, plaatsing en 6% btw inbegrepen voor een woning ouder dan 10 jaar; onderhoud 150 tot 200 euro, exclusief btw; herstelling 100 tot 150 euro voor de verplaatsing en het eerste uur, exclusief btw); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.360 euro, standaardplaatsing met 5 meter leiding en 6% btw inbegrepen voor een woning ouder dan 10 jaar; een langere leiding of stroom vanuit de zekeringkast komt erbij; onderhoud 150 tot 200 euro, exclusief btw; herstelling 100 tot 150 euro voor de verplaatsing en het eerste uur, exclusief btw); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -2338,10 +2338,10 @@ function rtKwVoorKeuze(maten, k) {
     if (a) a.click();
   });
 
-  // ---------- richtprijs per toestel (Rim, 24-10-2026) ----------
+  // ---------- richtprijs per toestel (Rim, 24-10-2026; rekenregel van 27-10-2026) ----------
   // Dezelfde berekening als het prijsadvies (calculate in js/prijscalculator.js) voor één kamer
-  // met een eigen buitenunit: set + plaatsing + standaardleiding, met btw en de marge uit
-  // js/prijzen.js, afgerond op 50 euro. Enkel voor toestellen met een setprijs in js/prijzen.js.
+  // met een eigen buitenunit: set (inkoop x 1,15) + Rims werk voor één binnenunit, plus btw,
+  // afgerond op 10 euro. Enkel voor toestellen met een setprijs in js/prijzen.js.
   var euro = new Intl.NumberFormat("nl-BE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
   var getal = new Intl.NumberFormat("nl-BE", { maximumFractionDigits: 0 });
   function prijsToestel(model) {
@@ -2354,13 +2354,9 @@ function rtKwVoorKeuze(maten, k) {
     var rij = t && t.prijzen[kw.toFixed(1)];
     if (!rij || rij[0] == null) return null;
     var P = RT_PRIJZEN;
-    var I = P.installatie;
-    var excl = rij[0] + I.buitenunit + I.binnenunit + Math.max(0, I.standaardLeiding - I.leidingInbegrepen) * I.perMeter;
-    var incl = excl * (1 + P.btw.standaard / 100);
-    return {
-      lo: Math.floor((incl * (1 - P.marge.min / 100)) / 50) * 50,
-      hi: Math.ceil((incl * (1 + P.marge.max / 100)) / 50) * 50,
-    };
+    var incl = (rij[0] + P.werk[1]) * (1 + P.btw.standaard / 100);
+    var bedrag = Math.round(incl / 10) * 10;
+    return { lo: bedrag, hi: bedrag };
   }
   // het kleinste vermogen met een setprijs
   function vanafPrijs(model) {
@@ -2389,8 +2385,8 @@ function rtKwVoorKeuze(maten, k) {
     box.appendChild(lbl);
     box.appendChild(bedrag);
     box.appendChild(uitleg);
-    var btw = "plaatsing en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar).";
-    var echt = " De echte prijs krijgt u in de offerte, na het gratis plaatsbezoek.";
+    var btw = "standaardplaatsing (5 m leiding inbegrepen) en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar).";
+    var echt = " Stroom vanuit de zekeringkast of een langere leiding komt erbij; de echte prijs krijgt u in de offerte, na het gratis plaatsbezoek.";
     function toon(kw) {
       var p = kw && richtprijs(model, kw);
       lbl.textContent = kw ? "Richtprijs voor " + rtKwTekst(kw) + " kW" : "Richtprijs";
@@ -2398,7 +2394,7 @@ function rtKwVoorKeuze(maten, k) {
         bedrag.textContent = "vanaf " + euro.format(v.prijs.lo);
         uitleg.textContent = "Voor " + rtKwTekst(v.kw) + " kW, met " + btw + echt;
       } else if (p) {
-        bedrag.textContent = euro.format(p.lo) + " – " + getal.format(p.hi);
+        bedrag.textContent = euro.format(p.lo);
         uitleg.textContent = "Met " + btw + echt;
       } else {
         bedrag.textContent = "Op aanvraag";
@@ -2418,7 +2414,7 @@ function rtKwVoorKeuze(maten, k) {
     var model = card.querySelector(".device-cta").dataset.model;
     var p = kw && richtprijs(model, kw);
     box.firstChild.textContent = kw ? "Richtprijs voor " + rtKwTekst(kw) + " kW" : "Richtprijs";
-    box.lastChild.textContent = !kw ? "vanaf " + euro.format(vanafPrijs(model).prijs.lo) : p ? euro.format(p.lo) + " – " + getal.format(p.hi) : "Op aanvraag";
+    box.lastChild.textContent = !kw ? "vanaf " + euro.format(vanafPrijs(model).prijs.lo) : p ? euro.format(p.lo) : "Op aanvraag";
   }
   cards.forEach(function (card) {
     var cta = card.querySelector(".device-cta");
@@ -2496,7 +2492,7 @@ function rtKwVoorKeuze(maten, k) {
         ruimte.appendChild(el("span", "td-kw-m2", (n === nums[0] ? "tot " : Math.round(n / 0.12) + "-") + Math.round(n / 0.09) + " m²"));
         tr.appendChild(ruimte);
         var p = richtprijs(model, n);
-        tr.appendChild(el("td", p ? null : "td-kw-geen", p ? euro.format(p.lo) + " – " + getal.format(p.hi) : "op aanvraag"));
+        tr.appendChild(el("td", p ? null : "td-kw-geen", p ? euro.format(p.lo) : "op aanvraag"));
       } else {
         tr.appendChild(el("td", null, "ca. " + (n === nums[0] ? "tot " : Math.round(n / 0.12) + " - ") + Math.round(n / 0.09) + " m²"));
       }
@@ -2508,7 +2504,7 @@ function rtKwVoorKeuze(maten, k) {
         el(
           "p",
           "td-kw-noot",
-          "Richtprijs met plaatsing en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar; jonger: " + RT_PRIJZEN.btw.nieuw +
+          "Richtprijs voor een standaardplaatsing (5 m leiding inbegrepen), met " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar; jonger: " + RT_PRIJZEN.btw.nieuw +
             "% btw). De echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest."
         )
       );

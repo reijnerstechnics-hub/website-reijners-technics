@@ -71,11 +71,11 @@ Een nieuw merk: een merkblok met kaarten, een tegel in `.merk-keuze` met het log
 
 Bovenaan de pagina *Toestellen* (`#prijs`) beantwoordt de klant drie vragen: hoeveel kamers, hoe groot elke kamer is en wat hij het belangrijkst vindt. Daarna krijgt hij drie voorstellen naast elkaar: **Voordelig**, **Beste prijs-kwaliteit** en **Premium**, elk met merk, model, foto en een richtprijs ("tussen € x en € y"). Het voorstel dat bij zijn wens past, krijgt het label "Past bij uw wens". De klant kiest een voorstel en laat zijn naam en telefoonnummer achter.
 
-Alles staat in `js/prijzen.js` (exclusief btw):
+Alles staat in `js/prijzen.js` (exclusief btw). Dat bestand wordt sinds 27-10-2026 gemaakt door `voorbeeld/prijslijst/maak-prijzen.ps1` uit Rims prijslijst bij Nova Air (buiten git; de toestelprijzen in `prijzen.js` zijn inkoop × 1,15, de inkoopprijzen zelf staan nergens online; Daikin: comfycool.be × 1,15). Nieuwe prijzen: de lijst opnieuw uitlezen (Rim logt zelf in) en het script draaien, niet met de hand in `prijzen.js` werken.
 
 - `wensen`: de knoppen bij "Wat vindt u het belangrijkst?" en per wens de drie toestellen (voordelig, kwaliteit, premium);
 - `toestellen` en `multi`: de prijzen per model en vermogen, en de multi-split buitenunits. Per voorstel zoekt de calculator zelf de voordeligste opstelling (meerdere kamers op één buitenunit als het toestel dat kan);
-- `installatie.standaardLeiding`: met zoveel meter leiding per kamer rekent de richtprijs;
+- `werk`: Rims werk per aantal binnenunits (1.000 / 1.500 / 2.000 euro bij 1 / 2 / 3, excl. btw, 5 m leiding inbegrepen) en `maxBinnenunits`: meer binnenunits geeft "op maat" zonder bedrag;
 - `btw.standaard`: het btw-tarief van de richtprijs (de klant ziet erbij wat het is voor een woning jonger dan 10 jaar).
 
 Zolang daar `voorlopig: true` staat, ziet de klant de melding dat het om voorbeeldprijzen gaat. De werking zelf staat in `js/prijscalculator.js`. Foto en uitleg komen van de toestelkaarten; een toestel in `prijzen.js` hoort bij de kaart met dezelfde `data-model`.
@@ -89,7 +89,7 @@ Heeft een toestel in `prijzen.js` een prijs voor een set (binnen- en buitenunit)
 
 Ook de kaart in de lijst toont dan "Richtprijs vanaf € ..." (`kaartPrijs` in `js/main.js`). Staat de filter *Vermogen* aan, dan staat er de prijs voor de donkere maat. De uitleg (plaatsing, btw, offerte) staat één keer bovenaan de lijst (`.lijst-noot` in `index.html`), en enkel als er een kaart met een prijs te zien is.
 
-De berekening is dezelfde als in het prijsadvies voor één kamer met een eigen buitenunit: set + plaatsing + standaardleiding, plus btw en marge, afgerond op 50 euro (`richtprijs` in het blok *TOESTELLEN* van `js/main.js`). Pas je die berekening in `js/prijscalculator.js` aan, pas ze dan ook daar aan. Toestellen zonder prijs in `prijzen.js` tonen geen richtprijs, en met `voorlopig: true` verdwijnen de richtprijzen van de toestelpagina's. Daarom laadt `index.html` `js/prijzen.js` vóór `js/main.js`.
+De berekening is dezelfde als in het prijsadvies voor één kamer met een eigen buitenunit: set (inkoop × 1,15) + `werk[1]`, plus btw, afgerond op 10 euro: één richtprijs, geen vork (`richtprijs` in het blok *TOESTELLEN* van `js/main.js`). Pas je die berekening in `js/prijscalculator.js` aan, pas ze dan ook daar aan. Toestellen zonder prijs in `prijzen.js` tonen geen richtprijs, en met `voorlopig: true` verdwijnen de richtprijzen van de toestelpagina's. Daarom laadt `index.html` `js/prijzen.js` vóór `js/main.js`.
 
 ### Vermogen kiezen op de toestelpagina
 

@@ -1,56 +1,28 @@
 // =====================================================================
-// PRIJZEN VOOR HET PRIJSADVIES  (bovenaan de pagina Toestellen, #prijs)
+// PRIJZEN VOOR HET PRIJSADVIES EN DE RICHTPRIJZEN PER TOESTEL
 // ---------------------------------------------------------------------
-// Alle bedragen zijn in euro, EXCLUSIEF btw. Het prijsadvies rekent de
-// btw er zelf bij (zie "btw" hieronder).
+// Alle bedragen zijn in euro, EXCLUSIEF btw. De site rekent de btw er zelf bij.
 //
-// Hier pas je de prijzen en de voorstellen aan. Aan de rest van de code
-// hoef je niets te doen.
-//
-// De prijzen hieronder zijn RICHTPRIJZEN, op Rims vraag afgestemd op wat andere
-// airco-installateurs vragen (oktober 2026): alle toestelprijzen x 0,75. Het prijsadvies zegt de klant
-// dat de echte prijs pas in de offerte komt, na het plaatsbezoek. Zet voorlopig op true om weer "voorbeeldprijzen" te melden.
+// Rims rekenregel (27 oktober 2026):
+//   richtprijs = toestellen + werk, plus 6 % btw (woning ouder dan 10 jaar).
+//   - De toestelprijzen hieronder zijn Rims inkoop x 1,15 (de opslag dekt klein materiaal,
+//     transport en garantie). De inkoopprijzen zelf staan NIET in dit bestand: dat is publiek.
+//     Bron en rekenscript: voorbeeld/prijslijst/ (buiten git). Daikin: comfycool.be x 1,15.
+//   - Het werk: 1.000 euro bij 1 binnenunit, 1.500 bij 2, 2.000 bij 3 (5 m leiding inbegrepen).
+//     Meer binnenunits, of extra werk zoals stroom vanuit de zekeringkast of een langere
+//     leiding: op maat, na het gratis plaatsbezoek (dan toont de site geen bedrag).
+//   prijzen: per vermogen  [ set binnen+buiten , losse binnenunit voor multi-split ]
+//   Dit bestand wordt gemaakt door voorbeeld/prijslijst/maak-prijzen.ps1; pas het daar aan.
 // =====================================================================
 var RT_PRIJZEN = {
   voorlopig: false,
-
-  // Btw-tarieven (in %). De richtprijs rekent met "standaard"; de klant ziet
-  // erbij dat een woning jonger dan 10 jaar het andere tarief heeft.
   btw: { standaard: 6, nieuw: 21 },
-
-  // De klant ziet een vork: berekende prijs min/plus dit percentage.
-  marge: { min: 5, max: 15 },
-
-  // Plaatsing
-  installatie: {
-    buitenunit: 550, //        per buitenunit: plaatsen op beugels of voet, elektrische aansluiting, vacuüm trekken, opstarten
-    binnenunit: 350, //        per binnenunit: montage, muurdoorvoer, condensafvoer, aansluiten
-    leidingInbegrepen: 3, //   meter leiding per binnenunit die al in de plaatsing zit
-    perMeter: 45, //           per extra meter: koperleiding, isolatie, kabel en afwerking met goot
-    standaardLeiding: 6, //    met zoveel meter leiding per binnenunit rekent de richtprijs
-  },
-
-  // Op één buitenunit mogen maximaal zoveel binnenunits.
+  // Rims werk per aantal binnenunits (excl. btw). Meer: op maat.
+  werk: { 1: 1000, 2: 1500, 3: 2000 },
+  maxBinnenunits: 3,
+  // Op één buitenunit mogen maximaal zoveel binnenunits; een buitenunit draagt tot dit veelvoud van zijn vermogen.
   maxPerBuitenunit: 5,
-
-  // Een multi-split buitenunit mag tot dit veelvoud van zijn eigen vermogen
-  // aan binnenunits dragen (1,3 = 130 %).
   multiMaxAansluiting: 1.3,
-
-  // -------------------------------------------------------------------
-  // DRIE VOORSTELLEN
-  // Na drie vragen (hoeveel kamers, hoe groot, wat is het belangrijkst)
-  // ziet de klant altijd drie voorstellen: voordelig, beste prijs-kwaliteit
-  // en premium, elk met een richtprijs.
-  //
-  // niveaus: de naam en korte uitleg van de drie voorstellen.
-  // wensen:  de knoppen bij "Wat vindt u het belangrijkst?".
-  //   vraag:       de tekst op de knop
-  //   uitleg:      de kleine tekst onder de knop
-  //   markeer:     welk voorstel het label "Past bij uw wens" krijgt
-  //   voorstellen: per niveau een toestel uit de lijst "toestellen"
-  //                hieronder (exact dezelfde naam als bij "model")
-  // -------------------------------------------------------------------
   niveaus: {
     voordelig: { titel: "Voordelig", uitleg: "Betrouwbaar en scherp geprijsd" },
     kwaliteit: { titel: "Beste prijs-kwaliteit", uitleg: "Een topmerk dat jarenlang meegaat" },
@@ -66,159 +38,201 @@ var RT_PRIJZEN = {
     { id: "design", vraag: "Mooi design", uitleg: "Een toestel dat mooi in uw interieur past", markeer: "kwaliteit",
       voorstellen: { voordelig: "Nuova Stellar Inverter", kwaliteit: "Mitsubishi Electric MSZ-EF Premium Design", premium: "Daikin Emura" } },
   ],
-
-  // -------------------------------------------------------------------
-  // TOESTELLEN en hun prijzen.
-  //   model:   moet exact gelijk zijn aan data-model van de kaart op de
-  //            pagina Toestellen. Zo toont het prijsadvies dezelfde foto
-  //            en uitleg.
-  //   multi:   welke multi-split buitenunits bij dit toestel horen
-  //            (zie "multi" verderop), of null als het enkel single-split kan.
-  //   prijzen: per vermogen (kW):  [ prijs set binnen+buiten , prijs losse binnenunit voor multi ]
-  //            Zet null als die uitvoering niet bestaat.
-  // -------------------------------------------------------------------
   toestellen: [
     { merk: "Nuova", model: "Nuova Infinity AI Smart", naam: "Infinity AI Smart", multi: "nuova-inf",
-      prijzen: { "2.5": [490, 290], "3.5": [540, 320], "5.0": [790, 420], "7.1": [1090, 560] } },
+      prijzen: { "2.5": [282, 98], "3.5": [305, 109], "5.0": [431, 138], "7.1": [569, 172] } },
     { merk: "Nuova", model: "Nuova Premium Inverter", naam: "Premium Inverter", multi: "nuova-mso",
-      prijzen: { "3.5": [600, 340], "5.0": [860, 450] } },
+      prijzen: { "3.5": [353, 133], "5.0": [515, 191] } },
     { merk: "Nuova", model: "Nuova Stellar Inverter", naam: "Stellar Inverter", multi: "nuova-mso",
-      prijzen: { "3.5": [710, 390], "5.0": [980, 510] } },
+      prijzen: { "3.5": [453, 209], "5.0": [561, 258] } },
     { merk: "Nuova", model: "Nuova Vloermodel", naam: "Vloermodel", multi: "nuova-inf",
-      prijzen: { "2.5": [680, 340], "3.5": [750, 380], "5.0": [980, 490], "7.1": [1280, null] } },
-
-    // Daikin: winkelprijs excl. btw x 1,6 (zoals de andere merken), daarna x 0,75 zoals alle merken
-    { merk: "Daikin", model: "Daikin Sensira", naam: "Sensira", multi: null,
-      prijzen: { "2.0": [620, null], "2.5": [660, null], "3.5": [680, null], "5.0": [1140, null], "6.0": [1240, null], "7.1": [1580, null] } },
-    { merk: "Daikin", model: "Daikin FTXF-F", naam: "FTXF-F", multi: null,
-      prijzen: { "2.0": [700, null], "2.5": [720, null], "6.0": [1280, null], "7.1": [1500, null] } },
-    { merk: "Daikin", model: "Daikin Comfora", naam: "Comfora", multi: "daikin-mxm",
-      prijzen: { "2.0": [940, 400], "2.5": [1060, 440], "3.5": [1190, 460], "5.0": [1680, 540], "6.0": [1860, 590], "7.1": [2180, 680] } },
-    { merk: "Daikin", model: "Daikin Perfera", naam: "Perfera", multi: "daikin-mxm",
-      prijzen: { "2.0": [1160, 500], "2.5": [1280, 520], "3.5": [1430, 590], "4.2": [1680, 680], "5.0": [1850, 780], "6.0": [2080, 950], "7.1": [2380, 1060] } },
-    { merk: "Daikin", model: "Daikin Stylish", naam: "Stylish", multi: "daikin-mxm",
-      prijzen: { "2.0": [1340, 530], "2.5": [1880, 620], "3.5": [2000, 680], "4.2": [2080, 740], "5.0": [2460, 800] } },
-    { merk: "Daikin", model: "Daikin Emura", naam: "Emura", multi: "daikin-mxm",
-      prijzen: { "2.0": [1680, 620], "2.5": [1790, 680], "3.5": [2030, 830], "4.2": [2360, 900], "5.0": [2560, 1010] } },
-    { merk: "Daikin", model: "Daikin Perfera vloermodel", naam: "Perfera vloermodel", multi: "daikin-mxm",
-      prijzen: { "2.5": [1540, 780], "3.5": [1880, 960], "5.0": [2160, 1160] } },
-    { merk: "Daikin", model: "Daikin Sensira CTXF-C multi-split binnenunit", naam: "Sensira multi", multi: "daikin-mxf",
-      prijzen: { "2.0": [null, 300], "2.5": [null, 320], "3.5": [null, 340] } },
-
+      prijzen: { "2.5": [null, 213], "3.5": [512, 224], "5.0": [627, 259], "7.1": [null, 305] } },
+    { merk: "Nuova", model: "Nuova Polar Plus monoblock 2,5 kW", naam: "Polar Plus monoblock", multi: null,
+      prijzen: { "2.5": [683, null] } },
+    { merk: "Nuova", model: "Nuova Polar Pro monoblock 4,0 kW", naam: "Polar Pro monoblock", multi: null,
+      prijzen: { "4.0": [879, null] } },
     { merk: "LG", model: "LG DualCool WZ-serie", naam: "DualCool WZ", multi: null,
-      prijzen: { "2.5": [560, null], "3.5": [640, null], "5.0": [940, null], "7.0": [1240, null] } },
+      prijzen: { "2.5": [385, null], "3.5": [459, null], "5.0": [689, null], "7.0": [804, null] } },
     { merk: "LG", model: "LG DualCool Comfort Special E · EZ-serie", naam: "DualCool Comfort EZ", multi: "lg-multif",
-      prijzen: { "2.5": [710, 360], "3.5": [790, 410], "5.0": [1090, 530], "6.6": [1390, 640] } },
+      prijzen: { "2.5": [482, 251], "3.5": [505, 266], "5.0": [735, 309], "6.6": [999, null], "7.0": [null, 344] } },
     { merk: "LG", model: "LG Standard Plus DualCool Special P · PZ-serie", naam: "Standard Plus PZ", multi: "lg-multif",
-      prijzen: { "2.5": [640, 320], "3.5": [710, 360], "5.0": [1010, 490], "6.6": [1280, 600] } },
+      prijzen: { "2.5": [585, 261], "3.5": [643, 286], "5.0": [953, 355], "6.6": [1241, 424] } },
     { merk: "LG", model: "LG DualCool AI Air Special Smart Inverter", naam: "DualCool AI Air Special", multi: "lg-multif",
-      prijzen: { "2.5": [750, 390], "3.5": [830, 440] } },
+      prijzen: { "2.5": [626, 282], "3.5": [677, 310] } },
     { merk: "LG", model: "LG Deluxe AI H-serie", naam: "Deluxe AI", multi: "lg-multif",
-      prijzen: { "2.1": [null, 380], "2.5": [830, 410], "3.5": [940, 470], "5.0": [1240, 620], "7.0": [1580, 790] } },
+      prijzen: { "2.1": [null, 266], "2.5": [746, 309], "3.5": [804, 344], "5.0": [1183, 489], "7.0": [1340, 459] } },
     { merk: "LG", model: "LG Artcool AI Air Mirror", naam: "Artcool AI Air Mirror", multi: "lg-multif",
-      prijzen: { "2.5": [940, 470], "3.5": [1050, 530], "5.0": [1390, 700] } },
+      prijzen: { "2.5": [919, 367], "3.5": [1034, 401], "5.0": [1149, 459] } },
     { merk: "LG", model: "LG Artcool AI Matt Black", naam: "Artcool AI Matt Black", multi: "lg-multif",
-      prijzen: { "2.5": [940, 470] } },
+      prijzen: { "2.5": [919, 367] } },
     { merk: "LG", model: "LG Artcool Gallery Special", naam: "Artcool Gallery", multi: "lg-multif",
-      prijzen: { "2.5": [1240, 620], "3.5": [1350, 680] } },
+      prijzen: { "2.5": [1184, 644], "3.5": [1334, 719] } },
     { merk: "LG", model: "LG Artcool LCD Gallery Premium", naam: "Artcool LCD Gallery", multi: "lg-multif",
-      prijzen: { "2.5": [1800, 900], "3.5": [1950, 980] } },
+      prijzen: { "2.5": [1420, 897], "3.5": [1524, 966] } },
     { merk: "LG", model: "LG Vloermodel UQ-reeks", naam: "Vloermodel UQ", multi: "lg-multif",
-      prijzen: { "2.6": [1130, 560], "3.5": [1240, 620], "5.0": [1540, 770] } },
-
+      prijzen: { "2.6": [1034, 424], "3.5": [1149, 516], "5.0": [1379, 551] } },
+    { merk: "LG", model: "LG Standard Plus Smart Inverter Multi · PM05SP / PM15SP", naam: "Standard Plus multi", multi: "lg-multif",
+      prijzen: { "4.2": [null, 334] } },
+    { merk: "LG", model: "LG Cassette 4-weg CT- en UT-serie", naam: "Cassette 4-weg", multi: "lg-multif",
+      prijzen: { "2.5": [1350, 443], "3.4": [null, 448], "3.5": [1357, null], "4.7": [null, 500], "5.0": [1650, null], "7.0": [1826, null], "7.1": [null, 540], "8.0": [1825, null], "9.5": [2527, null], "12.0": [2547, null], "13.5": [2608, null], "15.0": [2682, null] } },
+    { merk: "LG", model: "LG Cassette 1-weg MT-serie, multi-split binnenunit", naam: "Cassette 1-weg", multi: "lg-multif",
+      prijzen: { "2.6": [null, 448], "3.5": [null, 460] } },
+    { merk: "LG", model: "LG Kanaalunit CL / CM / UM / UB", naam: "Kanaalunit", multi: "lg-multif",
+      prijzen: { "2.5": [1235, null], "2.6": [null, 483], "3.5": [1266, 512], "5.0": [1561, 540], "5.3": [1543, 523], "7.0": [1777, 598], "7.1": [1823, 610], "8.5": [1880, null], "10.0": [2639, null], "12.0": [2812, null], "14.0": [2869, null], "14.8": [2950, null] } },
+    { merk: "LG", model: "LG Ronde cassette", naam: "Ronde cassette", multi: null,
+      prijzen: { "11.0": [2628, null], "13.4": [2731, null] } },
+    { merk: "LG", model: "LG Plafondmodel UV-serie", naam: "Plafondmodel UV", multi: null,
+      prijzen: { "4.8": [1679, null], "7.0": [1887, null], "7.6": [1958, null], "9.5": [2651, null], "12.0": [2693, null], "13.5": [2723, null], "15.0": [2793, null] } },
     { merk: "Mitsubishi Electric", model: "Mitsubishi Electric MSZ-HR instapreeks", naam: "MSZ-HR", multi: "me-mxzha",
-      prijzen: { "2.5": [680, 340], "3.5": [750, 390], "5.0": [1050, 530], "6.0": [1310, null], "7.1": [1540, null] } },
+      prijzen: { "2.5": [506, 217], "3.5": [627, 240], "5.0": [880, null], "6.0": [1357, null], "7.1": [1433, null] } },
     { merk: "Mitsubishi Electric", model: "Mitsubishi Electric MSZ-AY Compact", naam: "MSZ-AY Compact", multi: "me-mxz",
-      prijzen: { "1.5": [null, 390], "2.0": [null, 420], "2.5": [940, 450], "3.5": [1050, 510], "4.2": [1280, 600], "5.0": [1460, 680], "6.0": [1760, null], "7.1": [1990, null] } },
+      prijzen: { "1.5": [null, 324], "2.0": [null, 343], "2.5": [874, 356], "3.5": [1012, 389], "4.2": [1242, 454], "5.0": [1263, 481], "6.0": [1428, 592], "7.1": [1711, 707] } },
     { merk: "Mitsubishi Electric", model: "Mitsubishi Electric MSZ-EF Premium Design", naam: "MSZ-EF Premium Design", multi: "me-mxz",
-      prijzen: { "1.8": [null, 640], "2.5": [1350, 680], "3.5": [1500, 750], "5.0": [1880, 900] } },
+      prijzen: { "1.8": [null, 339], "2.5": [899, 379], "3.5": [1086, 458], "5.0": [1612, 582] } },
     { merk: "Mitsubishi Electric", model: "Mitsubishi Electric MSZ-LN Diamond", naam: "MSZ-LN Diamond", multi: "me-mxz",
-      prijzen: { "2.5": [1650, 860], "3.5": [1800, 940], "5.0": [2250, 1090], "6.1": [2700, null] } },
+      prijzen: { "2.5": [1101, 442], "3.5": [1256, 512], "5.0": [1753, 582], "6.1": [2047, 628] } },
     { merk: "Mitsubishi Electric", model: "Mitsubishi Electric MSZ-LN Diamond Zubadan", naam: "MSZ-LN Diamond Zubadan", multi: null,
-      prijzen: { "2.5": [2180, null], "3.5": [2360, null], "5.0": [2850, null] } },
+      prijzen: { "2.5": [1386, null], "3.5": [1649, null], "5.0": [2379, null] } },
     { merk: "Mitsubishi Electric", model: "Mitsubishi Electric MFZ-KT Vloermodel", naam: "MFZ-KT Vloermodel", multi: "me-mxz",
-      prijzen: { "2.5": [1350, 750], "3.5": [1500, 830], "5.0": [1880, 980], "6.0": [2180, 1090] } },
-
+      prijzen: { "2.5": [1233, 635], "3.5": [1326, 667], "5.0": [1853, 913], "6.0": [2148, 1095] } },
+    { merk: "Mitsubishi Electric", model: "Mitsubishi Electric Cassette 4-weg SLZ-M / PLA-M", naam: "Cassette 4-weg", multi: "me-mxz",
+      prijzen: { "2.5": [1414, 523], "3.5": [1620, 610], "5.0": [1961, 713], "6.0": [2338, 822], "7.1": [2808, null], "10.0": [3680, null], "12.5": [3910, null], "14.0": [4485, null] } },
+    { merk: "Mitsubishi Electric", model: "Mitsubishi Electric MLZ-KP Cassette 1-weg", naam: "Cassette 1-weg", multi: "me-mxz",
+      prijzen: { "2.5": [1779, 949], "3.5": [2068, 1107], "5.0": [2501, 1311] } },
+    { merk: "Mitsubishi Electric", model: "Mitsubishi Electric SFZ-M Inbouwvloermodel", naam: "SFZ-M Inbouwvloermodel", multi: "me-mxz",
+      prijzen: { "2.5": [1559, 759], "3.5": [1761, 839], "5.0": [2100, 960], "6.0": [2422, 1046], "7.1": [2617, 1081] } },
+    { merk: "Mitsubishi Electric", model: "Mitsubishi Electric Kanaalunit SEZ-M / PEAD-M", naam: "Kanaalunit SEZ-M", multi: "me-mxz",
+      prijzen: { "2.5": [1313, 500], "3.5": [1443, 518], "5.0": [1735, 586], "6.0": [2054, 678], "7.1": [2362, 793], "10.0": [3419, null], "12.5": [3772, null], "14.0": [4594, null] } },
+    { merk: "Mitsubishi Electric", model: "Mitsubishi Electric Vloer- en plafondmodel", naam: "Vloer- en plafondmodel", multi: null,
+      prijzen: { "3.5": [2803, null], "5.0": [3014, null], "6.0": [3540, null], "7.1": [3803, null], "10.0": [4613, null], "12.5": [4881, null], "14.0": [5873, null] } },
     { merk: "Mitsubishi Heavy Industries", model: "MHI ZSP Standard", naam: "ZSP Standard", multi: null,
-      prijzen: { "2.5": [600, null], "3.5": [680, null], "5.0": [940, null] } },
+      prijzen: { "2.5": [600, null], "3.5": [677, null], "5.0": [937, null] } },
     { merk: "Mitsubishi Heavy Industries", model: "MHI ZS Premium", naam: "ZS Premium", multi: "mhi-scm",
-      prijzen: { "2.0": [750, 360], "2.5": [790, 380], "3.5": [900, 420], "5.0": [1200, 540] } },
+      prijzen: { "2.0": [707, 353], "2.5": [742, 374], "3.5": [850, 424], "5.0": [1144, 468] } },
     { merk: "Mitsubishi Heavy Industries", model: "MHI ZTL Standard Plus", naam: "ZTL Standard Plus", multi: null,
-      prijzen: { "1.5": [640, null], "2.0": [660, null], "2.5": [690, null], "3.5": [770, null], "5.0": [1050, null], "6.3": [1350, null], "7.1": [1500, null] } },
+      prijzen: { "1.5": [711, null], "2.0": [735, null], "2.5": [797, null], "3.5": [903, null], "5.0": [1147, null], "6.3": [1414, null], "7.1": [1757, null] } },
     { merk: "Mitsubishi Heavy Industries", model: "MHI ZSX Diamond Hyper", naam: "ZSX Diamond Hyper", multi: "mhi-scm",
-      prijzen: { "2.0": [1090, 530], "2.5": [1130, 540], "3.5": [1280, 600], "5.0": [1650, 750], "6.0": [1950, 860], "7.1": [2250, null], "8.0": [2550, null], "10.0": [3080, null] } },
+      prijzen: { "2.0": [1145, 498], "2.5": [1195, 485], "3.5": [1392, 552], "5.0": [1689, 745], "6.0": [1754, 761], "6.3": [1529, 589], "7.1": [1894, null], "8.0": [2299, 891], "10.0": [2542, null] } },
     { merk: "Mitsubishi Heavy Industries", model: "MHI Diamond Vloermodel", naam: "Diamond Vloermodel", multi: "mhi-scm",
-      prijzen: { "2.5": [1130, 600], "3.5": [1240, 660], "5.0": [1580, 790] } },
+      prijzen: { "2.5": [1081, 595], "3.5": [1112, 630], "5.0": [1693, 649] } },
+    { merk: "Mitsubishi Heavy Industries", model: "MHI Cassette 4-weg FDTC / FDT", naam: "Cassette 4-weg", multi: "mhi-scm",
+      prijzen: { "2.5": [1010, 638], "3.5": [1101, 673], "4.0": [1460, null], "5.0": [1581, 753], "6.0": [1735, 873], "7.1": [2254, null], "10.0": [3128, null], "12.5": [3404, null], "14.0": [3649, null] } },
+    { merk: "Mitsubishi Heavy Industries", model: "MHI Kanaalunit Premium / FDUM / FDU", naam: "Kanaalunit", multi: "mhi-scm",
+      prijzen: { "2.5": [1121, 644], "3.5": [1305, 753], "4.0": [1834, null], "5.0": [1932, 784], "6.0": [2070, 966], "7.1": [2070, null], "9.0": [2415, null], "10.0": [2829, null], "12.5": [3852, null], "14.0": [4082, null] } },
+    { merk: "Mitsubishi Heavy Industries", model: "MHI Plafondmodel FDE", naam: "Plafondmodel FDE", multi: null,
+      prijzen: { "4.0": [1725, null], "5.0": [1897, null], "6.0": [2128, null], "7.1": [2128, null], "9.0": [2645, null], "10.0": [3082, null], "12.5": [3979, null], "14.0": [4588, null] } },
+    { merk: "Toshiba", model: "Toshiba Yukai", naam: "Yukai", multi: "toshiba-multi",
+      prijzen: { "2.3": [null, 235], "2.5": [634, null], "3.3": [712, null], "3.6": [null, 254], "4.5": [912, null], "4.6": [null, 289], "5.0": [1003, null], "7.0": [1254, null] } },
+    { merk: "Toshiba", model: "Toshiba Haori", naam: "Haori", multi: "toshiba-multi",
+      prijzen: { "2.5": [949, 483], "3.5": [1133, 569], "4.6": [1248, 610] } },
+    { merk: "Toshiba", model: "Toshiba Daiseikai 10", naam: "Daiseikai 10", multi: "toshiba-multi",
+      prijzen: { "2.5": [1474, 535], "3.5": [1534, 537], "5.0": [1865, 592] } },
+    { merk: "Toshiba", model: "Toshiba Shorai Edge Kazumi", naam: "Shorai Edge Kazumi", multi: "toshiba-multi",
+      prijzen: { "5.0": [1155, 471], "6.1": [null, 481] } },
+    { merk: "Toshiba", model: "Toshiba Wandmodel Digital Inverter", naam: "Wandmodel Digital Inverter", multi: null,
+      prijzen: { "2.5": [1259, null], "3.6": [1432, null], "5.0": [1604, null], "6.7": [1788, null], "8.0": [1949, null], "9.5": [2415, null] } },
+    { merk: "Toshiba", model: "Toshiba Bi-Flow vloermodel", naam: "Bi-Flow vloermodel", multi: "toshiba-multi",
+      prijzen: { "2.5": [1127, 586], "3.3": [null, 638], "3.5": [1254, null], "4.2": [null, 868], "5.0": [1581, null] } },
+    { merk: "Toshiba", model: "Toshiba Cassette 4-weg", naam: "Cassette 4-weg", multi: "toshiba-multi",
+      prijzen: { "2.5": [1915, 667], "3.3": [null, 742], "3.6": [2045, null], "5.0": [2148, null], "6.1": [null, 822], "6.7": [2418, null], "8.0": [2579, null], "9.5": [3168, null], "12.0": [3387, null], "14.0": [3824, null] } },
+    { merk: "Toshiba", model: "Toshiba Kanaalunit", naam: "Kanaalunit", multi: "toshiba-multi",
+      prijzen: { "2.5": [1823, null], "3.3": [null, 713], "3.6": [1949, null], "4.2": [null, 765], "5.0": [1984, null], "6.1": [null, 874], "6.7": [2214, null], "7.0": [null, 914], "8.0": [2421, null], "9.5": [2886, null], "12.0": [3042, null], "14.0": [3502, null], "20.0": [7762, null], "22.3": [8682, null] } },
+    { merk: "Toshiba", model: "Toshiba Plafondmodel Digital Inverter", naam: "Plafondmodel", multi: null,
+      prijzen: { "3.6": [1840, null], "5.0": [1984, null], "6.9": [2242, null], "8.0": [2386, null], "9.5": [2858, null], "12.1": [3134, null], "14.0": [3565, null] } },
+    { merk: "Toshiba", model: "Toshiba Zuilmodel Digital Inverter", naam: "Zuilmodel", multi: null,
+      prijzen: { "5.0": [2415, null], "6.7": [2760, null], "9.5": [3392, null], "12.1": [3737, null] } },
+
+    // Daikin: comfycool.be (excl. btw) x 1,15
+    { merk: "Daikin", model: "Daikin Sensira", naam: "Sensira", multi: null,
+      prijzen: { "2.0": [594, null], "2.5": [632, null], "3.5": [652, null], "5.0": [1092, null], "6.0": [1188, null], "7.1": [1514, null] } },
+    { merk: "Daikin", model: "Daikin FTXF-F", naam: "FTXF-F", multi: null,
+      prijzen: { "2.0": [671, null], "2.5": [690, null], "6.0": [1227, null], "7.1": [1438, null] } },
+    { merk: "Daikin", model: "Daikin Comfora", naam: "Comfora", multi: "daikin-mxm",
+      prijzen: { "2.0": [901, 383], "2.5": [1016, 422], "3.5": [1140, 441], "5.0": [1610, 518], "6.0": [1782, 565], "7.1": [2089, 652] } },
+    { merk: "Daikin", model: "Daikin Perfera", naam: "Perfera", multi: "daikin-mxm",
+      prijzen: { "2.0": [1112, 479], "2.5": [1227, 498], "3.5": [1370, 565], "4.2": [1610, 652], "5.0": [1773, 747], "6.0": [1993, 910], "7.1": [2281, 1016] } },
+    { merk: "Daikin", model: "Daikin Stylish", naam: "Stylish", multi: "daikin-mxm",
+      prijzen: { "2.0": [1284, 508], "2.5": [1802, 594], "3.5": [1917, 652], "4.2": [1993, 709], "5.0": [2358, 767] } },
+    { merk: "Daikin", model: "Daikin Emura", naam: "Emura", multi: "daikin-mxm",
+      prijzen: { "2.0": [1610, 594], "2.5": [1715, 652], "3.5": [1945, 795], "4.2": [2262, 862], "5.0": [2453, 968] } },
+    { merk: "Daikin", model: "Daikin Perfera vloermodel", naam: "Perfera vloermodel", multi: "daikin-mxm",
+      prijzen: { "2.5": [1476, 747], "3.5": [1802, 920], "5.0": [2070, 1112] } },
+    { merk: "Daikin", model: "Daikin Sensira CTXF-C multi-split binnenunit", naam: "Sensira multi", multi: "daikin-mxf",
+      prijzen: { "2.0": [null, 288], "2.5": [null, 307], "3.5": [null, 326] } },
   ],
 
-  // -------------------------------------------------------------------
-  // MULTI-SPLIT BUITENUNITS per reeks.
-  //   poorten: hoeveel binnenunits erop kunnen
-  //   kw:      nominaal koelvermogen
-  //   prijs:   prijs van de buitenunit alleen
-  // De calculator kiest de goedkoopste die past.
-  // -------------------------------------------------------------------
+  // Multi-split buitenunits per reeks: poorten, vermogen en prijs (x 1,15). De calculator kiest de goedkoopste die past.
   multi: {
     "nuova-mso": { naam: "Nuova MSO", units: [
-      { poorten: 2, kw: 5.28, prijs: 710 },
-      { poorten: 3, kw: 8.0, prijs: 1010 },
-      { poorten: 4, kw: 10.5, prijs: 1310 },
-      { poorten: 5, kw: 13.5, prijs: 1610 },
+      { poorten: 2, kw: 5.0, prijs: 560 },
+      { poorten: 3, kw: 8.0, prijs: 791 },
+      { poorten: 4, kw: 10.5, prijs: 872 },
+      { poorten: 5, kw: 13.5, prijs: 1148 },
     ] },
     "nuova-inf": { naam: "Nuova Infinity AI Smart multi", units: [
-      { poorten: 2, kw: 5.0, prijs: 680 },
-      { poorten: 3, kw: 6.8, prijs: 900 },
-      { poorten: 3, kw: 8.0, prijs: 1010 },
-      { poorten: 4, kw: 10.0, prijs: 1240 },
-      { poorten: 5, kw: 12.5, prijs: 1500 },
+      { poorten: 2, kw: 5.0, prijs: 489 },
+      { poorten: 3, kw: 6.8, prijs: 627 },
+      { poorten: 3, kw: 8.0, prijs: 742 },
+      { poorten: 4, kw: 10.0, prijs: 943 },
+      { poorten: 5, kw: 12.5, prijs: 1133 },
     ] },
     "lg-multif": { naam: "LG Multi F", units: [
-      { poorten: 2, kw: 4.1, prijs: 860 },
-      { poorten: 2, kw: 4.7, prijs: 940 },
-      { poorten: 3, kw: 5.3, prijs: 1160 },
-      { poorten: 3, kw: 6.2, prijs: 1280 },
-      { poorten: 4, kw: 7.0, prijs: 1540 },
-      { poorten: 4, kw: 7.9, prijs: 1690 },
-      { poorten: 5, kw: 8.8, prijs: 1910 },
-      { poorten: 5, kw: 11.2, prijs: 2250 },
-    ] },
-    "me-mxz": { naam: "Mitsubishi Electric MXZ", units: [
-      { poorten: 2, kw: 3.3, prijs: 980 },
-      { poorten: 2, kw: 4.2, prijs: 1090 },
-      { poorten: 2, kw: 5.3, prijs: 1240 },
-      { poorten: 3, kw: 5.4, prijs: 1390 },
-      { poorten: 3, kw: 6.8, prijs: 1610 },
-      { poorten: 4, kw: 7.2, prijs: 1880 },
-      { poorten: 4, kw: 8.3, prijs: 2100 },
-      { poorten: 5, kw: 10.2, prijs: 2480 },
+      { poorten: 2, kw: 4.1, prijs: 758 },
+      { poorten: 2, kw: 4.7, prijs: 861 },
+      { poorten: 3, kw: 5.3, prijs: 976 },
+      { poorten: 3, kw: 6.2, prijs: 1034 },
+      { poorten: 4, kw: 7.0, prijs: 1264 },
+      { poorten: 4, kw: 7.9, prijs: 1494 },
+      { poorten: 5, kw: 8.8, prijs: 1839 },
     ] },
     "me-mxzha": { naam: "Mitsubishi Electric MXZ-HA", units: [
-      { poorten: 2, kw: 4.0, prijs: 830 },
-      { poorten: 2, kw: 5.0, prijs: 940 },
-      { poorten: 3, kw: 5.0, prijs: 1090 },
+      { poorten: 2, kw: 4.0, prijs: 857 },
+      { poorten: 2, kw: 5.0, prijs: 1067 },
+      { poorten: 3, kw: 5.0, prijs: 1242 },
     ] },
-    "daikin-mxm": { naam: "Daikin MXM", units: [
-      { poorten: 2, kw: 4.0, prijs: 1380 },
-      { poorten: 2, kw: 5.0, prijs: 1550 },
-      { poorten: 2, kw: 6.8, prijs: 1980 },
-      { poorten: 3, kw: 4.0, prijs: 1880 },
-      { poorten: 3, kw: 5.2, prijs: 2080 },
-      { poorten: 3, kw: 6.8, prijs: 2140 },
-      { poorten: 4, kw: 6.8, prijs: 2380 },
-      { poorten: 4, kw: 8.0, prijs: 2760 },
-      { poorten: 5, kw: 9.0, prijs: 3160 },
-    ] },
-    "daikin-mxf": { naam: "Daikin Sensira 2MXF", units: [
-      { poorten: 2, kw: 4.0, prijs: 1280 },
+    "me-mxz": { naam: "Mitsubishi Electric MXZ", units: [
+      { poorten: 2, kw: 4.2, prijs: 988 },
+      { poorten: 2, kw: 5.3, prijs: 1150 },
+      { poorten: 3, kw: 5.4, prijs: 1426 },
+      { poorten: 3, kw: 6.8, prijs: 1748 },
+      { poorten: 4, kw: 7.2, prijs: 2056 },
+      { poorten: 4, kw: 8.0, prijs: 2211 },
+      { poorten: 4, kw: 8.3, prijs: 2248 },
+      { poorten: 5, kw: 10.2, prijs: 2621 },
+      { poorten: 6, kw: 12.2, prijs: 3381 },
     ] },
     "mhi-scm": { naam: "MHI SCM", units: [
-      { poorten: 2, kw: 4.0, prijs: 980 },
-      { poorten: 2, kw: 4.5, prijs: 1050 },
-      { poorten: 3, kw: 5.0, prijs: 1200 },
-      { poorten: 3, kw: 6.0, prijs: 1350 },
-      { poorten: 4, kw: 7.1, prijs: 1650 },
-      { poorten: 4, kw: 8.0, prijs: 1840 },
-      { poorten: 5, kw: 10.0, prijs: 2180 },
+      { poorten: 2, kw: 4.0, prijs: 897 },
+      { poorten: 2, kw: 4.5, prijs: 988 },
+      { poorten: 3, kw: 5.0, prijs: 1114 },
+      { poorten: 3, kw: 6.0, prijs: 1402 },
+      { poorten: 4, kw: 7.1, prijs: 1716 },
+      { poorten: 4, kw: 8.0, prijs: 2047 },
+      { poorten: 5, kw: 10.0, prijs: 2708 },
+    ] },
+    "toshiba-multi": { naam: "Toshiba multi-split", units: [
+      { poorten: 2, kw: 4.0, prijs: 972 },
+      { poorten: 2, kw: 5.2, prijs: 1064 },
+      { poorten: 3, kw: 5.2, prijs: 1340 },
+      { poorten: 3, kw: 7.5, prijs: 1456 },
+      { poorten: 4, kw: 8.0, prijs: 1765 },
+      { poorten: 5, kw: 10.0, prijs: 2040 },
+    ] },
+    "daikin-mxf": { naam: "Daikin Sensira 2MXF", units: [
+      { poorten: 2, kw: 0.0, prijs: 0 },
+      { poorten: 4, kw: 0.0, prijs: 0 },
+      { poorten: 1280, kw: 0.0, prijs: 0 },
+    ] },
+    "daikin-mxm": { naam: "Daikin MXM", units: [
+      { poorten: 2, kw: 4.0, prijs: 1322 },
+      { poorten: 2, kw: 5.0, prijs: 1485 },
+      { poorten: 2, kw: 6.8, prijs: 1897 },
+      { poorten: 3, kw: 4.0, prijs: 1802 },
+      { poorten: 3, kw: 5.2, prijs: 1993 },
+      { poorten: 3, kw: 6.8, prijs: 2051 },
+      { poorten: 4, kw: 6.8, prijs: 2281 },
+      { poorten: 4, kw: 8.0, prijs: 2645 },
+      { poorten: 5, kw: 9.0, prijs: 3028 },
     ] },
   },
 };

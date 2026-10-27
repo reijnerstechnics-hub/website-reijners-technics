@@ -20,7 +20,9 @@
   if (!root || typeof RT_PRIJZEN === "undefined") return;
 
   var P = RT_PRIJZEN;
-  var INST = P.installatie;
+  // Rims rekenregel (27-10-2026): het werk hangt af van het aantal binnenunits (P.werk);
+  // meer dan P.maxBinnenunits, dan is het op maat en toont de site geen bedrag.
+  var WERK = P.werk;
   var KW_PER_M2 = 0.1; // vuistregel: 100 W per m² (goed geïsoleerde woning)
   var STORE_KEY = "rt-prijsadvies-v2";
   var NIVEAUS = ["voordelig", "kwaliteit", "premium"];
@@ -89,14 +91,11 @@
   // =====================================================================
   // REKENEN
   // =====================================================================
-  // extra leiding per binnenunit bovenop wat in de plaatsing zit
-  var PIPE = Math.max(0, INST.standaardLeiding - INST.leidingInbegrepen) * INST.perMeter;
-
-  // Eén kamer met een eigen buitenunit (single-split)
+  // Eén kamer met een eigen buitenunit (single-split). Het werk wordt per aanvraag gerekend (calculate).
   function singleUnit(m, item) {
     var kw = sizeFor(m, item.kw, 0);
     if (kw == null) return null;
-    return { multi: false, items: [item], kw: [kw], mat: price(m, kw, 0), inst: INST.buitenunit + INST.binnenunit, pipe: PIPE };
+    return { multi: false, items: [item], kw: [kw], mat: price(m, kw, 0) };
   }
 
   // Meerdere kamers op één multi-split buitenunit
@@ -125,8 +124,6 @@
       items: items,
       kw: kws,
       mat: mat + best.prijs,
-      inst: INST.buitenunit + INST.binnenunit * items.length,
-      pipe: PIPE * items.length,
     };
   }
 
@@ -183,17 +180,28 @@
     var items = roomList().map(function (r, i) {
       return { naam: r.naam, kw: r.m2 * KW_PER_M2, i: i };
     });
-    var res = { model: m, units: unitsFor(m, items), mat: 0, inst: 0, pipe: 0 };
+    var res = { model: m, units: unitsFor(m, items), mat: 0, inst: 0, opMaat: false };
     res.units.forEach(function (u) {
       res.mat += u.mat;
-      res.inst += u.inst;
-      res.pipe += u.pipe;
     });
-    res.excl = res.mat + res.inst + res.pipe;
+    // het werk volgens het aantal binnenunits; meer dan het maximum is op maat
+    var binnen = res.units.reduce(function (s, u) {
+      return s + u.items.length;
+    }, 0);
+    if (binnen > P.maxBinnenunits || !WERK[binnen]) {
+      res.opMaat = true;
+      res.lo = res.hi = null;
+      return res;
+    }
+    res.inst = WERK[binnen];
+    res.excl = res.mat + res.inst;
     var incl = res.excl * (1 + P.btw.standaard / 100);
-    res.lo = Math.floor((incl * (1 - P.marge.min / 100)) / 50) * 50;
-    res.hi = Math.ceil((incl * (1 + P.marge.max / 100)) / 50) * 50;
+    res.lo = res.hi = Math.round(incl / 10) * 10; // één richtprijs, afgerond op 10 euro
     return res;
+  }
+  // de richtprijs als tekst: één bedrag, of "op maat"
+  function prijsTekst(res) {
+    return res.opMaat ? "Op maat" : eur(res.lo);
   }
 
   // Korte omschrijving van de opstelling, bv. "1 buitenunit met 3 binnenunits"
@@ -393,7 +401,7 @@
       h += '<div class="pc-vs-merk">' + esc(m.cfg.merk) + "</div>";
       h += '<h3 class="pc-vs-naam">' + esc(m.cfg.naam) + "</h3>";
       h += '<p class="pc-vs-why">' + esc(m.desc || niveau.uitleg) + "</p>";
-      h += '<div class="pc-vs-prijs"><small>Richtprijs</small><b>' + eur(res.lo) + " &ndash; " + eur(res.hi) + "</b></div>";
+      h += '<div class="pc-vs-prijs"><small>Richtprijs</small><b>' + prijsTekst(res) + "</b></div>";
       // één kamer en het toestel bestaat niet kleiner: dan staat erbij dat het de kleinste maat is
       var kleinste = "";
       if (list.length === 1 && kws.length === 1) {
@@ -419,12 +427,19 @@
     });
     h += "</div>";
 
+    var opMaat = NIVEAUS.some(function (nv) {
+      return results[nv] && results[nv].opMaat;
+    });
     h +=
-      '<p class="pc-fine">Dit zijn richtprijzen, incl. ' +
-      P.btw.standaard +
-      "% btw (woning ouder dan 10 jaar; jonger: " +
-      P.btw.nieuw +
-      "% btw), voor de toestellen en een standaardplaatsing. De echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest. Dat plaatsbezoek is gratis.</p>";
+      '<p class="pc-fine">' +
+      (opMaat
+        ? "Vanaf vier binnenunits komt er meestal meer materiaal en werk bij kijken. Daarom maakt Rim die prijs op maat, na het gratis plaatsbezoek."
+        : "Richtprijzen voor een standaardplaatsing (5 m leiding per binnenunit inbegrepen), incl. " +
+          P.btw.standaard +
+          "% btw (woning ouder dan 10 jaar; jonger: " +
+          P.btw.nieuw +
+          "% btw). Stroom vanuit de zekeringkast of een langere leiding komt erbij. De echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest. Dat plaatsbezoek is gratis.") +
+      "</p>";
     if (P.voorlopig) h += '<div class="pc-demo">Let op: dit prijsadvies gebruikt nog voorbeeldprijzen.</div>';
 
     // aanvraag
@@ -440,9 +455,7 @@
         " &middot; " +
         esc(gk.model.cfg.merk + " " + gk.model.cfg.naam) +
         " &middot; " +
-        eur(gk.lo) +
-        " &ndash; " +
-        eur(gk.hi) +
+        (gk.opMaat ? "prijs op maat" : "richtprijs " + eur(gk.lo)) +
         '</b><span class="pc-muted">Rim belt u binnen 24 uur terug en komt gratis langs. Daarna krijgt u een vaste offerte.</span></div>' +
         '<div class="pc-vs-form">' +
         '<div class="field"><label for="pc-naam">Naam</label><input id="pc-naam" type="text" autocomplete="name"></div>' +
@@ -545,7 +558,7 @@
       wens: wens().vraag,
       voorstel: P.niveaus[state.gekozen].titel,
       toestel: res.model.cfg.model,
-      richtprijs: eur(res.lo) + " - " + eur(res.hi) + " (incl. " + P.btw.standaard + "% btw)",
+      richtprijs: res.opMaat ? "op maat (meer dan " + P.maxBinnenunits + " binnenunits)" : eur(res.lo) + " (incl. " + P.btw.standaard + "% btw)",
       kamers: roomList()
         .map(function (r) {
           return r.naam + ": " + r.sizeLbl;
