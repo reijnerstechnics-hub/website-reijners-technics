@@ -102,6 +102,10 @@ Bestaat een toestel in meer dan één maat, dan zijn de maten in het kW-blok van
 
 Nog eens op dezelfde maat tikken zet de keuze af. Een tik op een maat op een kaart in de lijst opent het toestel met die maat al gekozen. Staat de filter *Vermogen* aan, dan staat op de kaarten de passende maat donker en kiest de detailpagina die maat zelf (`rtKwVoorKeuze`). De keuze per toestel blijft bewaard tot de pagina herladen wordt, ook na de terugknop.
 
+### Toestel bekijken: foto's, inzoomen en video
+
+Elke toestelfoto op de detailpagina opent een viewer (`zoomViewer` in `js/main.js`): inzoomen met het muiswiel, knijpen of een dubbeltik, slepen om te verschuiven, knoppen + en −, pijltjes voor de volgende foto. Extra foto's per toestel staan in `js/toestel-media.js` (`RT_MEDIA`, sleutel = `data-model`): `fotos` (webp 1000 × 1000, `assets/img/t-<slug>-<n>.webp`, met een kort label zoals "Klep open" of "Buitenunit") en `video` (de officiële merkvideo op YouTube: `youtube`-id, titel, kanaal). De miniaturen wisselen de hoofdfoto; de video laadt pas als de bezoeker op afspelen tikt (youtube-nocookie). De bronnen per foto staan in `voorbeeld/media/` (buiten git).
+
 Tikt de bezoeker een kleur aan, dan gaat die ook mee, bv. "Daikin Emura (zwart, 3,5 kW)". Op een toestelpagina vragen ook de knop *Offerte aanvragen* bovenaan en de balk onderaan op de gsm een offerte voor dat toestel. Elders beginnen die knoppen een gewone aanvraag, zonder toestel.
 
 ## Voor Google
