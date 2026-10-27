@@ -8888,3 +8888,31 @@ input.is-leeg {
   text-transform: uppercase;
   color: var(--muted);
 }
+
+/* Home, tegel "6 merken": de merken zijn links naar de lijst per merk */
+.v3-tile.dark .brands a {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.82rem;
+  color: #fff;
+  text-decoration: none;
+}
+.v3-tile.dark .brands a:hover,
+.v3-tile.dark .brands a:focus-visible {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+@media (max-width: 860px) {
+  .v3-tile.dark .brands a {
+    padding: 4px 10px;
+    font-size: 0.78rem;
+  }
+}
+/* Over ons, werkgebied: de gemeenten als gewone zin */
+.v4-towns-tekst {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--ink);
+}

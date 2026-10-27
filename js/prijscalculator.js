@@ -448,7 +448,7 @@
         '<div class="field"><label for="pc-naam">Naam</label><input id="pc-naam" type="text" autocomplete="name"></div>' +
         '<div class="field"><label for="pc-tel">Telefoon</label><input id="pc-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="04xx xx xx xx"></div>' +
         '<div class="field"><label for="pc-gem">Gemeente</label><input id="pc-gem" type="text" autocomplete="address-level2" placeholder="bv. Bree"></div>' +
-        '<button type="button" class="btn btn-gold" data-act="send">Vraag mijn gratis plaatsbezoek aan <span class="ar">&rarr;</span></button>' +
+        '<button type="button" class="btn btn-gold" data-act="send">Offerte aanvragen <span class="ar">&rarr;</span></button>' +
         "</div>" +
         '<div class="calc-status" id="pc-status" role="alert"></div>';
     }
