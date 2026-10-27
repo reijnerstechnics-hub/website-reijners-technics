@@ -179,8 +179,16 @@
       <div class="v3-kicker">Airco &amp; warmtepomp &middot; Uw installateur uit Dilsen-Stokkem</div>
       <h1>Uw airco aanvragen in <span class="u">2 minuten</span></h1>
       <p class="v3-lead"><span id="v4-sub">Kies waarmee we u helpen. Binnen 24 uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.</span></p>
-      <!-- ZOEKBALK: zoekt in alle toestellen, zie js/main.js (blok HOME: ZOEKBALK) -->
-      <form class="hz" id="hz" role="search" autocomplete="off">
+      <div class="v3-pick-lbl">Waarmee kunnen we helpen? E&eacute;n klik en u bent vertrokken.</div>
+      <div class="v3-picks">
+        <button type="button" class="v3-pick hl" data-start-dienst="nieuw"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M4.9 4.9l14.2 14.2M2 12h20M4.9 19.1 19.1 4.9"/></svg></span><b>Nieuwe airco of warmtepomp</b><small>Advies en plaatsing</small><span class="go" aria-hidden="true">&rarr;</span></button>
+        <button type="button" class="v3-pick" data-start-dienst="onderhoud"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5 5L22 13.6 13.6 22l-2.3-2.3a4 4 0 0 0-5-5L4 12.4 12.4 4z"/></svg></span><b>Onderhoud</b><small>Jaarlijks nazicht</small><span class="go" aria-hidden="true">&rarr;</span></button>
+        <button type="button" class="v3-pick" data-start-dienst="herstelling"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg></span><b>Herstelling</b><small>Storing of defect</small><span class="go" aria-hidden="true">&rarr;</span></button>
+      </div>
+      <!-- ZOEKBALK: zoekt in alle toestellen, zie js/main.js (blok HOME: ZOEKBALK).
+           Sinds 27-10-2026 (Rims keuze, optie 1) onder de drie keuzeknoppen, kleiner, als tweede weg. -->
+      <form class="hz hz-klein" id="hz" role="search" autocomplete="off">
+        <p class="hz-lbl">Of zoek een toestel of merk</p>
         <div class="hz-veld">
           <div class="hz-bar">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -190,14 +198,7 @@
           </div>
           <div class="hz-list" id="hz-list" role="listbox" aria-label="Gevonden toestellen" hidden></div>
         </div>
-        <p class="hz-tip">Bijvoorbeeld: <button type="button" data-q="Daikin Stylish">Daikin Stylish</button>, <button type="button" data-q="LG Artcool">LG Artcool</button>, <button type="button" data-q="Mitsubishi Electric Diamond">Mitsubishi Electric Diamond</button> of <button type="button" data-q="multi-split">multi-split</button></p>
       </form>
-      <div class="v3-pick-lbl">Waarmee kunnen we helpen? E&eacute;n klik en u bent vertrokken.</div>
-      <div class="v3-picks">
-        <button type="button" class="v3-pick hl" data-start-dienst="nieuw"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M4.9 4.9l14.2 14.2M2 12h20M4.9 19.1 19.1 4.9"/></svg></span><b>Nieuwe airco of warmtepomp</b><small>Advies en plaatsing</small><span class="go" aria-hidden="true">&rarr;</span></button>
-        <button type="button" class="v3-pick" data-start-dienst="onderhoud"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5 5L22 13.6 13.6 22l-2.3-2.3a4 4 0 0 0-5-5L4 12.4 12.4 4z"/></svg></span><b>Onderhoud</b><small>Jaarlijks nazicht</small><span class="go" aria-hidden="true">&rarr;</span></button>
-        <button type="button" class="v3-pick" data-start-dienst="herstelling"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg></span><b>Herstelling</b><small>Storing of defect</small><span class="go" aria-hidden="true">&rarr;</span></button>
-      </div>
       <p class="v3-richtprijs"><b>Elke woning is anders.</b> Daarom krijgt u uw prijs in een offerte op maat, na het gratis plaatsbezoek. <a href="#prijs">Welke airco past bij u? <span aria-hidden="true">&rarr;</span></a></p>
       <ul class="v3-checks"><li>Gratis plaatsbezoek</li><li>Rechtstreeks met de installateur</li><li>U beslist pas na de offerte</li></ul>
     </div>
@@ -512,135 +513,140 @@
   <div class="wrap">
 
     <h2 class="sr-only">Onze drie diensten</h2>
-    <div class="services">
-      <div class="service v4-svc rv">
-        <div class="v4-svc-ph"><img src="assets/img/g-n67.webp" alt="Wit MHI-wandmodel tegen een lichtgrijze muur" loading="lazy" width="779" height="585"></div>
-        <div class="idx mono">01 / NIEUW TOESTEL</div>
-        <h3>Een nieuwe airco of warmtepomp laten plaatsen</h3>
-        <p>We plaatsen airco's en warmtepompen als single-split (één binnenunit op één buitenunit) of multi-split (meerdere binnenunits op één buitenunit). We adviseren u over het juiste vermogen en leveren een werkende, netjes afgewerkte installatie op.</p>
-        <ul class="v4-gets"><li>Advies over het juiste vermogen</li><li>Gratis plaatsbezoek en een duidelijke offerte</li><li>Nette plaatsing, testen en uitleg</li></ul>
-        <div class="specs">
-          <div><span>Toestellen</span><span>Airco &amp; warmtepomp</span></div>
-          <div><span>Systemen</span><span>Single- &amp; multi-split</span></div>
-        </div>
-        <a class="btn btn-gold btn-sm v4-svc-btn" href="#calculator" data-start-dienst="nieuw">Plaatsing aanvragen <span class="ar">&rarr;</span></a>
-      </div>
-      <div class="service v4-svc rv">
-        <div class="v4-svc-ph"><img src="assets/img/g-n29.webp" alt="Twee Daikin-buitenunits met de meters aangesloten" loading="lazy" width="1372" height="1029"></div>
-        <div class="idx mono">02 / JAARLIJKS NAZICHT</div>
-        <h3>Uw toestel laten onderhouden</h3>
-        <p>Een jaarlijks nazicht en een grondige reiniging houden uw airco of warmtepomp zuinig en verlengen de levensduur.</p>
-        <ul class="v4-gets"><li>Filters en buitenunit gereinigd</li><li>Werking en koudemiddel nagekeken</li><li>Zuiniger, en het toestel gaat langer mee</li></ul>
-        <div class="specs">
-          <div><span>Toestellen</span><span>Airco &amp; warmtepomp</span></div>
-          <div><span>Ritme</span><span>Periodiek, op afspraak</span></div>
-        </div>
-        <a class="btn btn-gold btn-sm v4-svc-btn" href="#calculator" data-start-dienst="onderhoud">Onderhoud aanvragen <span class="ar">&rarr;</span></a>
-      </div>
-      <div class="service v4-svc rv">
-        <div class="v4-svc-ph"><img src="assets/img/g-n30.webp" alt="Daikin-buitenunit met de meters aangesloten" loading="lazy" width="700" height="525"></div>
-        <div class="idx mono">03 / STORING OF DEFECT</div>
-        <h3>Een storing laten herstellen</h3>
-        <p>Werkt uw airco of warmtepomp niet zoals het hoort? We zoeken ter plaatse uit wat er scheelt en lossen het meteen op als dat kan.</p>
-        <ul class="v4-gets"><li>Diagnose ter plaatse</li><li>Meteen opgelost als dat kan</li><li>Na uw aanvraag kunt u meteen zeggen wat er scheelt</li></ul>
-        <div class="specs">
-          <div><span>Toestellen</span><span>Airco &amp; warmtepomp</span></div>
-          <div><span>Aanpak</span><span>Diagnose ter plaatse</span></div>
-        </div>
-        <a class="btn btn-gold btn-sm v4-svc-btn" href="#calculator" data-start-dienst="herstelling">Herstelling aanvragen <span class="ar">&rarr;</span></a>
-      </div>
-    </div>
+    <!-- Sinds 27-10-2026 (Rims keuze): per dienst één blok met daaronder "Meer over ..." (inklapbaar, zelfde
+         mechaniek als de veelgestelde vragen: .faq-item/.faq-q in js/main.js). De stappen staan al op Home ("Zo werkt het"). -->
+    <div class="svc-blokken">
 
-    <div class="svc-details">
-      <div class="v3-shead rv">
-        <div><div class="v3-kicker">Per dienst</div><h2>Wat u mag verwachten</h2></div>
-        <p>Wat we precies doen, hoe het verloopt en waar u ongeveer op mag rekenen.</p>
-      </div>
-
-      <article class="svc-detail rv" id="dienst-nieuw">
-        <h3>Nieuwe airco of warmtepomp</h3>
-        <p class="svc-lead">U wilt uw huis het hele jaar aangenaam houden: in de zomer koel en stil, in de winter behaaglijk warm. We adviseren het juiste systeem en plaatsen het netjes.</p>
-        <div class="svc-box">
-          <h4>Stappen</h4>
-          <ol>
-            <li><strong>Gratis plaatsbezoek</strong>: we meten op, kijken waar alles komt en bespreken budget en mogelijkheden.</li>
-            <li><strong>Eerlijke offerte</strong>: u ziet precies wat het kost en wat u krijgt. Geen verplichtingen.</li>
-            <li><strong>Professionele plaatsing</strong>: we plaatsen, testen en leggen alles rustig uit.</li>
-            <li><strong>Comfort en nazorg</strong>: ook later voor onderhoud belt u hetzelfde nummer.</li>
-          </ol>
+      <article class="svc-blok rv" id="dienst-nieuw">
+        <div class="svc-blok-kop">
+          <div class="svc-blok-ph"><img src="assets/img/g-n67.webp" alt="Wit MHI-wandmodel tegen een lichtgrijze muur" width="779" height="585"></div>
+          <div class="svc-blok-tx">
+            <div class="idx mono">01 / NIEUW TOESTEL</div>
+            <h3>Een nieuwe airco of warmtepomp laten plaatsen</h3>
+            <p>We plaatsen airco's en warmtepompen als single-split (één binnenunit op één buitenunit) of multi-split (meerdere binnenunits op één buitenunit). We adviseren u over het juiste vermogen en leveren een werkende, netjes afgewerkte installatie op.</p>
+            <ul class="v4-gets"><li>Advies over het juiste vermogen</li><li>Gratis plaatsbezoek en een duidelijke offerte</li><li>Nette plaatsing, testen en uitleg</li></ul>
+            <div class="svc-blok-acties">
+              <a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="nieuw">Plaatsing aanvragen <span class="ar">&rarr;</span></a>
+            </div>
+          </div>
         </div>
-        <div class="svc-facts">
-          <div><span>Merken</span><p>Daikin, LG, Mitsubishi Electric, Mitsubishi Heavy Industries (MHI), Nuova en Toshiba. <a href="#toestellen" style="color:var(--sky);">Bekijk alle toestellen</a></p></div>
-          <div><span>Prijs</span><p><strong>Op maat van uw woning.</strong> De prijs hangt af van het toestel, het aantal kamers en de plaatsing. U krijgt een duidelijke offerte nadat Rim bij u is langs geweest, zonder verplichtingen. <a href="#prijs" style="color:var(--sky);">Ontdek welke airco bij u past</a></p></div>
+        <div class="faq-item svc-meer">
+          <button type="button" class="faq-q" aria-expanded="false">
+            <span>Meer over een nieuwe airco of warmtepomp</span>
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-a-wrap"><div class="faq-a"><div class="svc-meer-body">
+            <p class="svc-lead">U wilt uw huis het hele jaar aangenaam houden: in de zomer koel en stil, in de winter behaaglijk warm. We adviseren het juiste systeem en plaatsen het netjes.</p>
+            <div class="svc-meer-grid">
+              <div class="svc-box">
+                <h4>Stappen</h4>
+                <ol>
+                  <li><strong>Gratis plaatsbezoek</strong>: we meten op, kijken waar alles komt en bespreken budget en mogelijkheden.</li>
+                  <li><strong>Eerlijke offerte</strong>: u ziet precies wat het kost en wat u krijgt. Geen verplichtingen.</li>
+                  <li><strong>Professionele plaatsing</strong>: we plaatsen, testen en leggen alles rustig uit.</li>
+                  <li><strong>Comfort en nazorg</strong>: ook later voor onderhoud belt u hetzelfde nummer.</li>
+                </ol>
+              </div>
+              <div class="svc-facts">
+                <div><span>Merken</span><p>Daikin, LG, Mitsubishi Electric, Mitsubishi Heavy Industries (MHI), Nuova en Toshiba. <a href="#toestellen" style="color:var(--sky);">Bekijk alle toestellen</a></p></div>
+                <div><span>Prijs</span><p><strong>Op maat van uw woning.</strong> De prijs hangt af van het toestel, het aantal kamers en de plaatsing. U krijgt een duidelijke offerte nadat Rim bij u is langs geweest, zonder verplichtingen. <a href="#prijs" style="color:var(--sky);">Ontdek welke airco bij u past</a></p></div>
+              </div>
+              <div class="svc-plus">
+                <h4>Voordelen</h4>
+                <ul>
+                  <li>Gratis plaatsbezoek</li>
+                  <li>Geen callcenter: Rim belt u zelf terug</li>
+                  <li>Eerlijk advies, niet de duurste optie</li>
+                  <li>Nette plaatsing</li>
+                </ul>
+              </div>
+            </div>
+          </div></div></div>
         </div>
-        <div class="svc-plus">
-          <h4>Voordelen</h4>
-          <ul>
-            <li>Gratis plaatsbezoek</li>
-            <li>Geen callcenter: Rim belt u zelf terug</li>
-            <li>Eerlijk advies, niet de duurste optie</li>
-            <li>Nette plaatsing</li>
-          </ul>
-        </div>
-        <a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="nieuw">Plaatsing aanvragen <span class="ar">&rarr;</span></a>
       </article>
 
-      <article class="svc-detail rv" id="dienst-onderhoud">
-        <h3>Onderhoud en jaarlijks nazicht</h3>
-        <p class="svc-lead">Een airco of warmtepomp werkt beter en langer als u hem regelmatig laat nakijken. We reinigen, controleren en stellen alles goed af, jaarlijks in het voorjaar of najaar. We onderhouden ook toestellen van andere merken, zoals Samsung of Fujitsu.</p>
-        <div class="svc-box">
-          <h4>Wat we doen</h4>
-          <ul>
-            <li>Binnenunit reinigen</li>
-            <li>Buitenunit reinigen en controleren</li>
-            <li>Filters en leidingen nakijken</li>
-            <li>Koudemiddel nakijken (het middel dat de warmte verplaatst)</li>
-            <li>Elektrische veiligheid controleren</li>
-          </ul>
+      <article class="svc-blok rv" id="dienst-onderhoud">
+        <div class="svc-blok-kop">
+          <div class="svc-blok-ph"><img src="assets/img/g-n29.webp" alt="Twee Daikin-buitenunits met de meters aangesloten" loading="lazy" width="1372" height="1029"></div>
+          <div class="svc-blok-tx">
+            <div class="idx mono">02 / JAARLIJKS NAZICHT</div>
+            <h3>Uw toestel laten onderhouden</h3>
+            <p>Een jaarlijks nazicht en een grondige reiniging houden uw airco of warmtepomp zuinig en verlengen de levensduur.</p>
+            <ul class="v4-gets"><li>Filters en buitenunit gereinigd</li><li>Werking en koudemiddel nagekeken</li><li>Zuiniger, en het toestel gaat langer mee</li></ul>
+            <div class="svc-blok-acties">
+              <a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="onderhoud">Onderhoud aanvragen <span class="ar">&rarr;</span></a>
+            </div>
+          </div>
         </div>
-        <div class="svc-facts">
-          <div><span>Waarom onderhoud?</span><p>Een proper toestel verbruikt minder stroom, gaat langer mee en valt minder snel stil op een hete dag.</p></div>
-          <div><span>Timing en prijs</span><p>Best in het voorjaar (voor koeling) of najaar (voor verwarming). De prijs hangt af van de situatie en het aantal toestellen: die hoort u vooraf van Rim, nadat hij uw toestel heeft gezien.</p></div>
+        <div class="faq-item svc-meer">
+          <button type="button" class="faq-q" aria-expanded="false">
+            <span>Meer over onderhoud</span>
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-a-wrap"><div class="faq-a"><div class="svc-meer-body">
+            <p class="svc-lead">Een airco of warmtepomp werkt beter en langer als u hem regelmatig laat nakijken. We reinigen, controleren en stellen alles goed af, jaarlijks in het voorjaar of najaar. We onderhouden ook toestellen van andere merken, zoals Samsung of Fujitsu.</p>
+            <div class="svc-meer-grid">
+              <div class="svc-box">
+                <h4>Wat we doen</h4>
+                <ul>
+                  <li>Binnenunit reinigen</li>
+                  <li>Buitenunit reinigen en controleren</li>
+                  <li>Filters en leidingen nakijken</li>
+                  <li>Koudemiddel nakijken (het middel dat de warmte verplaatst)</li>
+                  <li>Elektrische veiligheid controleren</li>
+                </ul>
+              </div>
+              <div class="svc-facts">
+                <div><span>Waarom onderhoud?</span><p>Een proper toestel verbruikt minder stroom, gaat langer mee en valt minder snel stil op een hete dag.</p></div>
+                <div><span>Timing en prijs</span><p>Best in het voorjaar (voor koeling) of najaar (voor verwarming). De prijs hangt af van de situatie en het aantal toestellen: die hoort u vooraf van Rim, nadat hij uw toestel heeft gezien.</p></div>
+              </div>
+            </div>
+          </div></div></div>
         </div>
-        <a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="onderhoud">Onderhoud aanvragen <span class="ar">&rarr;</span></a>
       </article>
 
-      <article class="svc-detail rv" id="dienst-herstelling">
-        <h3>Herstelling bij een storing</h3>
-        <p class="svc-lead">Maakt uw toestel lawaai, koelt het niet, lekt het water of geeft het een foutcode? Rim zoekt ter plaatse uit wat er scheelt, ook bij andere merken, zoals Samsung of Fujitsu.</p>
-        <div class="svc-box">
-          <h4>Veelvoorkomende storingen</h4>
-          <ul>
-            <li>Toestel koelt of verwarmt slecht of niet</li>
-            <li>Lekt water</li>
-            <li>Maakt veel lawaai</li>
-            <li>Vreemde geuren</li>
-            <li>Foutcode op het display</li>
-            <li>Start niet op</li>
-          </ul>
+      <article class="svc-blok rv" id="dienst-herstelling">
+        <div class="svc-blok-kop">
+          <div class="svc-blok-ph"><img src="assets/img/g-n30.webp" alt="Daikin-buitenunit met de meters aangesloten" loading="lazy" width="700" height="525"></div>
+          <div class="svc-blok-tx">
+            <div class="idx mono">03 / STORING OF DEFECT</div>
+            <h3>Een storing laten herstellen</h3>
+            <p>Werkt uw airco of warmtepomp niet zoals het hoort? We zoeken ter plaatse uit wat er scheelt en lossen het meteen op als dat kan.</p>
+            <ul class="v4-gets"><li>Diagnose ter plaatse</li><li>Meteen opgelost als dat kan</li><li>Na uw aanvraag kunt u meteen zeggen wat er scheelt</li></ul>
+            <div class="svc-blok-acties">
+              <a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="herstelling">Herstelling aanvragen <span class="ar">&rarr;</span></a>
+              <p class="svc-dringend">Dringend? Bel Rim: <a href="tel:+32491113313">+32 491 11 33 13</a></p>
+            </div>
+          </div>
         </div>
-        <div class="svc-facts">
-          <div><span>Wanneer</span><p>Op afspraak. Rim belt u binnen 24 uur terug en spreekt met u een dag af.</p></div>
-          <div><span>Prijs</span><p>U hoort de prijs vooraf, nadat Rim het probleem heeft bekeken. Zo weet u waar u aan toe bent voor er iets hersteld wordt.</p></div>
+        <div class="faq-item svc-meer">
+          <button type="button" class="faq-q" aria-expanded="false">
+            <span>Meer over een herstelling</span>
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-a-wrap"><div class="faq-a"><div class="svc-meer-body">
+            <p class="svc-lead">Maakt uw toestel lawaai, koelt het niet, lekt het water of geeft het een foutcode? Rim zoekt ter plaatse uit wat er scheelt, ook bij andere merken, zoals Samsung of Fujitsu.</p>
+            <div class="svc-meer-grid">
+              <div class="svc-box">
+                <h4>Veelvoorkomende storingen</h4>
+                <ul>
+                  <li>Toestel koelt of verwarmt slecht of niet</li>
+                  <li>Lekt water</li>
+                  <li>Maakt veel lawaai</li>
+                  <li>Vreemde geuren</li>
+                  <li>Foutcode op het display</li>
+                  <li>Start niet op</li>
+                </ul>
+              </div>
+              <div class="svc-facts">
+                <div><span>Wanneer</span><p>Op afspraak. Rim belt u binnen 24 uur terug en spreekt met u een dag af.</p></div>
+                <div><span>Prijs</span><p>U hoort de prijs vooraf, nadat Rim het probleem heeft bekeken. Zo weet u waar u aan toe bent voor er iets hersteld wordt.</p></div>
+              </div>
+            </div>
+          </div></div></div>
         </div>
-        <a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="herstelling">Herstelling aanvragen <span class="ar">&rarr;</span></a>
-        <p class="svc-dringend">Dringend? Bel Rim: <a href="tel:+32491113313">+32 491 11 33 13</a></p>
       </article>
-    </div>
 
-    <div class="v4-journey v4-journey-sm">
-      <div class="v4-journey-l rv">
-        <div class="v3-kicker">Werkwijze</div>
-        <h2>Zo pakken we het aan</h2>
-        <p>Van het eerste bezoek tot de uitleg bij de oplevering, met &eacute;&eacute;n aanspreekpunt.</p>
-      </div>
-      <div class="v4-track">
-        <div class="v4-rail"></div><div class="v4-fill"></div>
-        <div class="v4-stop rv noimg" data-n="1"><div class="t"><div class="when">Op afspraak &middot; gratis</div><h3>Bezoek en advies</h3><p>We bekijken de situatie ter plaatse en bespreken wat het best past.</p></div></div>
-        <div class="v4-stop rv noimg" data-n="2"><div class="t"><div class="when">Na het bezoek</div><h3>Duidelijke offerte</h3><p>U krijgt vooraf een duidelijke prijs op papier.</p></div></div>
-        <div class="v4-stop rv noimg" data-n="3"><div class="t"><div class="when">Na uw akkoord</div><h3>Uitvoering</h3><p>We plaatsen het toestel en werken alles netjes af.</p></div></div>
-        <div class="v4-stop rv noimg" data-n="4"><div class="t"><div class="when">Bij de oplevering</div><h3>Testen en uitleg</h3><p>We testen de installatie en leggen uit hoe u ze bedient.</p></div></div>
-      </div>
     </div>
     <p style="margin-top:28px;font-size:0.93rem;color:var(--muted);">Bekijk enkele <a href="#realisaties" style="color:var(--sky);">plaatsingen bij klanten</a> om te zien hoe dat er in de praktijk uitziet.</p>
 

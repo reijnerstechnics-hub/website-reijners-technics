@@ -23,7 +23,7 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
   - herstelling €100 tot €150 voor de verplaatsing en het eerste uur, **exclusief btw** (Rims antwoord "zonder", 24-10-2026);
   - "vanaf €1.500" voor één kamer is met plaatsing en **6% btw** (woning ouder dan 10 jaar; jonger: 21%), Rims "ja" van 24-10-2026.
   - Alle andere bedragen op de site zijn nog niet bevestigd.
-  - Rims regel voor de richtprijzen van toestellen (26-10-2026): zijn inkoopprijs uit zijn prijslijst bij Nova Air plus een redelijk percentage, duidelijk als richtprijs; de inkoopprijzen blijven privé (zie Stand van zaken, 26 oktober).
+  - **Rims rekenregel voor de richtprijzen (27-10-2026):** toestellen aan zijn inkoopprijs (Nova Air; Daikin via comfycool.be, excl. btw) **x 1,15**, plus zijn werk: **€ 1.000 bij 1 binnenunit, € 1.500 bij 2, € 2.000 bij 3** (excl. btw, enkel 5 m leiding inbegrepen), en daarop 6 % btw. Vanaf 4 binnenunits of bij extra werk (stroom vanuit de zekeringkast, langere leiding) geen bedrag maar "op maat, na het plaatsbezoek". Altijd "richtprijs voor een standaardplaatsing" met "wat zit erin / wat kan erbij komen". De inkoopprijzen blijven privé in `voorbeeld/prijslijst/` (buiten git); `js/prijzen.js` bevat enkel de berekende bedragen.
   - Let op: voor particulieren hoort een prijs normaal mét btw op de site. Rim vraagt zijn boekhouder welk tarief geldt voor onderhoud en herstelling; daarna komt de prijs met btw erbij.
 
 ## Doel van de site
