@@ -2428,6 +2428,264 @@ function rtKwVoorKeuze(maten, k) {
   });
   window.rtKaartPrijs = kaartPrijs;
 
+  // ---------- toestel bekijken: fotoreeks, inzoomen, video (Rim, 27-10-2026) ----------
+  // De klant moet het toestel in elke stand kunnen zien. De extra foto's en de merkvideo
+  // staan in js/toestel-media.js (RT_MEDIA). De kaartfoto is altijd foto 1 en kan altijd
+  // groot bekeken worden, met inzoomen (muiswiel, knijpen op gsm, dubbeltik).
+  var zoomBox = null;
+  function zoomViewer() {
+    if (zoomBox) return zoomBox;
+    var box = el("div", "td-zoom");
+    box.hidden = true;
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-modal", "true");
+    box.setAttribute("aria-label", "Foto groot bekijken en inzoomen");
+    box.innerHTML =
+      '<div class="td-zoom-top"><span class="td-zoom-cap"></span><span class="td-zoom-count" aria-live="polite"></span>' +
+      '<button type="button" class="td-zoom-btn min" aria-label="Uitzoomen">&minus;</button><button type="button" class="td-zoom-btn plus" aria-label="Inzoomen">+</button>' +
+      '<button type="button" class="td-zoom-btn x" aria-label="Sluiten">&times;</button></div>' +
+      '<div class="td-zoom-vlak"><img alt="" draggable="false"></div>' +
+      '<button type="button" class="td-zoom-btn p" aria-label="Vorige foto">&lsaquo;</button><button type="button" class="td-zoom-btn n" aria-label="Volgende foto">&rsaquo;</button>' +
+      '<p class="td-zoom-hint">Knijp of scrol om in te zoomen, sleep om te verschuiven</p>';
+    document.body.appendChild(box);
+    var vlak = box.querySelector(".td-zoom-vlak");
+    var zimg = box.querySelector("img");
+    var lijst = [],
+      i = 0,
+      schaal = 1,
+      tx = 0,
+      ty = 0,
+      opener = null;
+    function teken() {
+      zimg.style.transform = "translate(" + tx + "px, " + ty + "px) scale(" + schaal + ")";
+      vlak.classList.toggle("ingezoomd", schaal > 1.01);
+    }
+    function zet(s, cx, cy) {
+      // zoomen rond het punt (cx, cy) in het vlak, zodat wat onder de vinger zit blijft staan
+      var r = vlak.getBoundingClientRect();
+      // zonder punt (knoppen, toetsen): rond het midden; anders rond de vinger of de muis
+      var px = cx == null ? 0 : cx - r.left - r.width / 2;
+      var py = cy == null ? 0 : cy - r.top - r.height / 2;
+      var nieuw = Math.max(1, Math.min(4, s));
+      tx = px - ((px - tx) * nieuw) / schaal;
+      ty = py - ((py - ty) * nieuw) / schaal;
+      schaal = nieuw;
+      if (schaal === 1) tx = ty = 0;
+      teken();
+    }
+    function toon(k) {
+      i = (k + lijst.length) % lijst.length;
+      schaal = 1;
+      tx = ty = 0;
+      zimg.src = lijst[i].src;
+      zimg.alt = lijst[i].alt || "";
+      box.querySelector(".td-zoom-cap").textContent = lijst[i].label || "";
+      box.querySelector(".td-zoom-count").textContent = lijst.length > 1 ? i + 1 + " / " + lijst.length : "";
+      box.classList.toggle("een", lijst.length < 2);
+      teken();
+    }
+    function sluit() {
+      box.hidden = true;
+      document.documentElement.style.overflow = "";
+      if (opener) opener.focus({ preventScroll: true });
+    }
+    box.querySelector(".x").addEventListener("click", sluit);
+    box.querySelector(".p").addEventListener("click", function () {
+      toon(i - 1);
+    });
+    box.querySelector(".n").addEventListener("click", function () {
+      toon(i + 1);
+    });
+    box.querySelector(".plus").addEventListener("click", function () {
+      zet(schaal * 1.5);
+    });
+    box.querySelector(".min").addEventListener("click", function () {
+      zet(schaal / 1.5);
+    });
+    vlak.addEventListener(
+      "wheel",
+      function (e) {
+        e.preventDefault();
+        zet(schaal * (e.deltaY < 0 ? 1.2 : 1 / 1.2), e.clientX, e.clientY);
+      },
+      { passive: false }
+    );
+    vlak.addEventListener("dblclick", function (e) {
+      zet(schaal > 1.01 ? 1 : 2.5, e.clientX, e.clientY);
+    });
+    // slepen en knijpen met de vinger of de muis (pointer events)
+    var vingers = {},
+      laatsteAfstand = 0,
+      laatsteTik = 0;
+    vlak.addEventListener("pointerdown", function (e) {
+      vingers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      vlak.setPointerCapture(e.pointerId);
+      var nu = Date.now();
+      if (e.pointerType !== "mouse" && nu - laatsteTik < 300) zet(schaal > 1.01 ? 1 : 2.5, e.clientX, e.clientY);
+      laatsteTik = nu;
+    });
+    vlak.addEventListener("pointermove", function (e) {
+      if (!vingers[e.pointerId]) return;
+      var ids = Object.keys(vingers);
+      if (ids.length === 2) {
+        var a = vingers[ids[0]],
+          b = vingers[ids[1]];
+        vingers[e.pointerId] = { x: e.clientX, y: e.clientY };
+        a = vingers[ids[0]];
+        b = vingers[ids[1]];
+        var afstand = Math.hypot(a.x - b.x, a.y - b.y);
+        if (laatsteAfstand) zet(schaal * (afstand / laatsteAfstand), (a.x + b.x) / 2, (a.y + b.y) / 2);
+        laatsteAfstand = afstand;
+      } else if (schaal > 1.01) {
+        tx += e.clientX - vingers[e.pointerId].x;
+        ty += e.clientY - vingers[e.pointerId].y;
+        vingers[e.pointerId] = { x: e.clientX, y: e.clientY };
+        teken();
+      } else {
+        vingers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      }
+    });
+    function los(e) {
+      var v = vingers[e.pointerId];
+      delete vingers[e.pointerId];
+      laatsteAfstand = 0;
+      // vegen naar de volgende foto als er niet ingezoomd is
+      if (v && schaal <= 1.01 && e.type === "pointerup" && Object.keys(vingers).length === 0) {
+        var dx = e.clientX - v.x;
+        if (Math.abs(dx) > 50 && lijst.length > 1) toon(i + (dx < 0 ? 1 : -1));
+      }
+    }
+    vlak.addEventListener("pointerup", los);
+    vlak.addEventListener("pointercancel", los);
+    document.addEventListener("keydown", function (e) {
+      if (box.hidden) return;
+      if (e.key === "Escape") sluit();
+      if (e.key === "ArrowLeft") toon(i - 1);
+      if (e.key === "ArrowRight") toon(i + 1);
+      if (e.key === "+" || e.key === "=") zet(schaal * 1.5);
+      if (e.key === "-") zet(schaal / 1.5);
+    });
+    box.addEventListener("click", function (e) {
+      if (e.target === box) sluit();
+    });
+    zoomBox = {
+      open: function (fotos, k, wie) {
+        lijst = fotos;
+        opener = wie;
+        toon(k);
+        box.hidden = false;
+        document.documentElement.style.overflow = "hidden";
+        box.querySelector(".x").focus();
+      },
+    };
+    return zoomBox;
+  }
+
+  function galerij(media, foto, img, model, naamVol) {
+    if (!img) return;
+    var m = typeof RT_MEDIA !== "undefined" ? RT_MEDIA[model] : null;
+    var extra = m && m.fotos ? m.fotos.filter(function (f) { return f && f.src; }) : [];
+    // de lijst voor de viewer: de getoonde foto (kaartfoto of gekozen kleur) + de extra foto's
+    function lijst() {
+      return [{ src: img.getAttribute("src"), alt: img.alt, label: huidigLabel }].concat(extra);
+    }
+    var huidigLabel = "";
+    var hoofd = img.getAttribute("src");
+    // de hoofdfoto is een knop: tikken = groot bekijken en inzoomen
+    img.classList.add("td-zoomable");
+    img.tabIndex = 0;
+    img.setAttribute("role", "button");
+    img.setAttribute("aria-label", "Groot bekijken en inzoomen: " + naamVol);
+    var hint = el("span", "td-zoom-tip", "Tik om in te zoomen");
+    foto.appendChild(hint);
+    var actief = 0; // 0 = hoofdfoto, 1.. = extra foto
+    function openViewer() {
+      zoomViewer().open(lijst(), actief, img);
+    }
+    img.addEventListener("click", openViewer);
+    img.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openViewer();
+      }
+    });
+    // kleurbolletjes veranderen de hoofdfoto: dan is die weer foto 1
+    foto.addEventListener("click", function (e) {
+      if (e.target.closest(".color-swatch")) {
+        hoofd = e.target.closest(".color-swatch").dataset.src;
+        huidigLabel = e.target.closest(".color-swatch").getAttribute("aria-label") || "";
+        kies(0);
+      }
+    });
+    var thumbs = null;
+    function kies(k) {
+      actief = k;
+      if (k === 0) img.setAttribute("src", hoofd);
+      else {
+        img.setAttribute("src", extra[k - 1].src);
+        img.alt = extra[k - 1].alt || naamVol;
+      }
+      if (thumbs)
+        thumbs.querySelectorAll("button").forEach(function (b, j) {
+          b.setAttribute("aria-pressed", j === k ? "true" : "false");
+        });
+    }
+    if (extra.length) {
+      thumbs = el("div", "td-thumbs");
+      thumbs.setAttribute("role", "group");
+      thumbs.setAttribute("aria-label", "Meer foto's van dit toestel");
+      [{ src: hoofd, label: "Vooraan", alt: naamVol }].concat(extra).forEach(function (f, k) {
+        var b = el("button", null);
+        b.type = "button";
+        b.setAttribute("aria-pressed", k === actief ? "true" : "false");
+        var ti = el("img");
+        ti.src = f.src;
+        ti.alt = "";
+        ti.loading = "lazy";
+        b.appendChild(ti);
+        b.appendChild(el("span", null, f.label || "Foto " + (k + 1)));
+        b.addEventListener("click", function () {
+          kies(k);
+        });
+        thumbs.appendChild(b);
+      });
+      media.appendChild(thumbs);
+      // de viewer start op de gekozen foto; de lijst bevat dan de hoofdfoto + alle extra's
+      img.addEventListener("click", function () {}, false);
+    }
+    // de merkvideo: pas laden als de klant op afspelen tikt (youtube-nocookie)
+    if (m && m.video && m.video.youtube && /^[\w-]{11}$/.test(m.video.youtube)) {
+      var v = m.video;
+      var vid = el("div", "td-video");
+      var knop = el("button", "td-video-start");
+      knop.type = "button";
+      knop.setAttribute("aria-label", "Video afspelen: " + (v.titel || naamVol));
+      var poster = el("img");
+      poster.src = hoofd;
+      poster.alt = "";
+      poster.loading = "lazy";
+      knop.appendChild(poster);
+      knop.appendChild(el("span", "td-video-play", "▶"));
+      var tekst = el("span", "td-video-tekst");
+      tekst.appendChild(el("b", null, "Bekijk de video"));
+      tekst.appendChild(el("small", null, "Van " + (v.kanaal || "het merk") + " op YouTube · laadt pas als u afspeelt"));
+      knop.appendChild(tekst);
+      vid.appendChild(knop);
+      knop.addEventListener("click", function () {
+        var fr = document.createElement("iframe");
+        fr.src = "https://www.youtube-nocookie.com/embed/" + v.youtube + "?autoplay=1&rel=0";
+        fr.title = v.titel || "Video: " + naamVol;
+        fr.allow = "autoplay; encrypted-media; picture-in-picture";
+        fr.setAttribute("allowfullscreen", "");
+        fr.setAttribute("loading", "lazy");
+        vid.innerHTML = "";
+        vid.appendChild(fr);
+        vid.classList.add("speelt");
+      });
+      media.appendChild(vid);
+    }
+  }
+
   // ---------- detailpagina ----------
   function vermogenTabel(card, model) {
     if (["wand", "vloer", "cassette", "kanaal", "plafond", "zuil", "monoblock"].indexOf(card.dataset.type) === -1) return null;
@@ -2576,6 +2834,8 @@ function rtKwVoorKeuze(maten, k) {
     // "Kleur" bij de kleurbolletjes, zodat duidelijk is wat ze doen
     var bolletjes = foto.querySelector(".color-swatches");
     if (bolletjes) bolletjes.insertBefore(el("span", "kleur-lbl", "Kleur"), bolletjes.firstChild);
+    // fotoreeks (klep open, zijkant, buitenunit ...), inzoomen en de merkvideo (js/toestel-media.js)
+    galerij(media, foto, img, model, merkNaam + " " + naam);
     top.appendChild(media);
 
     var info = el("div", "td-info");

@@ -9090,3 +9090,238 @@ input.is-leeg {
     max-height: 190px;
   }
 }
+
+/* ---------- toestel bekijken: fotoreeks, inzoomen en merkvideo (27 oktober 2026) ---------- */
+.td-media .device-photo {
+  position: relative;
+}
+img.td-zoomable {
+  cursor: zoom-in;
+}
+img.td-zoomable:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: -3px;
+}
+.td-zoom-tip {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(22, 40, 61, 0.78);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+.td-thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+.td-thumbs button {
+  flex: 0 0 auto;
+  width: 92px;
+  padding: 6px 6px 8px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+  text-align: center;
+}
+.td-thumbs button img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.td-thumbs button span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--body);
+}
+.td-thumbs button:hover {
+  border-color: var(--gold);
+}
+.td-thumbs button[aria-pressed="true"] {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.td-thumbs button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+/* de viewer: foto groot, inzoomen en verschuiven */
+.td-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 20, 32, 0.94);
+  display: flex;
+  flex-direction: column;
+}
+.td-zoom[hidden] {
+  display: none;
+}
+.td-zoom-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  color: #fff;
+}
+.td-zoom-cap {
+  flex: 1;
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+.td-zoom-count {
+  font-size: 0.85rem;
+  color: #dfe8ef;
+  margin-right: 8px;
+}
+.td-zoom-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.td-zoom-btn:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+.td-zoom-vlak {
+  flex: 1;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+  cursor: grab;
+}
+.td-zoom-vlak.ingezoomd {
+  cursor: move;
+}
+.td-zoom-vlak img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 12px;
+  transition: transform 0.08s linear;
+  will-change: transform;
+  user-select: none;
+}
+.td-zoom-btn.p,
+.td-zoom-btn.n {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.td-zoom-btn.p {
+  left: 12px;
+}
+.td-zoom-btn.n {
+  right: 12px;
+}
+.td-zoom.een .td-zoom-btn.p,
+.td-zoom.een .td-zoom-btn.n {
+  display: none;
+}
+.td-zoom-hint {
+  margin: 0;
+  padding: 10px 16px 14px;
+  text-align: center;
+  color: #dfe8ef;
+  font-size: 0.82rem;
+}
+/* de merkvideo: een rustig vlak met afspeelknop; YouTube laadt pas na een tik */
+.td-video {
+  margin-top: 14px;
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--ink);
+}
+.td-video-start {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  color: #fff;
+}
+.td-video-start img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
+}
+.td-video-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 66px;
+  height: 66px;
+  margin: -33px 0 0 -33px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 1.5rem;
+  display: grid;
+  place-items: center;
+  padding-left: 5px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.td-video-start:hover .td-video-play {
+  transform: scale(1.06);
+}
+.td-video-tekst {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  text-align: left;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+.td-video-tekst b {
+  display: block;
+  font-size: 1rem;
+}
+.td-video-tekst small {
+  display: block;
+  font-size: 0.76rem;
+  opacity: 0.9;
+}
+.td-video iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+@media (max-width: 760px) {
+  .td-thumbs button {
+    width: 78px;
+  }
+  .td-zoom-top {
+    padding: 10px 12px;
+  }
+}
