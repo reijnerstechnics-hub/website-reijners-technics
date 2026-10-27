@@ -29,10 +29,11 @@ var RT_PRIJZEN = {
     premium: { titel: "Premium", uitleg: "Het beste wat er is" },
   },
   wensen: [
+    // Rim (27-10-2026): Daikin en Mitsubishi minstens bij "Beste prijs-kwaliteit"; enkel hun kale instapmodellen bij "Voordelig".
     { id: "prijs", vraag: "Zo voordelig mogelijk", uitleg: "Een betrouwbaar toestel tegen een scherpe prijs", markeer: "voordelig",
-      voorstellen: { voordelig: "Nuova Infinity AI Smart", kwaliteit: "Daikin Perfera", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
+      voorstellen: { voordelig: "Nuova Infinity AI Smart", kwaliteit: "Mitsubishi Electric MSZ-AY Compact", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
     { id: "kwaliteit", vraag: "Goede prijs-kwaliteit", uitleg: "Een topmerk dat jarenlang meegaat", markeer: "kwaliteit",
-      voorstellen: { voordelig: "Nuova Infinity AI Smart", kwaliteit: "Daikin Perfera", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
+      voorstellen: { voordelig: "Daikin Sensira", kwaliteit: "Daikin Comfora", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
     { id: "stil", vraag: "Extra stil en zuinig", uitleg: "Fluisterstil en zo weinig mogelijk verbruik", markeer: "premium",
       voorstellen: { voordelig: "Nuova Stellar Inverter", kwaliteit: "Mitsubishi Electric MSZ-AY Compact", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
     { id: "design", vraag: "Mooi design", uitleg: "Een toestel dat mooi in uw interieur past", markeer: "kwaliteit",
@@ -218,11 +219,6 @@ var RT_PRIJZEN = {
       { poorten: 4, kw: 8.0, prijs: 1765 },
       { poorten: 5, kw: 10.0, prijs: 2040 },
     ] },
-    "daikin-mxf": { naam: "Daikin Sensira 2MXF", units: [
-      { poorten: 2, kw: 0.0, prijs: 0 },
-      { poorten: 4, kw: 0.0, prijs: 0 },
-      { poorten: 1280, kw: 0.0, prijs: 0 },
-    ] },
     "daikin-mxm": { naam: "Daikin MXM", units: [
       { poorten: 2, kw: 4.0, prijs: 1322 },
       { poorten: 2, kw: 5.0, prijs: 1485 },
@@ -233,6 +229,11 @@ var RT_PRIJZEN = {
       { poorten: 4, kw: 6.8, prijs: 2281 },
       { poorten: 4, kw: 8.0, prijs: 2645 },
       { poorten: 5, kw: 9.0, prijs: 3028 },
+    ] },
+    "daikin-mxf": { naam: "Daikin Sensira 2MXF", units: [
+      { poorten: 2, kw: 0.0, prijs: 0 },
+      { poorten: 4, kw: 0.0, prijs: 0 },
+      { poorten: 1280, kw: 0.0, prijs: 0 },
     ] },
   },
 };
