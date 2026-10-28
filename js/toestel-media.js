@@ -16,7 +16,7 @@ var RT_MEDIA ={
       {
         "src": "assets/img/t-lg-dualcool-wz-serie-2.webp",
         "label": "Klep dicht",
-        "alt": "LG DualCool WZ binnenunit, vooraanzicht met gesloten klep"
+        "alt": "LG DualCool WZ binnenunit, schuin van voren met gesloten klep"
       },
       {
         "src": "assets/img/t-lg-dualcool-wz-serie-3.webp",
@@ -60,13 +60,13 @@ var RT_MEDIA ={
     "fotos": [
       {
         "src": "assets/img/t-lg-standard-plus-dualcool-special-p-pz-serie-2.webp",
-        "label": "Klep open",
-        "alt": "LG Standard Plus PZ binnenunit met open klep"
+        "label": "Zijkant",
+        "alt": "LG Standard Plus PZ binnenunit, schuin van opzij"
       },
       {
         "src": "assets/img/t-lg-standard-plus-dualcool-special-p-pz-serie-3.webp",
-        "label": "Zijkant",
-        "alt": "LG Standard Plus PZ binnenunit, schuin van opzij"
+        "label": "Bovenkant",
+        "alt": "LG Standard Plus PZ binnenunit, van boven gezien"
       },
       {
         "src": "assets/img/t-lg-standard-plus-dualcool-special-p-pz-serie-4.webp",
@@ -94,8 +94,8 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-lg-dualcool-ai-air-special-smart-inverter-4.webp",
-        "label": "Zijkant",
-        "alt": "LG DualCool AI Air Special binnenunit van opzij"
+        "label": "Detail",
+        "alt": "LG DualCool AI Air Special binnenunit, close-up van de uitblaasopening"
       }
     ],
     "video": {
@@ -234,13 +234,13 @@ var RT_MEDIA ={
     "fotos": [
       {
         "src": "assets/img/t-lg-standard-plus-smart-inverter-multi-pm05sp-pm15sp-2.webp",
-        "label": "Klep open",
-        "alt": "LG Standard Plus multi-split binnenunit met open klep"
+        "label": "Zijkant",
+        "alt": "LG Standard Plus multi-split binnenunit, schuin van opzij"
       },
       {
         "src": "assets/img/t-lg-standard-plus-smart-inverter-multi-pm05sp-pm15sp-3.webp",
-        "label": "Zijkant",
-        "alt": "LG Standard Plus multi-split binnenunit, schuin van opzij"
+        "label": "Bovenkant",
+        "alt": "LG Standard Plus multi-split binnenunit, van boven gezien"
       }
     ],
     "video": null
@@ -916,14 +916,14 @@ var RT_MEDIA ={
   "Nuova Infinity AI Smart": {
     "fotos": [
       {
-        "src": "assets/img/t-nuova-infinity-ai-smart-2.webp",
+        "src": "assets/img/t-nuova-infinity-ai-smart-3.webp",
         "label": "Klep open",
         "alt": "Nuova Infinity AI Smart binnenunit in wit, vooraanzicht met open klep"
       },
       {
-        "src": "assets/img/t-nuova-infinity-ai-smart-3.webp",
+        "src": "assets/img/t-nuova-infinity-ai-smart-2.webp",
         "label": "Zijkant",
-        "alt": "Nuova Infinity AI Smart binnenunit in wit, zijaanzicht met open klep"
+        "alt": "Nuova Infinity AI Smart binnenunit in wit, schuin van opzij met open klep"
       },
       {
         "src": "assets/img/t-nuova-infinity-ai-smart-4.webp",
@@ -1021,14 +1021,9 @@ var RT_MEDIA ={
   "Daikin Sensira": {
     "fotos": [
       {
-        "src": "assets/img/t-daikin-sensira-2.webp",
-        "label": "Vooraanzicht",
-        "alt": "Daikin Sensira FTXF-F binnenunit, vooraanzicht"
-      },
-      {
         "src": "assets/img/t-daikin-sensira-3.webp",
         "label": "Zijkant",
-        "alt": "Daikin Sensira FTXF-F binnenunit, schuin van links"
+        "alt": "Daikin Sensira FTXC-E binnenunit, schuin van links"
       },
       {
         "src": "assets/img/t-daikin-sensira-4.webp",
@@ -1038,7 +1033,7 @@ var RT_MEDIA ={
       {
         "src": "assets/img/t-daikin-sensira-5.webp",
         "label": "Afstandsbediening",
-        "alt": "Daikin afstandsbediening ARC470A1 van de Sensira"
+        "alt": "Afstandsbediening van de Daikin Sensira FTXC-E"
       }
     ],
     "video": null

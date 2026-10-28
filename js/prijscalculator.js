@@ -28,10 +28,10 @@
   var NIVEAUS = ["voordelig", "kwaliteit", "premium"];
 
   var SIZES = [
-    { v: "s", t: "Klein", s: "tot 15 m²", m2: 12 },
-    { v: "m", t: "Gemiddeld", s: "15 tot 25 m²", m2: 20 },
-    { v: "l", t: "Groot", s: "25 tot 40 m²", m2: 32 },
-    { v: "xl", t: "Heel groot", s: "meer dan 40 m²", m2: 48 },
+    { v: "s", t: "Klein", s: "tot 15\u00a0m²", m2: 12 },
+    { v: "m", t: "Gemiddeld", s: "15 tot 25\u00a0m²", m2: 20 },
+    { v: "l", t: "Groot", s: "25 tot 40\u00a0m²", m2: 32 },
+    { v: "xl", t: "Heel groot", s: "meer dan 40\u00a0m²", m2: 48 },
   ];
 
   var euro = new Intl.NumberFormat("nl-BE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
@@ -303,7 +303,7 @@
     aantal: function () {
       var h = q("In hoeveel kamers wilt u een airco?", "Tel elke kamer waar een toestel moet komen.");
       h += '<div class="pc-opts pc-opts-n">';
-      for (var n = 1; n <= 6; n++) h += opt('data-n="' + n + '"', state.n === n, n === 6 ? "6 of meer" : String(n), n === 1 ? "kamer" : "kamers");
+      for (var n = 1; n <= 6; n++) h += opt('data-n="' + n + '"', state.n === n, n === 6 ? "6+" : String(n), n === 1 ? "kamer" : "kamers");
       h += "</div>";
       if (state.n === 6) h += '<p class="pc-hint">Bij meer dan 6 kamers rekenen we met 6. De rest bespreken we graag samen.</p>';
       return h;
@@ -438,7 +438,7 @@
           P.btw.standaard +
           "% btw (woning ouder dan 10 jaar; jonger: " +
           P.btw.nieuw +
-          "% btw). Stroom vanuit de zekeringkast of een langere leiding komt erbij. De echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest. Dat plaatsbezoek is gratis.") +
+          "% btw). Stroom vanuit de zekeringkast of een langere leiding komt erbij. De echte prijs krijgt u in de offerte, nadat Rim bij u langs is geweest. Dat plaatsbezoek is gratis.") +
       "</p>";
     if (P.voorlopig) h += '<div class="pc-demo">Let op: dit prijsadvies gebruikt nog voorbeeldprijzen.</div>';
 
@@ -446,7 +446,7 @@
     var gk = results[state.gekozen];
     h += '<div class="pc-lead pc-vs-lead">';
     if (state.sent) {
-      h += '<b>Bedankt! Rim belt u binnen 24 uur terug.</b><span class="pc-muted">Dan plannen we samen het gratis plaatsbezoek.</span>';
+      h += '<b>Bedankt! Rim belt u binnen 24\u00a0uur terug.</b><span class="pc-muted">Dan plannen we samen het gratis plaatsbezoek.</span>';
     } else {
       h +=
         "<div><b>" +
@@ -456,7 +456,7 @@
         esc(gk.model.cfg.merk + " " + gk.model.cfg.naam) +
         " &middot; " +
         (gk.opMaat ? "prijs op maat" : "richtprijs " + eur(gk.lo)) +
-        '</b><span class="pc-muted">Rim belt u binnen 24 uur terug en komt gratis langs. Daarna krijgt u een vaste offerte.</span></div>' +
+        '</b><span class="pc-muted">Rim belt u binnen 24\u00a0uur terug en komt gratis langs. Daarna krijgt u een vaste offerte.</span></div>' +
         '<div class="pc-vs-form">' +
         '<div class="field"><label for="pc-naam">Naam</label><input id="pc-naam" type="text" autocomplete="name"></div>' +
         '<div class="field"><label for="pc-tel">Telefoon</label><input id="pc-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="04xx xx xx xx"></div>' +
@@ -517,6 +517,10 @@
   });
 
   // Enter springt naar het volgende veld; op het laatste veld wordt verstuurd (zoals op Home)
+  // de rode rand van een leeg veld verdwijnt zodra de bezoeker typt
+  root.addEventListener("input", function (e) {
+    if (e.target.classList) e.target.classList.remove("is-leeg");
+  });
   root.addEventListener("keydown", function (e) {
     var velden = ["pc-naam", "pc-tel", "pc-gem"];
     var i = velden.indexOf(e.target.id);
@@ -535,12 +539,22 @@
     if (!naam || !tel || !gem) {
       st.textContent = "Vul uw naam, telefoonnummer en gemeente in.";
       st.className = "calc-status err";
+      // zoals in het formulier op Home: rode rand rond de lege velden, focus op het eerste
+      var eerste = null;
+      ["pc-naam", "pc-tel", "pc-gem"].forEach(function (id) {
+        var veld = document.getElementById(id);
+        var leeg = !veld.value.trim();
+        veld.classList.toggle("is-leeg", leeg);
+        if (leeg && !eerste) eerste = veld;
+      });
+      if (eerste) eerste.focus();
       return;
     }
     // zelfde controle als in het formulier op Home: minstens 8 cijfers
     if (tel.replace(/\D/g, "").length < 8) {
       st.textContent = "Kijk uw telefoonnummer even na, dan kan Rim u terugbellen.";
       st.className = "calc-status err";
+      document.getElementById("pc-tel").classList.add("is-leeg");
       document.getElementById("pc-tel").focus();
       return;
     }
@@ -595,7 +609,15 @@
       })
       .catch(function () {
         btn.disabled = false;
-        st.innerHTML = 'Versturen lukte niet. Probeer het opnieuw of bel <a href="tel:+32491113313">+32 491 11 33 13</a>.';
+        // zoals in het formulier op Home: de aanvraag kan ook via WhatsApp, met het voorstel erin
+        var wa =
+          "Hallo Rim, ik vroeg een offerte via het prijsadvies op de website.\nToestel: " +
+          res.model.cfg.model +
+          "\nNaam: " + naam + "\nTelefoon: " + tel + "\nGemeente: " + gem;
+        st.innerHTML =
+          'Versturen lukte niet. <a href="https://wa.me/32491113313?text=' +
+          encodeURIComponent(wa) +
+          '" target="_blank" rel="noopener">Stuur uw aanvraag via WhatsApp</a> of bel <a href="tel:+32491113313">+32 491 11 33 13</a>.';
         st.className = "calc-status err";
       });
   }

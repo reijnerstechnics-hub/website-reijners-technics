@@ -314,7 +314,7 @@ function sendLead(data) {
 
     sendLead(data)
       .then(function () {
-        done(true, "Bedankt, " + data.naam + "! Rim belt u binnen 24 uur terug.");
+        done(true, "Bedankt, " + data.naam + "! Rim belt u binnen 24\u00a0uur terug.");
         if (window.rtLeadDone) window.rtLeadDone(data.naam);
       })
       .catch(function () {
@@ -522,6 +522,9 @@ function sendLead(data) {
     if (digits.length < 8) {
       statusEl.textContent = "Kijk uw telefoonnummer even na, dan kan Rim u terugbellen.";
       statusEl.className = "calc-status err";
+      var telVeld = document.getElementById("calc-telefoon");
+      telVeld.classList.add("is-leeg");
+      telVeld.focus();
       return;
     }
     state.naam = naam;
@@ -564,7 +567,7 @@ function sendLead(data) {
   function showDone() {
     document.getElementById("calc-done-title").textContent = "Bedankt, " + state.naam + "!";
     document.getElementById("calc-done-text").textContent =
-      "Uw aanvraag is goed ontvangen. Rim belt u binnen 24 uur terug op " + state.telefoon + ".";
+      "Uw aanvraag is goed ontvangen. Rim belt u binnen 24\u00a0uur terug op " + state.telefoon + ".";
     var isNieuw = state.dienst === "nieuw";
     document.getElementById("calc-extra-nieuw").hidden = !isNieuw;
     document.getElementById("calc-extra-onderhoud").hidden = state.dienst !== "onderhoud";
@@ -913,7 +916,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.360 euro, standaardplaatsing met 5 meter leiding en 6% btw inbegrepen voor een woning ouder dan 10 jaar; een langere leiding of stroom vanuit de zekeringkast komt erbij; onderhoud 150 tot 200 euro, exclusief btw; herstelling 100 tot 150 euro voor de verplaatsing en het eerste uur, exclusief btw); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24 uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.360 euro, standaardplaatsing met 5 meter leiding en 6% btw inbegrepen voor een woning ouder dan 10 jaar; een langere leiding of stroom vanuit de zekeringkast komt erbij; onderhoud 150 tot 200 euro, exclusief btw; herstelling 100 tot 150 euro voor de verplaatsing en het eerste uur, exclusief btw); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24\u00a0uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -1600,7 +1603,7 @@ function rtKwVoorKeuze(maten, k) {
   var actiefTekst = document.createElement("span");
   var actiefWis = document.createElement("button");
   actiefWis.type = "button";
-  actiefWis.textContent = "Alle toestellen tonen";
+  actiefWis.textContent = "Toon alle toestellen";
   actiefWis.addEventListener("click", function () {
     if (zoek) zoek.value = "";
     zoekNaar("");
@@ -1766,7 +1769,7 @@ function rtKwVoorKeuze(maten, k) {
     { id: "3", label: "3,5 kW", sub: "28-39 m²", zin: "van ongeveer 3,5 kW", van: 2.95, tot: 3.95 },
     { id: "5", label: "5 kW", sub: "39-56 m²", zin: "van ongeveer 5 kW", van: 3.95, tot: 5.45 },
     { id: "7", label: "7 kW", sub: "56-78 m²", zin: "van ongeveer 7 kW", van: 5.45, tot: 7.55 },
-    { id: "groot", label: "Meer dan 7,5 kW", sub: "meer dan 78 m²", zin: "van meer dan 7,5 kW", van: 7.55, tot: 999 },
+    { id: "groot", label: "Meer dan 7,5\u00a0kW", sub: "meer dan 78 m²", zin: "van meer dan 7,5 kW", van: 7.55, tot: 999 },
   ];
   function kwKeuze(id) {
     for (var i = 0; i < KW_KEUZES.length; i++) if (KW_KEUZES[i].id === id) return KW_KEUZES[i];
@@ -2121,6 +2124,10 @@ function rtKwVoorKeuze(maten, k) {
     dd.addEventListener("mouseleave", function () {
       dd.classList.remove("dicht");
     });
+    // met het toetsenbord: komt de focus terug in het menu, dan mag het weer openen
+    dd.addEventListener("focusin", function () {
+      dd.classList.remove("dicht");
+    });
   });
 
   render();
@@ -2264,7 +2271,7 @@ function rtKwVoorKeuze(maten, k) {
       m.dataset.kw = n;
       maten.appendChild(m);
     });
-    if (kw.bereik) maten.appendChild(el("span", "bereik", rtKwTekst(kw.bereik[0]) + " – " + rtKwTekst(kw.bereik[1])));
+    if (kw.bereik) maten.appendChild(el("span", "bereik", rtKwTekst(kw.bereik[0]) + " - " + rtKwTekst(kw.bereik[1])));
     box.appendChild(maten);
     return box;
   }
@@ -2384,7 +2391,7 @@ function rtKwVoorKeuze(maten, k) {
     box.appendChild(lbl);
     box.appendChild(bedrag);
     box.appendChild(uitleg);
-    var btw = "standaardplaatsing (5 m leiding inbegrepen) en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar).";
+    var btw = "een standaardplaatsing (5 m leiding inbegrepen) en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar).";
     var echt = " Stroom vanuit de zekeringkast of een langere leiding komt erbij; de echte prijs krijgt u in de offerte, na het gratis plaatsbezoek.";
     function toon(kw) {
       var p = kw && richtprijs(model, kw);
@@ -2657,8 +2664,10 @@ function rtKwVoorKeuze(maten, k) {
     var thumbs = null;
     function kies(k) {
       actief = k;
-      if (k === 0) img.setAttribute("src", hoofd);
-      else {
+      if (k === 0) {
+        img.setAttribute("src", hoofd);
+        img.alt = naamVol;
+      } else {
         img.setAttribute("src", extra[k - 1].src);
         img.alt = extra[k - 1].alt || naamVol;
       }
@@ -2789,7 +2798,7 @@ function rtKwVoorKeuze(maten, k) {
         var p = richtprijs(model, n);
         tr.appendChild(el("td", p ? null : "td-kw-geen", p ? euro.format(p.lo) : "op aanvraag"));
       } else {
-        tr.appendChild(el("td", null, "ca. " + (n === nums[0] ? "tot " : Math.round(n / 0.12) + " - ") + Math.round(n / 0.09) + " m²"));
+        tr.appendChild(el("td", null, "ca. " + (n === nums[0] ? "tot " : Math.round(n / 0.12) + "-") + Math.round(n / 0.09) + " m²"));
       }
       t.appendChild(tr);
     });
@@ -2800,7 +2809,7 @@ function rtKwVoorKeuze(maten, k) {
           "p",
           "td-kw-noot",
           "Richtprijs voor een standaardplaatsing (5 m leiding inbegrepen), met " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar; jonger: " + RT_PRIJZEN.btw.nieuw +
-            "% btw). De echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest."
+            "% btw). De echte prijs krijgt u in de offerte, nadat Rim bij u langs is geweest."
         )
       );
     return box;
@@ -2810,8 +2819,8 @@ function rtKwVoorKeuze(maten, k) {
   // past ook in een kleinere kamer, dus daar staat "tot": een slaapkamer van 12 m² hoort er ook bij.
   function ruimteTekst(n, kleinste) {
     return kleinste
-      ? "voor een kamer tot " + Math.round(n / 0.09) + " m²"
-      : "voor een kamer van " + Math.round(n / 0.12) + " tot " + Math.round(n / 0.09) + " m²";
+      ? "Voor een kamer tot ongeveer " + Math.round(n / 0.09) + " m²"
+      : "Voor een kamer van ongeveer " + Math.round(n / 0.12) + " tot " + Math.round(n / 0.09) + " m²";
   }
   function kleinsteMaat(card) {
     var kw = rtKw(card);
@@ -2821,7 +2830,7 @@ function rtKwVoorKeuze(maten, k) {
   function kwZin(card, n, metPrijs) {
     var t = card.dataset.type;
     if (t === "buiten") return "Welk vermogen past, hangt af van de binnenunits. Dat rekenen we voor u uit.";
-    if (n) return "Ongeveer " + ruimteTekst(n, n === kleinsteMaat(card)) + ".";
+    if (n) return ruimteTekst(n, n === kleinsteMaat(card)) + ".";
     if (t === "mobiel") return "Twijfelt u? Rim helpt u graag kiezen.";
     return (metPrijs ? "Kies een vermogen voor de richtprijs. " : "") + "Twijfelt u? Het juiste vermogen bepalen we samen bij het gratis plaatsbezoek.";
   }
@@ -2877,7 +2886,13 @@ function rtKwVoorKeuze(maten, k) {
 
     var info = el("div", "td-info");
     info.appendChild(el("div", "device-brand", merkNaam + " · " + card.querySelector(".device-brand").textContent.replace(/^Airco · /, "")));
-    var h1 = el("h1", null, naam);
+    // een woord met een koppelteken ("4-weg", "FTXF-F") niet over twee regels
+    var h1 = el("h1");
+    naam.split(" ").forEach(function (w, i) {
+      if (i) h1.appendChild(document.createTextNode(" "));
+      if (w.indexOf("-") > 0) h1.appendChild(el("span", "nw", w));
+      else h1.appendChild(document.createTextNode(w));
+    });
     if (sub) h1.appendChild(el("span", "device-sub", " " + sub.textContent));
     info.appendChild(h1);
     var groep = rtGroep(card.dataset.type);
@@ -2929,7 +2944,7 @@ function rtKwVoorKeuze(maten, k) {
     acts.appendChild(wa);
     acts.appendChild(mail);
     info.appendChild(acts);
-    info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Rim belt u binnen 24 uur terug · U beslist pas na de offerte"));
+    info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Rim belt u binnen 24\u00a0uur terug · U beslist pas na de offerte"));
     top.appendChild(info);
     detail.appendChild(top);
 
@@ -2944,7 +2959,7 @@ function rtKwVoorKeuze(maten, k) {
       var dt = el("dt");
       dt.appendChild(s[0].cloneNode(true));
       dl.appendChild(dt);
-      dl.appendChild(el("dd", null, s[s.length - 1].textContent));
+      dl.appendChild(el("dd", null, s[s.length - 1].textContent.replace(/(\d) (?=kW|m²|dB)/g, "$1\u00a0")));
     });
     specs.appendChild(dl);
     body.appendChild(specs);
@@ -3362,8 +3377,8 @@ function rtKwVoorKeuze(maten, k) {
   var month = new Date().getMonth();
   var mode = month >= 4 && month <= 8 ? "cool" : "warm";
   var SUB = {
-    cool: "Koel en stil, ook op de warmste zomerdag. Binnen 24 uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.",
-    warm: "Behaaglijk warm deze winter, met een warmtepomp: een airco die ook verwarmt. Binnen 24 uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.",
+    cool: "Koel en stil, ook op de warmste zomerdag. Binnen 24\u00a0uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.",
+    warm: "Behaaglijk warm deze winter, met een warmtepomp: een airco die ook verwarmt. Binnen 24\u00a0uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.",
   };
   var tempEl = document.getElementById("v4-temp");
   var lblEl = document.getElementById("v4-thlbl");
