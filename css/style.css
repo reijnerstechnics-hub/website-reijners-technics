@@ -9325,3 +9325,11 @@ img.td-zoomable:focus-visible {
     padding: 10px 12px;
   }
 }
+/* de miniaturenrij mag de fotokolom niet breder maken dan het scherm (gsm) */
+.td-media {
+  min-width: 0;
+  max-width: 100%;
+}
+.td-thumbs {
+  max-width: 100%;
+}
