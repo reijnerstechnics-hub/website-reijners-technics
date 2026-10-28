@@ -9580,3 +9580,198 @@ img.td-zoomable:focus-visible {
     padding: 22px 20px;
   }
 }
+
+/* ---------- diensten: drie tegels naast elkaar, zoals de pagina Contact (Rims keuze van 28-10-2026) ---------- */
+/* Elke dienst is een witte kaart met een eigen foto, één zin en één gouden knop. "Meer over ..." staat als een
+   rustige knop onder de tegel; het paneel klapt over de volle breedte onder de drie tegels open. De .faq-item
+   staat op display: contents, zodat de knop en het paneel zelf in het raster staan. Geen .rv op de tegels:
+   op gsm bleef een hoge, nog niet "verschenen" kaart anders even als leeg vlak staan. */
+.dn-sec {
+  padding-bottom: 64px;
+}
+.dn-tegels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 20px;
+  align-items: stretch;
+}
+.dn-tegel {
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--sh-1);
+  overflow: hidden;
+}
+.dn-foto {
+  aspect-ratio: 4 / 3;
+  background: var(--surface-alt);
+}
+.dn-foto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.dn-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 20px 22px 22px;
+}
+.dn-body .v3-kicker {
+  margin-bottom: 10px;
+}
+.dn-body h2 {
+  font-size: 1.28rem;
+  line-height: 1.25;
+  margin: 0;
+}
+.dn-body > p {
+  margin: 10px 0 0;
+  color: var(--body);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+.dn-body .btn {
+  margin-top: auto;
+  padding-top: 13px;
+  padding-bottom: 13px;
+  justify-content: center;
+  width: 100%;
+  font-size: 0.95rem;
+}
+.dn-body > p + .btn {
+  margin-top: 18px;
+}
+.dn-body > p.dn-dringend {
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+  text-align: center;
+}
+.dn-dringend a {
+  color: var(--sky);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* "Meer over ...": rustige knop onder de tegel, zelfde plus-icoon als bij de veelgestelde vragen */
+.faq-item.dn-meer {
+  display: contents;
+}
+.dn-meer .faq-q {
+  grid-row: 2;
+  margin-top: 10px;
+  min-height: 44px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+.dn-meer .faq-q:hover {
+  background: #fff;
+}
+.dn-meer.dn-1 .faq-q {
+  grid-column: 1;
+}
+.dn-meer.dn-2 .faq-q {
+  grid-column: 2;
+}
+.dn-meer.dn-3 .faq-q {
+  grid-column: 3;
+}
+.dn-meer .faq-a-wrap {
+  grid-column: 1 / -1;
+}
+.dn-meer.dn-1 .faq-a-wrap {
+  grid-row: 3;
+}
+.dn-meer.dn-2 .faq-a-wrap {
+  grid-row: 4;
+}
+.dn-meer.dn-3 .faq-a-wrap {
+  grid-row: 5;
+}
+.dn-meer .faq-a p {
+  padding: 0;
+}
+/* het paneel: dezelfde witte kaart, met de bestaande blokken (stappen, richtprijs, voordelen) */
+.dn-paneel.svc-meer-body {
+  margin: 12px 0 10px;
+  padding: 24px 26px 26px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--sh-1);
+}
+.dn-paneel h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-tekst);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.dn-paneel .svc-plus h3 {
+  color: var(--gold-text);
+}
+
+@media (max-width: 1000px) and (min-width: 701px) {
+  .dn-tegels {
+    gap: 0 14px;
+  }
+  .dn-body {
+    padding: 18px 18px 20px;
+  }
+  .dn-body h2 {
+    font-size: 1.15rem;
+  }
+  .dn-body .btn {
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 0.9rem;
+  }
+}
+@media (max-width: 700px) {
+  /* gsm: tegel, "Meer over ..." en paneel onder elkaar, per dienst */
+  .dn-sec {
+    padding-bottom: 52px;
+  }
+  .dn-tegels {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dn-tegels .dn-tegel,
+  .dn-tegels .dn-meer .faq-q,
+  .dn-tegels .dn-meer .faq-a-wrap {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .dn-tegel.dn-1 { order: 1; }
+  .dn-meer.dn-1 .faq-q { order: 2; }
+  .dn-meer.dn-1 .faq-a-wrap { order: 3; }
+  .dn-tegel.dn-2 { order: 4; }
+  .dn-meer.dn-2 .faq-q { order: 5; }
+  .dn-meer.dn-2 .faq-a-wrap { order: 6; }
+  .dn-tegel.dn-3 { order: 7; }
+  .dn-meer.dn-3 .faq-q { order: 8; }
+  .dn-meer.dn-3 .faq-a-wrap { order: 9; }
+  .dn-meer .faq-a-wrap {
+    margin-bottom: 22px;
+  }
+  .dn-meer.dn-3 .faq-a-wrap {
+    margin-bottom: 0;
+  }
+  .dn-foto {
+    aspect-ratio: 16 / 10;
+  }
+  .dn-paneel.svc-meer-body {
+    padding: 20px 18px 22px;
+  }
+  /* "Bel Rim" onder de herstelknop: tikdoel van 44 px */
+  .dn-dringend a {
+    display: inline-block;
+    padding: 11px 6px;
+  }
+}

@@ -509,144 +509,135 @@
   </div>
 </section>
 
-<section class="v2-after-phead" data-page="diensten">
+<section class="alt v2-after-phead dn-sec" data-page="diensten">
   <div class="wrap">
 
-    <h2 class="sr-only">Onze drie diensten</h2>
-    <!-- Sinds 27-10-2026 (Rims keuze): per dienst één blok met daaronder "Meer over ..." (inklapbaar, zelfde
-         mechaniek als de veelgestelde vragen: .faq-item/.faq-q in js/main.js). De stappen staan al op Home ("Zo werkt het"). -->
-    <div class="svc-blokken">
+    <!-- Sinds 28-10-2026 (Rims keuze): drie tegels naast elkaar (op gsm onder elkaar), in dezelfde stijl als de
+         pagina Contact: witte kaarten, veel ruimte, één gouden knop per tegel. Elke tegel heeft een eigen foto van
+         een plaatsing van Rim, één zin en de knop. De uitleg zit achter "Meer over ..." (zelfde open- en
+         dichtklappen als de veelgestelde vragen: .faq-item/.faq-q in js/main.js). Het paneel klapt op computer en
+         tablet over de volle breedte onder de drie tegels open (.faq-item staat op display: contents, zodat de knop
+         en het paneel zelf in het raster .dn-tegels staan); op gsm staat alles gewoon onder elkaar. -->
+    <div class="dn-tegels">
 
-      <article class="svc-blok rv" id="dienst-nieuw">
-        <div class="svc-blok-kop">
-          <div class="svc-blok-ph"><img src="assets/img/g-n67.webp" alt="Wit MHI-wandmodel tegen een lichtgrijze muur" width="779" height="585"></div>
-          <div class="svc-blok-tx">
-            <div class="idx mono">01 / NIEUW TOESTEL</div>
-            <h3>Een nieuwe airco of warmtepomp laten plaatsen</h3>
-            <p>We plaatsen airco's en warmtepompen als single-split (één binnenunit op één buitenunit) of multi-split (meerdere binnenunits op één buitenunit). We adviseren u over het juiste vermogen en leveren een werkende, netjes afgewerkte installatie op.</p>
-            <ul class="v4-gets"><li>Advies over het juiste vermogen</li><li>Gratis plaatsbezoek en een duidelijke offerte</li><li>Nette plaatsing, testen en uitleg</li></ul>
-            <div class="svc-blok-acties">
-              <a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="nieuw">Plaatsing aanvragen <span class="ar">&rarr;</span></a>
-            </div>
-          </div>
-        </div>
-        <div class="faq-item svc-meer">
-          <button type="button" class="faq-q" aria-expanded="false">
-            <span>Meer over een nieuwe airco of warmtepomp</span>
-            <span class="faq-icon" aria-hidden="true">+</span>
-          </button>
-          <div class="faq-a-wrap"><div class="faq-a"><div class="svc-meer-body">
-            <p class="svc-lead">U wilt uw huis het hele jaar aangenaam houden: in de zomer koel en stil, in de winter behaaglijk warm. We adviseren het juiste systeem en plaatsen het netjes.</p>
-            <div class="svc-meer-grid">
-              <div class="svc-box">
-                <h4>Stappen</h4>
-                <ol>
-                  <li><strong>Gratis plaatsbezoek</strong>: we meten op, kijken waar alles komt en bespreken budget en mogelijkheden.</li>
-                  <li><strong>Eerlijke offerte</strong>: u ziet precies wat het kost en wat u krijgt. Geen verplichtingen.</li>
-                  <li><strong>Professionele plaatsing</strong>: we plaatsen, testen en leggen alles rustig uit.</li>
-                  <li><strong>Comfort en nazorg</strong>: ook later voor onderhoud belt u hetzelfde nummer.</li>
-                </ol>
-              </div>
-              <div class="svc-facts">
-                <div><span>Merken</span><p>Daikin, LG, Mitsubishi Electric, Mitsubishi Heavy Industries (MHI), Nuova en Toshiba. <a href="#toestellen" style="color:var(--sky);">Bekijk alle toestellen</a></p></div>
-                <div><span>Richtprijs</span><p><strong>Eén kamer: meestal &euro;1.400 tot &euro;2.500</strong> (een designmodel tot ongeveer &euro;3.100). Twee kamers op één buitenunit: ongeveer &euro;2.300 tot &euro;4.100; drie kamers: &euro;3.100 tot &euro;5.900. Standaardplaatsing en 6% btw inbegrepen, voor een woning ouder dan 10 jaar (jonger: 21% btw). <a href="#prijs" style="color:var(--sky);">Bereken uw richtprijs</a> of bekijk de richtprijs bij elk toestel.</p></div>
-                <div><span>Wat zit erin</span><p>Het toestel, tot 5 m leiding tussen binnen- en buitenunit, de plaatsing, het vacuüm trekken en het opstarten. <strong>Wat kan erbij komen:</strong> een langere leiding, stroom vanuit de zekeringkast, of vanaf vier binnenunits. Dat ziet Rim bij het gratis plaatsbezoek; de echte prijs staat in de offerte.</p></div>
-              </div>
-              <div class="svc-plus">
-                <h4>Voordelen</h4>
-                <ul>
-                  <li>Gratis plaatsbezoek</li>
-                  <li>Geen callcenter: Rim belt u zelf terug</li>
-                  <li>Eerlijk advies, niet de duurste optie</li>
-                  <li>Nette plaatsing</li>
-                </ul>
-              </div>
-            </div>
-          </div></div></div>
+      <article class="dn-tegel dn-1" id="dienst-nieuw">
+        <div class="dn-foto"><img src="assets/img/g-n91.webp" alt="Wit Daikin-wandmodel hoog tegen de muur, naast het raam" width="1200" height="900"></div>
+        <div class="dn-body">
+          <div class="v3-kicker">Nieuw toestel</div>
+          <h2>Een nieuwe airco of warmtepomp laten plaatsen</h2>
+          <p>Single-split of multi-split, met advies over het juiste vermogen, een gratis plaatsbezoek en een nette, geteste plaatsing.</p>
+          <a class="btn btn-gold" href="#calculator" data-start-dienst="nieuw">Plaatsing aanvragen <span class="ar">&rarr;</span></a>
         </div>
       </article>
 
-      <article class="svc-blok rv" id="dienst-onderhoud">
-        <div class="svc-blok-kop">
-          <div class="svc-blok-ph"><img src="assets/img/g-n29.webp" alt="Twee Daikin-buitenunits met de meters aangesloten" loading="lazy" width="1372" height="1029"></div>
-          <div class="svc-blok-tx">
-            <div class="idx mono">02 / JAARLIJKS NAZICHT</div>
-            <h3>Uw toestel laten onderhouden</h3>
-            <p>Een jaarlijks nazicht en een grondige reiniging houden uw airco of warmtepomp zuinig en verlengen de levensduur.</p>
-            <ul class="v4-gets"><li>Filters en buitenunit gereinigd</li><li>Werking en koudemiddel nagekeken</li><li>Zuiniger, en het toestel gaat langer mee</li></ul>
-            <div class="svc-blok-acties">
-              <a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="onderhoud">Onderhoud aanvragen <span class="ar">&rarr;</span></a>
-            </div>
-          </div>
-        </div>
-        <div class="faq-item svc-meer">
-          <button type="button" class="faq-q" aria-expanded="false">
-            <span>Meer over onderhoud</span>
-            <span class="faq-icon" aria-hidden="true">+</span>
-          </button>
-          <div class="faq-a-wrap"><div class="faq-a"><div class="svc-meer-body">
-            <p class="svc-lead">Een airco of warmtepomp werkt beter en langer als u hem regelmatig laat nakijken. We reinigen, controleren en stellen alles goed af, jaarlijks in het voorjaar of najaar. We onderhouden ook toestellen van andere merken, zoals Samsung of Fujitsu.</p>
-            <div class="svc-meer-grid">
-              <div class="svc-box">
-                <h4>Wat we doen</h4>
-                <ul>
-                  <li>Binnenunit reinigen</li>
-                  <li>Buitenunit reinigen en controleren</li>
-                  <li>Filters en leidingen nakijken</li>
-                  <li>Koudemiddel nakijken (het middel dat de warmte verplaatst)</li>
-                  <li>Elektrische veiligheid controleren</li>
-                </ul>
-              </div>
-              <div class="svc-facts">
-                <div><span>Waarom onderhoud?</span><p>Een proper toestel verbruikt minder stroom, gaat langer mee en valt minder snel stil op een hete dag.</p></div>
-                <div><span>Timing en prijs</span><p>Best in het voorjaar (voor koeling) of najaar (voor verwarming). <strong>Richtprijs: &euro;150 tot &euro;200, exclusief btw.</strong> Dat hangt af van de situatie en het aantal toestellen. Dit is een richtprijs: de echte prijs hoort u van Rim, nadat hij uw toestel heeft gezien.</p></div>
-              </div>
-            </div>
-          </div></div></div>
+      <article class="dn-tegel dn-2" id="dienst-onderhoud">
+        <div class="dn-foto"><img src="assets/img/g-n85.webp" alt="Koperleidingen klaarmaken om aan te sluiten op de binnenunit" loading="lazy" width="858" height="644"></div>
+        <div class="dn-body">
+          <div class="v3-kicker">Onderhoud</div>
+          <h2>Uw toestel laten onderhouden</h2>
+          <p>Een jaarlijks nazicht en een grondige reiniging houden uw airco of warmtepomp zuinig en verlengen de levensduur.</p>
+          <a class="btn btn-gold" href="#calculator" data-start-dienst="onderhoud">Onderhoud aanvragen <span class="ar">&rarr;</span></a>
         </div>
       </article>
 
-      <article class="svc-blok rv" id="dienst-herstelling">
-        <div class="svc-blok-kop">
-          <div class="svc-blok-ph"><img src="assets/img/g-n30.webp" alt="Daikin-buitenunit met de meters aangesloten" loading="lazy" width="700" height="525"></div>
-          <div class="svc-blok-tx">
-            <div class="idx mono">03 / STORING OF DEFECT</div>
-            <h3>Een storing laten herstellen</h3>
-            <p>Werkt uw airco of warmtepomp niet zoals het hoort? We zoeken ter plaatse uit wat er scheelt en lossen het meteen op als dat kan.</p>
-            <ul class="v4-gets"><li>Diagnose ter plaatse</li><li>Meteen opgelost als dat kan</li><li>Na uw aanvraag kunt u meteen zeggen wat er scheelt</li></ul>
-            <div class="svc-blok-acties">
-              <a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="herstelling">Herstelling aanvragen <span class="ar">&rarr;</span></a>
-              <p class="svc-dringend">Dringend? Bel Rim: <a href="tel:+32491113313">+32 491 11 33 13</a></p>
-            </div>
-          </div>
-        </div>
-        <div class="faq-item svc-meer">
-          <button type="button" class="faq-q" aria-expanded="false">
-            <span>Meer over een herstelling</span>
-            <span class="faq-icon" aria-hidden="true">+</span>
-          </button>
-          <div class="faq-a-wrap"><div class="faq-a"><div class="svc-meer-body">
-            <p class="svc-lead">Maakt uw toestel lawaai, koelt het niet, lekt het water of geeft het een foutcode? Rim zoekt ter plaatse uit wat er scheelt, ook bij andere merken, zoals Samsung of Fujitsu.</p>
-            <div class="svc-meer-grid">
-              <div class="svc-box">
-                <h4>Veelvoorkomende storingen</h4>
-                <ul>
-                  <li>Toestel koelt of verwarmt slecht of niet</li>
-                  <li>Lekt water</li>
-                  <li>Maakt veel lawaai</li>
-                  <li>Vreemde geuren</li>
-                  <li>Foutcode op het display</li>
-                  <li>Start niet op</li>
-                </ul>
-              </div>
-              <div class="svc-facts">
-                <div><span>Wanneer</span><p>Op afspraak. Rim belt u binnen 24 uur terug en spreekt met u een dag af.</p></div>
-                <div><span>Prijs</span><p><strong>Richtprijs: &euro;100 tot &euro;150, exclusief btw.</strong> Voor de verplaatsing en het eerste uur. Onderdelen en extra werk komen erbij: die prijs hoort u vooraf, nadat Rim het probleem heeft bekeken.</p></div>
-              </div>
-            </div>
-          </div></div></div>
+      <article class="dn-tegel dn-3" id="dienst-herstelling">
+        <div class="dn-foto"><img src="assets/img/g-n30.webp" alt="Daikin-buitenunit met de meters aangesloten" loading="lazy" width="700" height="525"></div>
+        <div class="dn-body">
+          <div class="v3-kicker">Herstelling</div>
+          <h2>Een storing laten herstellen</h2>
+          <p>Werkt uw airco of warmtepomp niet zoals het hoort? We zoeken ter plaatse uit wat er scheelt en lossen het meteen op als dat kan.</p>
+          <a class="btn btn-gold" href="#calculator" data-start-dienst="herstelling">Herstelling aanvragen <span class="ar">&rarr;</span></a>
+          <p class="dn-dringend">Dringend? Bel Rim: <a href="tel:+32491113313">+32 491 11 33 13</a></p>
         </div>
       </article>
+
+      <div class="faq-item dn-meer dn-1">
+        <button type="button" class="faq-q" aria-expanded="false">
+          <span>Meer over een nieuw toestel</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a-wrap"><div class="faq-a"><div class="dn-paneel svc-meer-body">
+          <p class="svc-lead">U wilt uw huis het hele jaar aangenaam houden: in de zomer koel en stil, in de winter behaaglijk warm. We plaatsen airco's en warmtepompen als single-split (één binnenunit op één buitenunit) of multi-split (meerdere binnenunits op één buitenunit), adviseren het juiste systeem en plaatsen het netjes.</p>
+          <div class="svc-meer-grid">
+            <div class="svc-box">
+              <h3>Stappen</h3>
+              <ol>
+                <li><strong>Gratis plaatsbezoek</strong>: we meten op, adviseren het juiste vermogen, kijken waar alles komt en bespreken budget en mogelijkheden.</li>
+                <li><strong>Eerlijke offerte</strong>: u ziet precies wat het kost en wat u krijgt. Geen verplichtingen.</li>
+                <li><strong>Professionele plaatsing</strong>: we plaatsen, testen en leggen alles rustig uit.</li>
+                <li><strong>Comfort en nazorg</strong>: ook later voor onderhoud belt u hetzelfde nummer.</li>
+              </ol>
+            </div>
+            <div class="svc-facts">
+              <div><span>Merken</span><p>Daikin, LG, Mitsubishi Electric, Mitsubishi Heavy Industries (MHI), Nuova en Toshiba. <a href="#toestellen" style="color:var(--sky);">Bekijk alle toestellen</a></p></div>
+              <div><span>Richtprijs</span><p><strong>Eén kamer: meestal &euro;1.400 tot &euro;2.500</strong> (een designmodel tot ongeveer &euro;3.100). Twee kamers op één buitenunit: ongeveer &euro;2.300 tot &euro;4.100; drie kamers: &euro;3.100 tot &euro;5.900. Standaardplaatsing en 6% btw inbegrepen, voor een woning ouder dan 10 jaar (jonger: 21% btw). <a href="#prijs" style="color:var(--sky);">Bereken uw richtprijs</a> of bekijk de richtprijs bij elk toestel.</p></div>
+              <div><span>Wat zit erin</span><p>Het toestel, tot 5 m leiding tussen binnen- en buitenunit, de plaatsing, het vacuüm trekken en het opstarten. <strong>Wat kan erbij komen:</strong> een langere leiding, stroom vanuit de zekeringkast, of vanaf vier binnenunits. Dat ziet Rim bij het gratis plaatsbezoek; de echte prijs staat in de offerte.</p></div>
+            </div>
+            <div class="svc-plus">
+              <h3>Voordelen</h3>
+              <ul>
+                <li>Gratis plaatsbezoek</li>
+                <li>Geen callcenter: Rim belt u zelf terug</li>
+                <li>Eerlijk advies, niet de duurste optie</li>
+                <li>Nette plaatsing</li>
+              </ul>
+            </div>
+          </div>
+        </div></div></div>
+      </div>
+
+      <div class="faq-item dn-meer dn-2">
+        <button type="button" class="faq-q" aria-expanded="false">
+          <span>Meer over onderhoud</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a-wrap"><div class="faq-a"><div class="dn-paneel svc-meer-body">
+          <p class="svc-lead">Een airco of warmtepomp werkt beter en langer als u hem regelmatig laat nakijken. We reinigen, controleren en stellen alles goed af, jaarlijks in het voorjaar of najaar. We onderhouden ook toestellen van andere merken, zoals Samsung of Fujitsu.</p>
+          <div class="svc-meer-grid">
+            <div class="svc-box">
+              <h3>Wat we doen</h3>
+              <ul>
+                <li>Binnenunit en filters reinigen</li>
+                <li>Buitenunit reinigen en controleren</li>
+                <li>Leidingen nakijken</li>
+                <li>Werking en koudemiddel nakijken (het middel dat de warmte verplaatst)</li>
+                <li>Elektrische veiligheid controleren</li>
+              </ul>
+            </div>
+            <div class="svc-facts">
+              <div><span>Waarom onderhoud?</span><p>Een proper toestel verbruikt minder stroom, gaat langer mee en valt minder snel stil op een hete dag.</p></div>
+              <div><span>Timing en prijs</span><p>Best in het voorjaar (voor koeling) of najaar (voor verwarming). <strong>Richtprijs: &euro;150 tot &euro;200, exclusief btw.</strong> Dat hangt af van de situatie en het aantal toestellen. Dit is een richtprijs: de echte prijs hoort u van Rim, nadat hij uw toestel heeft gezien.</p></div>
+            </div>
+          </div>
+        </div></div></div>
+      </div>
+
+      <div class="faq-item dn-meer dn-3">
+        <button type="button" class="faq-q" aria-expanded="false">
+          <span>Meer over een herstelling</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a-wrap"><div class="faq-a"><div class="dn-paneel svc-meer-body">
+          <p class="svc-lead">Maakt uw toestel lawaai, koelt het niet, lekt het water of geeft het een foutcode? Rim zoekt ter plaatse uit wat er scheelt, ook bij andere merken, zoals Samsung of Fujitsu.</p>
+          <div class="svc-meer-grid">
+            <div class="svc-box">
+              <h3>Veelvoorkomende storingen</h3>
+              <ul>
+                <li>Toestel koelt of verwarmt slecht of niet</li>
+                <li>Lekt water</li>
+                <li>Maakt veel lawaai</li>
+                <li>Vreemde geuren</li>
+                <li>Foutcode op het display</li>
+                <li>Start niet op</li>
+              </ul>
+            </div>
+            <div class="svc-facts">
+              <div><span>Wanneer</span><p>Op afspraak. Na uw aanvraag kunt u meteen zeggen wat er scheelt; Rim belt u binnen 24 uur terug en spreekt met u een dag af.</p></div>
+              <div><span>Prijs</span><p><strong>Richtprijs: &euro;100 tot &euro;150, exclusief btw.</strong> Voor de verplaatsing en het eerste uur. Onderdelen en extra werk komen erbij: die prijs hoort u vooraf, nadat Rim het probleem heeft bekeken.</p></div>
+            </div>
+          </div>
+        </div></div></div>
+      </div>
 
     </div>
     <p style="margin-top:28px;font-size:0.93rem;color:var(--muted);">Bekijk enkele <a href="#realisaties" style="color:var(--sky);">plaatsingen bij klanten</a> om te zien hoe dat er in de praktijk uitziet.</p>
