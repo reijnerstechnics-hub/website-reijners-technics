@@ -10290,3 +10290,70 @@ img.td-zoomable:focus-visible {
 .pc-opt b {
   text-wrap: balance;
 }
+
+/* ---------- hertest 28-10 (H1-H4) ---------- */
+/* H1: prijsadvies op een smalle gsm (320 px): de foto boven de tekst, zodat de naam niet afgesneden wordt */
+@media (max-width: 360px) {
+  .pc-vs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pc-vs > *,
+  .pc-vs-ph {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .pc-vs-ph {
+    width: 100%;
+    max-width: 200px;
+    margin: 4px 0;
+  }
+  /* H2: de afspeelknop van de merkvideo kleiner en hoger, niet over "Bekijk de video" */
+  .td-video-play {
+    top: 30%;
+    width: 54px;
+    height: 54px;
+    margin: -27px 0 0 -27px;
+    font-size: 1.25rem;
+  }
+}
+/* H3: tablet met aanraakscherm (861-1100 px): alle tikdoelen minstens 44 px */
+@media (pointer: coarse) and (min-width: 861px) and (max-width: 1100px) {
+  #site-nav > a,
+  #site-nav .nav-dd > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  #cta-header,
+  .hz-bar input,
+  .hz-bar button,
+  .calc-back {
+    min-height: 44px;
+  }
+  .calc-wijzig {
+    padding: 10px 4px;
+    margin: -10px -4px;
+  }
+  .v4-tip {
+    display: inline-block;
+    padding: 11px 0;
+    margin: -11px 0;
+  }
+  .td-media .color-swatch {
+    position: relative;
+  }
+  .td-media .color-swatch::before {
+    content: "";
+    position: absolute;
+    inset: -11px;
+    border-radius: 50%;
+  }
+}
+/* H3: toestellenlijst op tablet: de typeregel boven de naam altijd twee regels hoog, zodat de kW-blokken
+   naast elkaar op dezelfde hoogte staan (bv. LG Cassette 1-weg naast 4-weg) */
+@media (min-width: 641px) and (max-width: 1000px) {
+  .toestellen-main .device-card .device-brand {
+    min-height: 38px;
+    min-height: 2lh;
+  }
+}

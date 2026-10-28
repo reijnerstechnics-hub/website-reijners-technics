@@ -39,7 +39,7 @@
     return euro.format(Math.round(v));
   }
   function kwTxt(k) {
-    return Number(k).toFixed(1).replace(".", ",") + " kW";
+    return Number(k).toFixed(1).replace(".", ",") + " kW"; // vaste spatie: "5,0 kW" breekt niet af
   }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {

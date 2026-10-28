@@ -123,7 +123,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-lg-deluxe-ai-h-serie-5.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Afstandsbediening van de LG Deluxe AI"
       }
     ],
@@ -219,7 +219,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-lg-vloermodel-uq-reeks-3.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Afstandsbediening van het LG vloermodel UQ"
       },
       {
@@ -321,7 +321,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-lg-plafondmodel-uv-serie-4.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Afstandsbediening van het LG plafondmodel UV"
       }
     ],
@@ -508,7 +508,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-toshiba-zuilmodel-digital-inverter-4.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Bedrade afstandsbediening van het Toshiba zuilmodel"
       }
     ],
@@ -542,7 +542,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ay-compact-4.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Afstandsbediening van de Mitsubishi Electric MSZ-AY Compact"
       }
     ],
@@ -571,7 +571,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ef-premium-design-5.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Afstandsbediening van de Mitsubishi Electric MSZ-EF Premium Design"
       }
     ],
@@ -624,7 +624,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ln-diamond-zubadan-4.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Zwarte afstandsbediening van de Mitsubishi Electric MSZ-LN Diamond Zubadan"
       }
     ],
@@ -1032,7 +1032,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-daikin-sensira-5.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Afstandsbediening van de Daikin Sensira FTXC-E"
       }
     ],
@@ -1057,7 +1057,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-daikin-ftxf-f-5.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Daikin afstandsbediening ARC470A1 van de FTXF-F"
       }
     ],
@@ -1077,7 +1077,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-daikin-comfora-4.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Daikin afstandsbediening ARC480A van de Comfora"
       }
     ],
@@ -1164,7 +1164,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-daikin-emura-5.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Daikin afstandsbediening ARC488A1 van de Emura"
       }
     ],
@@ -1188,7 +1188,7 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-daikin-perfera-vloermodel-4.webp",
-        "label": "Afstandsbediening",
+        "label": "Afstands­bediening",
         "alt": "Daikin afstandsbediening van het Perfera vloermodel"
       },
       {
