@@ -2445,6 +2445,8 @@ function rtKwVoorKeuze(maten, k) {
       '<button type="button" class="td-zoom-btn x" aria-label="Sluiten">&times;</button></div>' +
       '<div class="td-zoom-vlak"><img alt="" draggable="false"></div>' +
       '<button type="button" class="td-zoom-btn p" aria-label="Vorige foto">&lsaquo;</button><button type="button" class="td-zoom-btn n" aria-label="Volgende foto">&rsaquo;</button>' +
+      // uitleg onder de foto (Realisaties) en eventueel een link naar het toestel
+      '<div class="td-zoom-onder" hidden><p class="td-zoom-uitleg"></p><a class="td-zoom-link" href="#" hidden>Bekijk dit toestel <span aria-hidden="true">&rarr;</span></a></div>' +
       '<p class="td-zoom-hint">Knijp of scrol om in te zoomen, sleep om te verschuiven</p>';
     document.body.appendChild(box);
     var vlak = box.querySelector(".td-zoom-vlak");
@@ -2481,6 +2483,18 @@ function rtKwVoorKeuze(maten, k) {
       box.querySelector(".td-zoom-cap").textContent = lijst[i].label || "";
       box.querySelector(".td-zoom-count").textContent = lijst.length > 1 ? i + 1 + " / " + lijst.length : "";
       box.classList.toggle("een", lijst.length < 2);
+      // uitleg en link onderaan (enkel als de foto er een heeft, bv. op Realisaties)
+      var onder = box.querySelector(".td-zoom-onder");
+      var link = box.querySelector(".td-zoom-link");
+      onder.hidden = !lijst[i].uitleg && !lijst[i].link;
+      box.querySelector(".td-zoom-uitleg").textContent = lijst[i].uitleg || "";
+      link.hidden = !lijst[i].link;
+      if (lijst[i].link) link.setAttribute("href", lijst[i].link);
+      // de buren alvast laden, zodat vegen meteen een foto toont
+      if (lijst.length > 1)
+        [i + 1, i - 1].forEach(function (k) {
+          new Image().src = lijst[(k + lijst.length) % lijst.length].src;
+        });
       teken();
     }
     function sluit() {
@@ -2489,6 +2503,11 @@ function rtKwVoorKeuze(maten, k) {
       if (opener) opener.focus({ preventScroll: true });
     }
     box.querySelector(".x").addEventListener("click", sluit);
+    // "Bekijk dit toestel": eerst de viewer dicht, daarna doet de gewone #link zijn werk
+    box.querySelector(".td-zoom-link").addEventListener("click", function () {
+      opener = null;
+      sluit();
+    });
     box.querySelector(".p").addEventListener("click", function () {
       toon(i - 1);
     });
@@ -2514,10 +2533,14 @@ function rtKwVoorKeuze(maten, k) {
     });
     // slepen en knijpen met de vinger of de muis (pointer events)
     var vingers = {},
+      begin = {}, // waar elke vinger begon: om te weten of de bezoeker veegde
+      knijp = false, // twee vingers gebruikt: dan is het geen veeg
       laatsteAfstand = 0,
       laatsteTik = 0;
     vlak.addEventListener("pointerdown", function (e) {
       vingers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      begin[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (Object.keys(vingers).length > 1) knijp = true;
       vlak.setPointerCapture(e.pointerId);
       var nu = Date.now();
       if (e.pointerType !== "mouse" && nu - laatsteTik < 300) zet(schaal > 1.01 ? 1 : 2.5, e.clientX, e.clientY);
@@ -2545,14 +2568,17 @@ function rtKwVoorKeuze(maten, k) {
       }
     });
     function los(e) {
-      var v = vingers[e.pointerId];
+      // vanaf het beginpunt rekenen: vingers[] schuift mee tijdens het slepen
+      var v = vingers[e.pointerId] && begin[e.pointerId];
       delete vingers[e.pointerId];
+      delete begin[e.pointerId];
       laatsteAfstand = 0;
       // vegen naar de volgende foto als er niet ingezoomd is
-      if (v && schaal <= 1.01 && e.type === "pointerup" && Object.keys(vingers).length === 0) {
+      if (v && !knijp && schaal <= 1.01 && e.type === "pointerup" && Object.keys(vingers).length === 0) {
         var dx = e.clientX - v.x;
         if (Math.abs(dx) > 50 && lijst.length > 1) toon(i + (dx < 0 ? 1 : -1));
       }
+      if (!Object.keys(vingers).length) knijp = false;
     }
     vlak.addEventListener("pointerup", los);
     vlak.addEventListener("pointercancel", los);
@@ -2563,11 +2589,21 @@ function rtKwVoorKeuze(maten, k) {
       if (e.key === "ArrowRight") toon(i + 1);
       if (e.key === "+" || e.key === "=") zet(schaal * 1.5);
       if (e.key === "-") zet(schaal / 1.5);
+      // Tab blijft binnen de viewer (knoppen en de link)
+      if (e.key === "Tab") {
+        var doelen = Array.prototype.slice.call(box.querySelectorAll("button, a[href]")).filter(function (d) {
+          return d.offsetParent !== null;
+        });
+        var k = doelen.indexOf(document.activeElement);
+        e.preventDefault();
+        if (doelen.length) doelen[(k + (e.shiftKey ? -1 : 1) + doelen.length) % doelen.length].focus();
+      }
     });
     box.addEventListener("click", function (e) {
       if (e.target === box) sluit();
     });
     zoomBox = {
+      // fotos: [{ src, alt, label (bovenaan), uitleg (onderaan, mag), link (#adres, mag) }]
       open: function (fotos, k, wie) {
         lijst = fotos;
         opener = wie;
@@ -2579,6 +2615,8 @@ function rtKwVoorKeuze(maten, k) {
     };
     return zoomBox;
   }
+  // ook voor het fotoraster op Realisaties (blok REALISATIES: FOTORASTER)
+  window.rtZoomViewer = zoomViewer;
 
   function galerij(media, foto, img, model, naamVol) {
     if (!img) return;
@@ -3557,104 +3595,6 @@ function rtKwVoorKeuze(maten, k) {
     });
   }
 
-  // ---------- realisaties: foto groot bekijken ----------
-  var box = null,
-    list = [],
-    idx = 0,
-    opener = null;
-  function buildBox() {
-    box = document.createElement("div");
-    box.className = "v4-lb";
-    box.hidden = true;
-    box.setAttribute("role", "dialog");
-    box.setAttribute("aria-modal", "true");
-    box.setAttribute("aria-label", "Foto groot bekijken");
-    box.innerHTML =
-      '<span class="v4-lb-count" aria-live="polite"></span><button type="button" class="v4-lb-btn x" aria-label="Sluiten">&times;</button><button type="button" class="v4-lb-btn p" aria-label="Vorige foto">&lsaquo;</button><figure><img alt=""><figcaption></figcaption></figure><button type="button" class="v4-lb-btn n" aria-label="Volgende foto">&rsaquo;</button>';
-    document.body.appendChild(box);
-    box.querySelector(".x").addEventListener("click", closeBox);
-    box.querySelector(".p").addEventListener("click", function () {
-      showAt(idx - 1);
-    });
-    box.querySelector(".n").addEventListener("click", function () {
-      showAt(idx + 1);
-    });
-    box.addEventListener("click", function (e) {
-      if (e.target === box) closeBox();
-    });
-    document.addEventListener("keydown", function (e) {
-      if (box.hidden) return;
-      if (e.key === "Escape") closeBox();
-      if (e.key === "ArrowLeft") showAt(idx - 1);
-      if (e.key === "ArrowRight") showAt(idx + 1);
-      // Tab blijft binnen de viewer (sluiten, vorige, volgende)
-      if (e.key === "Tab") {
-        var knoppen = Array.prototype.slice.call(box.querySelectorAll("button"));
-        var k = knoppen.indexOf(document.activeElement);
-        e.preventDefault();
-        knoppen[(k + (e.shiftKey ? -1 : 1) + knoppen.length) % knoppen.length].focus();
-      }
-    });
-    var sx = null;
-    box.addEventListener(
-      "touchstart",
-      function (e) {
-        sx = e.touches[0].clientX;
-      },
-      { passive: true }
-    );
-    box.addEventListener("touchend", function (e) {
-      if (sx === null) return;
-      var dx = e.changedTouches[0].clientX - sx;
-      if (Math.abs(dx) > 40) showAt(idx + (dx < 0 ? 1 : -1));
-      sx = null;
-    });
-  }
-  function showAt(i) {
-    idx = (i + list.length) % list.length;
-    var slide = list[idx];
-    var img = slide.querySelector("img");
-    if (img.dataset.src && !img.getAttribute("src")) img.setAttribute("src", img.dataset.src);
-    var cap = slide.querySelector(".carousel-caption");
-    box.querySelector("img").src = img.currentSrc || img.src;
-    box.querySelector("img").alt = img.alt;
-    box.querySelector("figcaption").textContent = cap ? cap.textContent : img.alt;
-    box.querySelector(".v4-lb-count").textContent = idx + 1 + " / " + list.length;
-  }
-  function closeBox() {
-    box.hidden = true;
-    document.documentElement.style.overflow = "";
-    // terug naar de foto waarmee de viewer geopend werd
-    if (opener) opener.focus({ preventScroll: true });
-  }
-  document.querySelectorAll(".brand-frame").forEach(function (frame) {
-    var slides = Array.prototype.slice.call(frame.querySelectorAll(".carousel-slide"));
-    slides.forEach(function (sl, i) {
-      var img = sl.querySelector("img");
-      if (!img) return;
-      img.classList.add("v4-zoom");
-      img.tabIndex = 0;
-      img.setAttribute("role", "button");
-      img.setAttribute("aria-label", "Groot bekijken: " + img.alt);
-      function open() {
-        if (!box) buildBox();
-        opener = img;
-        list = slides;
-        showAt(i);
-        box.hidden = false;
-        document.documentElement.style.overflow = "hidden";
-        box.querySelector(".x").focus();
-      }
-      img.addEventListener("click", open);
-      img.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          open();
-        }
-      });
-    });
-  });
-
   // ---------- contact: bedankmoment na versturen ----------
   window.rtLeadDone = function (naam) {
     var d = document.getElementById("v4-lead-done");
@@ -3681,4 +3621,87 @@ function rtKwVoorKeuze(maten, k) {
       var naamVeld = document.querySelector("#lead-form [name=naam]");
       if (naamVeld) naamVeld.focus();
     });
+})();
+
+// =====================================================================
+// REALISATIES: FOTORASTER MET EEN FILTER PER MERK (Rims keuzes van 28-10-2026)
+// Alle foto's als tegels (<li class="rl-tegel" data-merk="...">, zie de uitleg in
+// index.html). De knoppen bovenaan tonen enkel de foto's van dat merk; "Alle" toont
+// alles, ook de foto's zonder herkenbaar merk. Een tik op een foto opent ze groot in
+// dezelfde viewer als de toestelpagina's (window.rtZoomViewer): inzoomen, vegen naar
+// de volgende foto binnen de filter, de uitleg onderaan en "3 / 24".
+// =====================================================================
+(function () {
+  var raster = document.getElementById("rl-raster");
+  if (!raster) return;
+  var tegels = Array.prototype.slice.call(raster.querySelectorAll(".rl-tegel"));
+  var knoppen = Array.prototype.slice.call(document.querySelectorAll(".rl-filter"));
+  var status = document.getElementById("rl-status");
+  var NAMEN = { daikin: "Daikin", lg: "LG", me: "Mitsubishi Electric", mhi: "MHI", nuova: "Nuova", toshiba: "Toshiba" };
+  var merk = "";
+
+  // aantal foto's per knop; een merk zonder foto's krijgt geen knop
+  knoppen.forEach(function (k) {
+    var m = k.dataset.merk;
+    var n = tegels.filter(function (t) {
+      return !m || t.dataset.merk === m;
+    }).length;
+    var tel = k.querySelector(".rl-n");
+    if (tel) tel.textContent = n;
+    k.hidden = !n;
+  });
+
+  function kies(m) {
+    merk = m || "";
+    knoppen.forEach(function (k) {
+      k.setAttribute("aria-pressed", k.dataset.merk === merk ? "true" : "false");
+    });
+    var n = 0;
+    tegels.forEach(function (t) {
+      var ok = !merk || t.dataset.merk === merk;
+      t.hidden = !ok;
+      if (ok) n++;
+    });
+    // met een merk gekozen is het merklabel op elke tegel overbodig: rustiger zonder
+    raster.classList.toggle("rl-een-merk", !!merk);
+    if (status) status.textContent = n + (n === 1 ? " foto" : " foto's") + (merk ? " van " + NAMEN[merk] : "");
+  }
+  knoppen.forEach(function (k) {
+    k.addEventListener("click", function () {
+      kies(k.dataset.merk);
+    });
+  });
+
+  // De tegel "Ook achter de kap netjes" op Home linkt naar #aansluitingen (een foto in het
+  // raster): dan eerst de filter terug op "Alle", anders is die foto misschien verborgen.
+  document.addEventListener(
+    "click",
+    function (e) {
+      if (e.target.closest && e.target.closest('a[href="#aansluitingen"]')) kies("");
+    },
+    true
+  );
+
+  // groot bekijken: de lijst = de foto's die nu zichtbaar zijn (binnen de filter)
+  raster.addEventListener("click", function (e) {
+    var knop = e.target.closest(".rl-open");
+    if (!knop || !window.rtZoomViewer) return;
+    var zichtbaar = tegels.filter(function (t) {
+      return !t.hidden;
+    });
+    var lijst = zichtbaar.map(function (t) {
+      var b = t.querySelector(".rl-open");
+      var img = b.querySelector("img");
+      return {
+        src: b.dataset.groot || img.getAttribute("src"),
+        alt: img.alt,
+        label: NAMEN[t.dataset.merk] || "",
+        uitleg: b.dataset.uitleg || img.alt,
+        link: b.dataset.toestel || "",
+      };
+    });
+    window.rtZoomViewer().open(lijst, zichtbaar.indexOf(knop.closest(".rl-tegel")), knop);
+  });
+
+  kies("");
 })();

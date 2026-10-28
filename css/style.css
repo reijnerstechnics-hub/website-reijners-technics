@@ -9927,3 +9927,219 @@ img.td-zoomable:focus-visible {
     height: 52px;
   }
 }
+
+/* ---------- realisaties: één fotoraster met een filter per merk (Rims keuzes van 28-10-2026) ---------- */
+/* Rustig zoals Diensten en Contact: witte vlakken, veel ruimte, de foto's doen het werk. In het raster enkel de
+   foto (4:3) met een klein merklabel; de uitleg verschijnt pas in de grote weergave (.td-zoom-onder).
+   Gsm 2 kolommen, tablet en computer 3. De filterknoppen zijn echte knoppen (aria-pressed), minstens 44 px hoog. */
+.rl-sec {
+  padding-bottom: 72px;
+}
+.rl-kop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 24px;
+}
+.rl-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.rl-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 17px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 29, 46, 0.06); /* zelfde schaduw als --sh-1, zodat de witte knop loskomt van de achtergrond */
+  color: var(--ink);
+  font-family: var(--font-tekst);
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.rl-filter[hidden] {
+  display: none;
+}
+.rl-filter:hover {
+  border-color: var(--sky);
+}
+.rl-filter:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.rl-filter[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.rl-n {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.rl-filter[aria-pressed="true"] .rl-n {
+  color: #c9d6e2;
+}
+.rl-tip {
+  margin: 0;
+  color: var(--body);
+  font-size: 0.93rem;
+}
+.rl-raster {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.rl-tegel {
+  margin: 0;
+}
+.rl-tegel[hidden] {
+  display: none;
+}
+.rl-open {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--surface-alt);
+  box-shadow: var(--sh-1);
+  cursor: zoom-in;
+}
+.rl-open img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.rl-open:hover img {
+  transform: scale(1.025);
+}
+.rl-open:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.rl-merk {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--ink);
+  font-family: var(--font-tekst);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.4;
+  box-shadow: 0 1px 3px rgba(15, 29, 46, 0.18);
+}
+.rl-een-merk .rl-merk {
+  display: none;
+}
+.rl-sec .v4-insta {
+  margin-top: 44px;
+}
+/* de grote weergave: de uitleg onderaan, in een rustig donker vlak */
+.td-zoom {
+  background: rgba(10, 20, 32, 0.97); /* iets dichter, zodat de uitleg niet tegen de pagina erachter staat */
+}
+.td-zoom-onder {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px 18px 0;
+  color: #fff;
+  text-align: center;
+}
+.td-zoom-onder[hidden] {
+  display: none;
+}
+.td-zoom-uitleg {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.td-zoom-link {
+  gap: 6px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 6px;
+  color: var(--gold);
+  font-weight: 700;
+}
+.td-zoom-link[hidden] {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rl-open img {
+    transition: none;
+  }
+  .rl-open:hover img {
+    transform: none;
+  }
+}
+@media (max-width: 1000px) {
+  .rl-raster {
+    gap: 14px;
+  }
+}
+@media (max-width: 700px) {
+  .rl-sec {
+    padding-bottom: 56px;
+  }
+  .rl-kop {
+    margin-bottom: 18px;
+  }
+  .rl-filters {
+    gap: 6px;
+  }
+  /* zo passen de zes knoppen vanaf 360 px breed op twee rijen */
+  .rl-filter {
+    padding: 0 11px;
+    font-size: 0.88rem;
+    gap: 4px;
+  }
+  .rl-tip {
+    font-size: 0.88rem;
+  }
+  /* de links in de zin onderaan: een tikvlak van 44 px hoog, zonder de regels uit elkaar te duwen */
+  .rl-sec .v4-meer a {
+    padding: 11px 0;
+  }
+  .rl-raster {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .rl-open {
+    border-radius: 12px;
+  }
+  .rl-merk {
+    left: 7px;
+    bottom: 7px;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+  }
+  .td-zoom-onder {
+    padding: 10px 14px 0;
+  }
+  .td-zoom-uitleg {
+    font-size: 0.95rem;
+  }
+}

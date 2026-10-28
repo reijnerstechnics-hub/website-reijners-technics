@@ -49,6 +49,33 @@ Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via What
     - De site kiest de reeks volgens de maand, net zoals de tekst "Koelen/Verwarmen". Klikt de bezoeker op Koelen of Verwarmen, dan wisselen de foto's mee (event `rt-seizoen` in `js/main.js`).
     - Elke reeks heeft in beide vakken evenveel foto's, in dezelfde volgorde. De eerste `warm`-foto staat in de HTML met `src` en `class="rot on"`.
 
+## Realisaties
+
+Sinds 28-10-2026 (Rims keuzes) is *Realisaties* (`#realisaties`) één fotoraster met een filter per merk, in de rustige stijl van Diensten en Contact. Elke foto staat er maar één keer in (71 foto's). Op gsm 2 kolommen, op tablet en computer 3.
+
+- **Filterknoppen** bovenaan (`.rl-filter`, met `aria-pressed`): Alle / Daikin / LG / Mitsubishi Electric / MHI / Toshiba / Nuova. Elke knop telt zelf zijn foto's; een merk zonder foto's (nu Toshiba) blijft verborgen tot er een foto bij komt. Foto's zonder herkenbaar merk staan enkel onder *Alle*.
+- **Tegels**: in het raster enkel de foto met een klein merklabel. Een tik opent de foto groot in dezelfde viewer als de toestelpagina's (`zoomViewer` / `window.rtZoomViewer` in `js/main.js`): inzoomen, vegen of pijltjes naar de volgende foto binnen de gekozen filter, "3 / 24", en onderaan de uitleg (en soms "Bekijk dit toestel").
+- **Volgorde** = de volgorde in `index.html`: de mooiste foto's eerst (binnenunits in een mooi interieur, nette buitenunits), daarna de omkastingen en achteraan de technische foto's (aansluiten, eerste opstart). De tegel "Ook achter de kap netjes" op Home linkt naar `#aansluitingen`: dat is de eerste technische foto (de open LG Multi F-buitenunit); die link zet de filter eerst terug op *Alle*.
+- De werking staat in het blok *REALISATIES: FOTORASTER* in `js/main.js`, de opmaak achteraan in `css/style.css` onder "realisaties: één fotoraster met een filter per merk".
+
+**Een nieuwe foto toevoegen**
+
+1. Zet de foto als webp in `assets/img/`, liefst liggend 4:3 (bv. `g-n94.webp`, 1200 × 900). Geen foto's met Gree of Olimpia Splendid, geen foto van Rim en Fabio samen (zie `CLAUDE.md`).
+2. Voor een grote foto (meer dan ± 40 kB) maak je een kleine versie voor de tegel, `r-<naam>.webp` van 600 × 450, bijvoorbeeld met ffmpeg:
+   `ffmpeg -i g-n94.webp -vf scale=600:450:flags=lanczos -c:v libwebp -quality 75 -compression_level 6 r-g-n94.webp`
+3. Voeg in `index.html`, in `<ul class="rl-raster">`, één regel toe op de plaats waar de foto moet komen:
+
+```html
+<li class="rl-tegel" data-merk="daikin"><button type="button" class="rl-open" data-groot="assets/img/g-n94.webp" data-uitleg="Daikin-wandmodel boven de deur, met de leiding in een wit kanaal."><img src="assets/img/r-g-n94.webp" alt="Daikin-wandmodel boven de deur" width="600" height="450" loading="lazy" decoding="async"><span class="rl-merk" aria-hidden="true">Daikin</span></button></li>
+```
+
+   - `data-merk`: `daikin`, `lg`, `me` (Mitsubishi Electric), `mhi`, `nuova` of `toshiba`; leeg (`data-merk=""`, en dan zonder `<span class="rl-merk">`) als er geen merk te zien is;
+   - `data-uitleg`: wat er op de foto te zien is, enkel wat echt klopt (geen gemeente of toestelnaam die je niet zeker weet);
+   - `alt`: een korte beschrijving van de foto;
+   - `data-groot` enkel als de tegel de kleine versie `r-...` toont; zonder kleine versie zet je de foto zelf in `src`, met haar eigen `width` en `height`;
+   - `data-toestel="#toestel-..."` (mag): dan staat in de grote weergave "Bekijk dit toestel".
+4. Pas op Home de teller aan: `<b data-count="71">71</b>` ("foto's van eigen plaatsingen") is het aantal tegels.
+
 ## Toestellen
 
 Op de pagina *Toestellen* kiest de bezoeker eerst een merk (of zoekt op naam), daarna in de linkerkolom het vermogen dat hij nodig heeft en/of een soort toestel. Tijdens een zoekopdracht staat boven de lijst wat hij zocht, met de knop *Alle toestellen tonen*, en tonen de merktegels het aantal gevonden per merk; een merk kiezen wist de zoekterm. De filter *Vermogen* heeft aaneensluitende maten ("tot 2,5 kW · tot 28 m²", "3,5 kW · 28-39 m²", ...), zodat ook een kleine kamer ergens past. De hulpkaart "Twijfelt u tussen modellen?" staat één keer, in het laatste zichtbare merkblok. Elk toestel is één kaart (`<div class="device-card">`) in het blok van zijn merk in `index.html` (`#toestellen-daikin`, `#toestellen-lg`, ...). Uit diezelfde kaart maakt de site ook de detailpagina (`#toestel-<naam>`), dus een toestel staat maar op één plaats.
