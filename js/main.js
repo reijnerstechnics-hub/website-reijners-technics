@@ -1600,7 +1600,7 @@ function rtKwVoorKeuze(maten, k) {
   var actiefTekst = document.createElement("span");
   var actiefWis = document.createElement("button");
   actiefWis.type = "button";
-  actiefWis.textContent = "Alle toestellen tonen";
+  actiefWis.textContent = "Toon alle toestellen";
   actiefWis.addEventListener("click", function () {
     if (zoek) zoek.value = "";
     zoekNaar("");
@@ -2264,7 +2264,7 @@ function rtKwVoorKeuze(maten, k) {
       m.dataset.kw = n;
       maten.appendChild(m);
     });
-    if (kw.bereik) maten.appendChild(el("span", "bereik", rtKwTekst(kw.bereik[0]) + " – " + rtKwTekst(kw.bereik[1])));
+    if (kw.bereik) maten.appendChild(el("span", "bereik", rtKwTekst(kw.bereik[0]) + " - " + rtKwTekst(kw.bereik[1])));
     box.appendChild(maten);
     return box;
   }
@@ -2384,7 +2384,7 @@ function rtKwVoorKeuze(maten, k) {
     box.appendChild(lbl);
     box.appendChild(bedrag);
     box.appendChild(uitleg);
-    var btw = "standaardplaatsing (5 m leiding inbegrepen) en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar).";
+    var btw = "een standaardplaatsing (5 m leiding inbegrepen) en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar).";
     var echt = " Stroom vanuit de zekeringkast of een langere leiding komt erbij; de echte prijs krijgt u in de offerte, na het gratis plaatsbezoek.";
     function toon(kw) {
       var p = kw && richtprijs(model, kw);
@@ -2751,7 +2751,7 @@ function rtKwVoorKeuze(maten, k) {
         var p = richtprijs(model, n);
         tr.appendChild(el("td", p ? null : "td-kw-geen", p ? euro.format(p.lo) : "op aanvraag"));
       } else {
-        tr.appendChild(el("td", null, "ca. " + (n === nums[0] ? "tot " : Math.round(n / 0.12) + " - ") + Math.round(n / 0.09) + " m²"));
+        tr.appendChild(el("td", null, "ca. " + (n === nums[0] ? "tot " : Math.round(n / 0.12) + "-") + Math.round(n / 0.09) + " m²"));
       }
       t.appendChild(tr);
     });
@@ -2762,7 +2762,7 @@ function rtKwVoorKeuze(maten, k) {
           "p",
           "td-kw-noot",
           "Richtprijs voor een standaardplaatsing (5 m leiding inbegrepen), met " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar; jonger: " + RT_PRIJZEN.btw.nieuw +
-            "% btw). De echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest."
+            "% btw). De echte prijs krijgt u in de offerte, nadat Rim bij u langs is geweest."
         )
       );
     return box;
@@ -2772,8 +2772,8 @@ function rtKwVoorKeuze(maten, k) {
   // past ook in een kleinere kamer, dus daar staat "tot": een slaapkamer van 12 m² hoort er ook bij.
   function ruimteTekst(n, kleinste) {
     return kleinste
-      ? "voor een kamer tot " + Math.round(n / 0.09) + " m²"
-      : "voor een kamer van " + Math.round(n / 0.12) + " tot " + Math.round(n / 0.09) + " m²";
+      ? "Voor een kamer tot ongeveer " + Math.round(n / 0.09) + " m²"
+      : "Voor een kamer van ongeveer " + Math.round(n / 0.12) + " tot " + Math.round(n / 0.09) + " m²";
   }
   function kleinsteMaat(card) {
     var kw = rtKw(card);
@@ -2783,7 +2783,7 @@ function rtKwVoorKeuze(maten, k) {
   function kwZin(card, n, metPrijs) {
     var t = card.dataset.type;
     if (t === "buiten") return "Welk vermogen past, hangt af van de binnenunits. Dat rekenen we voor u uit.";
-    if (n) return "Ongeveer " + ruimteTekst(n, n === kleinsteMaat(card)) + ".";
+    if (n) return ruimteTekst(n, n === kleinsteMaat(card)) + ".";
     if (t === "mobiel") return "Twijfelt u? Rim helpt u graag kiezen.";
     return (metPrijs ? "Kies een vermogen voor de richtprijs. " : "") + "Twijfelt u? Het juiste vermogen bepalen we samen bij het gratis plaatsbezoek.";
   }

@@ -438,7 +438,7 @@
           P.btw.standaard +
           "% btw (woning ouder dan 10 jaar; jonger: " +
           P.btw.nieuw +
-          "% btw). Stroom vanuit de zekeringkast of een langere leiding komt erbij. De echte prijs krijgt u in de offerte, nadat Rim bij u is langs geweest. Dat plaatsbezoek is gratis.") +
+          "% btw). Stroom vanuit de zekeringkast of een langere leiding komt erbij. De echte prijs krijgt u in de offerte, nadat Rim bij u langs is geweest. Dat plaatsbezoek is gratis.") +
       "</p>";
     if (P.voorlopig) h += '<div class="pc-demo">Let op: dit prijsadvies gebruikt nog voorbeeldprijzen.</div>';
 
