@@ -514,11 +514,10 @@
 
     <!-- Sinds 28-10-2026 (Rims keuzes): drie tegels onder elkaar, in dezelfde stijl als de pagina Contact: witte
          kaarten, veel ruimte, één gouden knop per tegel. Op computer en tablet ligt de foto naast de tekst (om en
-         om links en rechts), op gsm erboven. Elke tegel heeft een eigen foto van een plaatsing van Rim, één zin en
-         de knop. De uitleg zit achter "Meer over ..." (zelfde open- en dichtklappen als de veelgestelde vragen:
+         om links en rechts), op gsm erboven. Elke tegel heeft een eigen foto van Rim, één zin en de knop; bij
+         Onderhoud wisselen twee foto's (filter, poetsen). De uitleg zit achter "Meer over ..." (zelfde open- en dichtklappen als de veelgestelde vragen:
          .faq-item/.faq-q in js/main.js); de knop en het paneel staan onder de eigen tegel (.faq-item op
-         display: contents, volgorde via order in .dn-tegels). De foto bij Onderhoud wordt nog vervangen door een
-         foto van Rim met een open binnenunit (Rim bezorgt ze). -->
+         display: contents, volgorde via order in .dn-tegels). -->
     <div class="dn-tegels">
 
       <article class="dn-tegel dn-1" id="dienst-nieuw">
@@ -532,7 +531,11 @@
       </article>
 
       <article class="dn-tegel dn-2" id="dienst-onderhoud">
-        <div class="dn-foto"><img src="assets/img/g-n85.webp" alt="Koperleidingen klaarmaken om aan te sluiten op de binnenunit" loading="lazy" width="858" height="644"></div>
+        <!-- Rims eigen foto's van een onderhoud (28-10-2026): eerst de filter, dan het poetsen; ze wisselen (data-rotate, zie js/main.js) -->
+        <div class="dn-foto" data-rotate="4000">
+          <img class="rot on" src="assets/img/d-onderhoud-filter.webp" alt="Rim haalt de filter uit een binnenunit bij een onderhoud" width="1200" height="900">
+          <img class="rot" data-src="assets/img/d-onderhoud-poetsen.webp" alt="Rim poetst de binnenunit met een doek" width="1200" height="900">
+        </div>
         <div class="dn-body">
           <div class="v3-kicker">Onderhoud</div>
           <h2>Uw toestel laten onderhouden</h2>
@@ -2794,12 +2797,24 @@
 <section class="alt v2-after-phead ct-sec" data-page="contact">
   <div class="wrap">
 
-    <!-- de vier knoppen: bellen, WhatsApp, e-mail, offerte (Rims keuze, 28-10-2026) -->
+    <!-- Rim in het groot (zijn vraag, 28-10-2026): de bezoeker ziet met wie hij te maken heeft. De nummerplaat van de
+         bestelwagen is onherkenbaar gemaakt. Rechts de vier knoppen: bellen, WhatsApp, e-mail, offerte. -->
+    <div class="ct-top">
+      <figure class="ct-rim">
+        <img src="assets/img/rim-bestelwagen.webp" alt="Rim Reijners, zaakvoerder van Reijners Technics, bij zijn bestelwagen" width="1000" height="1250">
+        <figcaption><b>Rim Reijners</b> zaakvoerder</figcaption>
+      </figure>
+      <div class="ct-top-tekst">
+        <div class="v3-kicker">Uw installateur</div>
+        <h2>U hebt rechtstreeks met Rim te maken</h2>
+        <p>Rim komt zelf langs voor het plaatsbezoek, plaatst uw airco en belt u zelf terug. Geen callcenter, geen tussenpersoon. Al 6 jaar airco's in Dilsen-Stokkem en omgeving.</p>
     <div class="ct-acts">
       <a class="ct-act" href="tel:+32491113313"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><b>Bel Rim</b><span class="sub mono">+32 491 11 33 13</span></a>
       <a class="ct-act ct-act-wa js-wa" href="#" target="_blank" rel="noopener"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.38 5.07L2 22l5.06-1.35A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18a7.94 7.94 0 0 1-4.05-1.11l-.29-.17-3 .8.8-2.93-.19-.3A8 8 0 1 1 12 20z"/></svg></span><b>WhatsApp</b><span class="sub">Stuur een bericht of foto</span></a>
       <a class="ct-act js-mail" href="mailto:reijnerstechnics@gmail.com"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span><b>E-mail</b><span class="sub">Stuur uw vraag</span></a>
       <a class="ct-act ct-act-gold" href="#calculator"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><b>Offerte aanvragen</b><span class="sub">Twee korte vragen</span></a>
+    </div>
+      </div>
     </div>
 
     <!-- zo gaat het verder: enkel de drie beloftes die Rim bevestigde -->

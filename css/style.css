@@ -9338,10 +9338,60 @@ img.td-zoomable:focus-visible {
 .ct-sec {
   padding-bottom: 72px;
 }
-/* de vier knoppen bovenaan: witte kaarten, de offerteknop in goud */
+/* Rim in het groot naast de vier knoppen (zijn vraag van 28-10-2026) */
+.ct-top {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 32px;
+  align-items: center;
+}
+.ct-rim {
+  position: relative;
+  margin: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: var(--sh-2);
+  background: var(--surface-alt);
+}
+.ct-rim img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.ct-rim figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 44px 20px 16px;
+  background: linear-gradient(to top, rgba(22, 40, 61, 0.78), rgba(22, 40, 61, 0));
+  color: #fff;
+  font-size: 0.92rem;
+}
+.ct-rim figcaption b {
+  display: block;
+  font-family: var(--font-kop);
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+.ct-top-tekst h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+.ct-top-tekst > p {
+  margin: 12px 0 22px;
+  color: var(--body);
+  font-size: 1.04rem;
+  line-height: 1.6;
+  max-width: 52ch;
+}
+/* de vier knoppen: witte kaarten, de offerteknop in goud; naast de foto twee rijen van twee */
 .ct-acts {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 .ct-act {
@@ -9522,13 +9572,31 @@ img.td-zoomable:focus-visible {
 }
 
 @media (max-width: 1000px) {
-  .ct-acts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .ct-top {
+    gap: 22px;
+  }
+  .ct-top-tekst h2 {
+    font-size: 1.45rem;
   }
 }
 @media (max-width: 860px) {
   .ct-sec {
     padding-bottom: 56px;
+  }
+  /* tablet en gsm: de foto boven de tekst, niet te hoog */
+  .ct-top {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .ct-rim img {
+    aspect-ratio: 4 / 3;
+    object-position: 50% 30%;
+  }
+  .ct-rim figcaption {
+    padding-top: 36px;
+  }
+  .ct-top-tekst > p {
+    margin-bottom: 16px;
   }
   .ct-steplist {
     grid-template-columns: 1fr;
@@ -9613,6 +9681,7 @@ img.td-zoomable:focus-visible {
   overflow: hidden;
 }
 .dn-foto {
+  position: relative; /* voor de wisselende foto's (img.rot) bij Onderhoud */
   aspect-ratio: 16 / 10;
   background: var(--surface-alt);
 }
