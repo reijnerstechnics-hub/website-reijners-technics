@@ -8254,8 +8254,8 @@ h3,
   }
 }
 
-/* ---------- gsm: tikdoelen van minstens 44 px ---------- */
-@media (max-width: 760px) {
+/* ---------- gsm: tikdoelen van minstens 44 px (ook op een tablet met aanraakscherm, controle 28-10) ---------- */
+@media (max-width: 760px), (pointer: coarse) and (max-width: 1100px) {
   .btn-sm,
   .slide-toestel {
     min-height: 44px;
@@ -8708,8 +8708,8 @@ section[data-page="realisaties"] .v4-strip {
 /* ---------- gsm: tikdoelen van minstens 44 px (open punt uit de controle van 24 oktober) ----------
    Tekstlinks in een zin krijgen ruimte rond de tekst (padding) en halen die ruimte met een
    negatieve marge weer uit de regel: de tekst blijft even groot en op dezelfde plaats. Alleen de
-   voorbeelden onder de zoekbalk en de lijsten in de voettekst staan iets verder uit elkaar. */
-@media (max-width: 760px) {
+   voorbeelden onder de zoekbalk en de lijsten in de voettekst staan iets verder uit elkaar. Sinds 28-10 ook op een tablet met aanraakscherm. */
+@media (max-width: 760px), (pointer: coarse) and (max-width: 1100px) {
   /* de maten in het kW-blok op de kaarten in de lijst: een tik opent het toestel met die maat */
   .toestellen-main .kw-maten span {
     display: inline-flex;
@@ -9926,4 +9926,152 @@ img.td-zoomable:focus-visible {
     width: 52px;
     height: 52px;
   }
+}
+
+/* ---------- controle 28-10-2026: layout (ui-ontwerper en tester) ---------- */
+/* getal en eenheid of een woord met koppelteken niet over twee regels */
+.nw {
+  white-space: nowrap;
+}
+/* toestelpagina: de afspeelknop van de merkvideo niet over de titel op gsm */
+@media (max-width: 560px) {
+  .td-video:not(.speelt) {
+    aspect-ratio: 4 / 3;
+  }
+  .td-video-play {
+    top: 44%;
+  }
+}
+/* toestelpagina: het kleurpilletje onder de foto in plaats van over het toestel, en grotere tikzones */
+.td-media .device-photo:has(.color-swatches) {
+  padding-bottom: 64px;
+}
+@media (max-width: 860px) {
+  .td-media .color-swatches {
+    gap: 22px;
+    padding: 8px 16px;
+  }
+  .td-media .color-swatch {
+    position: relative;
+  }
+  .td-media .color-swatch::before {
+    content: "";
+    position: absolute;
+    inset: -11px;
+    border-radius: 50%;
+  }
+}
+/* toestelpagina: lange labels onder de miniaturen ("Afstandsbediening") afbreken in plaats van afsnijden */
+.td-thumbs button span {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  overflow-wrap: anywhere;
+}
+/* Home, "Zo werkt het": het woordje boven de donkere kaart leesbaar */
+.v4-stop.end .when {
+  color: var(--gold);
+}
+/* Home, tegel "24 uur": voldoende contrast */
+.v3-tile .num em {
+  color: var(--gold-text);
+}
+/* Home: merkpillen en zoekknop als volwaardige tikdoelen */
+@media (max-width: 860px) {
+  .v3-tile.dark .brands a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 14px;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 480px) {
+  .hz-klein .hz-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* de tegels van Home in één kolom: in twee kolommen braken titels en pilletjes op 3 regels */
+  .v3-bento {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .v3-tile.big {
+    grid-column: auto;
+  }
+}
+/* Contact op tablet: foto en knoppen naast elkaar, de foto niet uitvergroot */
+@media (min-width: 561px) and (max-width: 860px) {
+  .ct-top {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    align-items: start;
+  }
+  .ct-acts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+}
+/* prijsadvies, voorstellen op gsm: prijs, uitleg en knoppen over de volle breedte */
+@media (max-width: 480px) {
+  .pc-vs-prijs,
+  .pc-vs-info,
+  .pc-vs-btn,
+  .pc-vs-meer {
+    grid-column: 1 / -1;
+  }
+}
+/* toestellenlijst: kW-blokken op dezelfde hoogte */
+@media (min-width: 641px) {
+  .toestellen-main .device-card h3,
+  .toestellen-main .device-sys {
+    min-height: 3.1em;
+  }
+}
+@media (max-width: 360px) {
+  /* toestellenlijst op 320: bredere tekstkolom */
+  .toestellen-main .device-card {
+    grid-template-columns: 80px minmax(0, 1fr);
+    column-gap: 10px;
+    padding: 12px;
+  }
+  /* paginatitels (bv. "Privacyverklaring") niet afgesneden */
+  .v2-phead h1 {
+    font-size: 1.95rem;
+    overflow-wrap: anywhere;
+  }
+}
+@media (max-width: 760px) {
+  /* toestellenlijst op gsm: geen tekst die tussen de menubalk en de knop Filter door schuift */
+  .v4-filterbtn {
+    top: 92px;
+    box-shadow: 0 -12px 0 4px var(--surface), 0 8px 20px rgba(15, 29, 46, 0.18);
+  }
+  /* uitleg-labels bij de specificaties: groot genoeg om aan te tikken */
+  .v4-tip {
+    display: inline-block;
+    padding: 11px 0;
+    margin: -11px 0;
+  }
+}
+/* zoomviewer: de pijlknoppen zichtbaar op een witte foto */
+.td-zoom-btn.p,
+.td-zoom-btn.n {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--line);
+}
+/* Diensten op tablet: de vragen even breed als de tegels */
+@media (max-width: 860px) {
+  .faq-list {
+    max-width: none;
+  }
+}
+/* Contact: de twee kaarten onderaan even hoog */
+.ct-grid {
+  align-items: stretch;
+}
+/* geen woord alleen op de laatste regel */
+.ct-steplist b,
+.merk-tag,
+.v3-pick b,
+.option-title,
+.pc-opt b {
+  text-wrap: balance;
 }
