@@ -24,7 +24,6 @@
     diensten: "diensten.html",
     toestellen: "toestellen.html",
     realisaties: "realisaties.html",
-    "over-ons": "over-ons.html",
     contact: "contact.html",
     privacy: "privacy.html",
   };

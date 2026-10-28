@@ -7,13 +7,15 @@ Het is een statische website (HTML, CSS en JavaScript) zonder build-stap: elke w
 ## Mappen
 
 ```
-index.html        alle pagina's (home, diensten, toestellen, realisaties, over ons, contact)
+index.html        alle pagina's (home, diensten, toestellen, realisaties, contact)
 css/style.css     de volledige opmaak; kleuren en lettertypes staan bovenaan in :root
 js/main.js        navigatie, formulieren, carrousels, filters, fotoviewer, animaties
 assets/img/       alle foto's, het logo en de merklogo's (logo-<merk>.svg)
 ```
 
 De pagina's staan allemaal in `index.html`. Het menu toont of verbergt ze (`#diensten`, `#contact`, ...), zodat links en de terugknop gewoon werken.
+
+Sinds 28-10-2026 (Rims keuze) zijn *Over ons* en *Contact* één pagina, *Contact* (`#contact`). Van boven naar onder: de kop, Rim bij zijn werkbus met de vier knoppen (`.ct-top`: Bel Rim, WhatsApp, E-mail, Offerte aanvragen), het verhaal met de quote "Elke plaatsing moet zelf overtuigen." (`.ct-verhaal`, `id="over-ons"`), het team met de kaartjes van Rim en Fabio (`.ct-team`), "Zo gaat het verder" in drie stappen (`.ct-steps`) en de gegevenskaart naast "Waarvoor mag Rim langskomen?" (`.ct-grid`). Er is geen menu-item *Over ons* meer. Oude links naar `#over-ons` werken nog: ze openen de pagina Contact bij het verhaal. De opmaak staat achteraan in `css/style.css` onder "contact: het verhaal en het team".
 
 ## Lokaal bekijken
 
