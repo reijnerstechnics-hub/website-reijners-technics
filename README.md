@@ -27,7 +27,7 @@ en ga naar http://localhost:8000.
 
 ## Formulieren
 
-Het aanvraagformulier op de startpagina en het contactformulier versturen hun gegevens via [Formspree](https://formspree.io) naar het e-mailadres dat aan het Formspree-formulier gekoppeld is. Het adres van het formulier staat bovenaan het blok *AANVRAGEN VERSTUREN* in `js/main.js`:
+Het aanvraagformulier (op de startpagina en in het prijsadvies; de pagina Contact heeft sinds 28-10-2026 geen apart contactformulier meer, maar vier grote knoppen en links naar hetzelfde korte formulier) verstuurt zijn gegevens via [Formspree](https://formspree.io) naar het e-mailadres dat aan het Formspree-formulier gekoppeld is. Het adres van het formulier staat bovenaan het blok *AANVRAGEN VERSTUREN* in `js/main.js`:
 
 ```js
 var FORMSPREE_URL = "https://formspree.io/f/mdeakpaq";
