@@ -25,16 +25,18 @@ var RT_PRIJZEN = {
   multiMaxAansluiting: 1.3,
   niveaus: {
     voordelig: { titel: "Voordelig", uitleg: "Betrouwbaar en scherp geprijsd" },
-    kwaliteit: { titel: "Beste prijs-kwaliteit", uitleg: "Een topmerk dat jarenlang meegaat" },
-    premium: { titel: "Premium", uitleg: "Het beste wat er is" },
+    kwaliteit: { titel: "Beste prijs-kwaliteit", uitleg: "Een gekend merk, goede verhouding prijs en kwaliteit" },
+    premium: { titel: "Premium", uitleg: "Het meest uitgebreide model" },
   },
   wensen: [
     // Rim (27-10-2026): Daikin en Mitsubishi minstens bij "Beste prijs-kwaliteit"; enkel hun kale instapmodellen bij "Voordelig".
     { id: "prijs", vraag: "Zo voordelig mogelijk", uitleg: "Een betrouwbaar toestel tegen een scherpe prijs", markeer: "voordelig",
       voorstellen: { voordelig: "Nuova Infinity AI Smart", kwaliteit: "Mitsubishi Electric MSZ-AY Compact", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
-    { id: "kwaliteit", vraag: "Goede prijs-kwaliteit", uitleg: "Een topmerk dat jarenlang meegaat", markeer: "kwaliteit",
-      voorstellen: { voordelig: "Daikin Sensira", kwaliteit: "Daikin Comfora", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
-    { id: "stil", vraag: "Extra stil en zuinig", uitleg: "Fluisterstil en zo weinig mogelijk verbruik", markeer: "premium",
+    // Rim (29-10-2026): bij 2 of 3 kamers was Comfora duurder dan de Diamond, dus "wisselen". Het prijsadvies zet de drie
+    // voorstellen bovendien zelf in volgorde van prijs (js/prijscalculator.js), want bij 1 kamer is de Comfora net goedkoper.
+    { id: "kwaliteit", vraag: "Goede prijs-kwaliteit", uitleg: "Een gekend merk, goede verhouding prijs en kwaliteit", markeer: "kwaliteit",
+      voorstellen: { voordelig: "Daikin Sensira", kwaliteit: "Mitsubishi Electric MSZ-LN Diamond", premium: "Daikin Comfora" } },
+    { id: "stil", vraag: "Extra stil en zuinig", uitleg: "Stil en zuinig in gebruik", markeer: "premium",
       voorstellen: { voordelig: "Nuova Stellar Inverter", kwaliteit: "Mitsubishi Electric MSZ-AY Compact", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
     { id: "design", vraag: "Mooi design", uitleg: "Een toestel dat mooi in uw interieur past", markeer: "kwaliteit",
       voorstellen: { voordelig: "Nuova Stellar Inverter", kwaliteit: "Mitsubishi Electric MSZ-EF Premium Design", premium: "Daikin Emura" } },
@@ -75,7 +77,7 @@ var RT_PRIJZEN = {
     { merk: "LG", model: "LG Standard Plus Smart Inverter Multi · PM05SP / PM15SP", naam: "Standard Plus multi", multi: "lg-multif",
       prijzen: { "4.2": [null, 334] } },
     { merk: "LG", model: "LG Cassette 4-weg CT- en UT-serie", naam: "Cassette 4-weg", multi: "lg-multif",
-      prijzen: { "2.5": [1350, 443], "3.4": [null, 448], "3.5": [1357, null], "4.7": [null, 500], "5.0": [1650, null], "7.0": [1826, null], "7.1": [null, 540], "8.0": [1825, null], "9.5": [2527, null], "12.0": [2547, null], "13.5": [2608, null], "15.0": [2682, null] } },
+      prijzen: { "2.5": [1350, 443], "3.5": [1357, 448], "5.0": [1650, 500], "7.0": [1826, 540], "8.0": [1825, null], "9.5": [2527, null], "12.0": [2547, null], "13.5": [2608, null], "15.0": [2682, null] } },
     { merk: "LG", model: "LG Cassette 1-weg MT-serie, multi-split binnenunit", naam: "Cassette 1-weg", multi: "lg-multif",
       prijzen: { "2.6": [null, 448], "3.5": [null, 460] } },
     { merk: "LG", model: "LG Kanaalunit CL / CM / UM / UB", naam: "Kanaalunit", multi: "lg-multif",
@@ -231,9 +233,7 @@ var RT_PRIJZEN = {
       { poorten: 5, kw: 9.0, prijs: 3028 },
     ] },
     "daikin-mxf": { naam: "Daikin Sensira 2MXF", units: [
-      { poorten: 2, kw: 0.0, prijs: 0 },
-      { poorten: 4, kw: 0.0, prijs: 0 },
-      { poorten: 1280, kw: 0.0, prijs: 0 },
+      { poorten: 2, kw: 4.0, prijs: 1227 },
     ] },
   },
 };
