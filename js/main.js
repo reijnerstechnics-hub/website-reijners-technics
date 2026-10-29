@@ -250,8 +250,8 @@ function sendLead(data) {
   });
 
   var PLACEHOLDERS = {
-    "Nieuwe airco": "Bijvoorbeeld: aantal ruimtes, bestaande verwarming, gewenste periode",
-    "Nieuwe warmtepomp": "Bijvoorbeeld: aantal ruimtes, bestaande verwarming, gewenste periode",
+    "Nieuwe airco": "Bijvoorbeeld: aantal kamers, bestaande verwarming, gewenste periode",
+    "Nieuwe warmtepomp": "Bijvoorbeeld: aantal kamers, bestaande verwarming, gewenste periode",
     Onderhoud: "Bijvoorbeeld: merk en type toestel, wanneer het laatste onderhoud was",
     Herstelling: "Bijvoorbeeld: merk en type toestel, wat er scheelt en sinds wanneer, eventuele foutcode",
     "Iets anders": "Uw vraag of bericht",
@@ -314,7 +314,7 @@ function sendLead(data) {
 
     sendLead(data)
       .then(function () {
-        done(true, "Bedankt, " + data.naam + "! Rim belt u binnen 24\u00a0uur terug.");
+        done(true, "Bedankt, " + data.naam + ". Rim belt u op werkdagen binnen 24\u00a0uur terug.");
         if (window.rtLeadDone) window.rtLeadDone(data.naam);
       })
       .catch(function () {
@@ -362,9 +362,9 @@ function sendLead(data) {
     return (LABELS[field] && LABELS[field][value]) || value || "";
   }
   function roomsLabel(v) {
-    if (v === "4+") return "4 of meer ruimtes";
-    if (v === "1") return "1 ruimte";
-    return v + " ruimtes";
+    if (v === "4+") return "4 of meer kamers";
+    if (v === "1") return "1 kamer";
+    return v + " kamers";
   }
 
   function currentKey() {
@@ -415,7 +415,7 @@ function sendLead(data) {
   var GERUST = {
     nieuw: "Gratis plaatsbezoek · U beslist pas na de offerte",
     onderhoud: "Aanvragen kost niets · Rim spreekt met u een dag af",
-    herstelling: "Aanvragen kost niets · Daarna kunt u zeggen wat er scheelt · U hoort de prijs vooraf",
+    herstelling: "Aanvragen kost niets · Na het versturen kunt u het probleem beschrijven · U hoort de prijs vooraf",
   };
   function toonDienst() {
     var el = document.getElementById("calc-dienst");
@@ -473,8 +473,8 @@ function sendLead(data) {
     lines.push("- " + label("dienst", s.dienst));
     // het toestel (met vermogen en kleur) dat de bezoeker op een toestelpagina koos
     if (s.dienst === "nieuw" && window.rtModel) lines.push("- Toestel: " + window.rtModel);
-    if (s.ruimtes) lines.push("- Ruimtes: " + roomsLabel(s.ruimtes));
-    if (s.grootte) lines.push("- Oppervlakte per ruimte: " + label("grootte", s.grootte));
+    if (s.ruimtes) lines.push("- Kamers: " + roomsLabel(s.ruimtes));
+    if (s.grootte) lines.push("- Oppervlakte per kamer: " + label("grootte", s.grootte));
     if (s.probleem && s.probleem.length)
       lines.push(
         "- Probleem: " +
@@ -565,9 +565,9 @@ function sendLead(data) {
   });
 
   function showDone() {
-    document.getElementById("calc-done-title").textContent = "Bedankt, " + state.naam + "!";
+    document.getElementById("calc-done-title").textContent = "Bedankt, " + state.naam;
     document.getElementById("calc-done-text").textContent =
-      "Uw aanvraag is goed ontvangen. Rim belt u binnen 24\u00a0uur terug op " + state.telefoon + ".";
+      "Uw aanvraag is goed ontvangen. Op werkdagen belt Rim u binnen 24\u00a0uur terug op " + state.telefoon + ".";
     var isNieuw = state.dienst === "nieuw";
     document.getElementById("calc-extra-nieuw").hidden = !isNieuw;
     document.getElementById("calc-extra-onderhoud").hidden = state.dienst !== "onderhoud";
@@ -635,7 +635,7 @@ function sendLead(data) {
     };
     var perRoom = low === high ? kom(low) + " kW" : kom(low) + " - " + kom(high) + " kW";
     var n = s.ruimtes === "4+" ? 4 : parseInt(s.ruimtes, 10);
-    return n && n > 1 ? perRoom + " per ruimte (bij " + roomsLabel(s.ruimtes) + ")" : perRoom;
+    return n && n > 1 ? perRoom + " per kamer (bij " + roomsLabel(s.ruimtes) + ")" : perRoom;
   }
 
   var extraBtn = document.getElementById("calc-extra-send");
@@ -783,7 +783,7 @@ window.rtGoToOffer = function (d, model) {
       window.rtGoToOffer(btn.getAttribute("data-start-dienst"), btn.getAttribute("data-model") || "");
     });
   });
-  // Gewone links naar het formulier (knop bovenaan, balk onderaan, "Start uw aanvraag"):
+  // Gewone links naar het formulier (knop bovenaan, balk onderaan, "Offerte aanvragen"):
   // op een toestelpagina vragen ze een offerte voor dat toestel, met het gekozen vermogen.
   // Elders gaat het om een gewone aanvraag: dan geen toestel dat de bezoeker eerder bekeek.
   document.addEventListener(
@@ -916,7 +916,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.360 euro, standaardplaatsing met 5 meter leiding en 6% btw inbegrepen voor een woning ouder dan 10 jaar; een langere leiding of stroom vanuit de zekeringkast komt erbij; onderhoud 150 tot 200 euro, exclusief btw; herstelling 100 tot 150 euro voor de verplaatsing en het eerste uur, exclusief btw); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt binnen 24\u00a0uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.360 euro, standaardplaatsing met 5 meter leiding en 6% btw inbegrepen voor een woning ouder dan 10 jaar; een langere leiding of stroom vanuit de zekeringkast komt erbij; onderhoud 150 tot 200 euro, exclusief btw; herstelling 100 tot 150 euro voor de verplaatsing en het eerste uur, exclusief btw); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt op werkdagen binnen 24\u00a0uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -2944,7 +2944,7 @@ function rtKwVoorKeuze(maten, k) {
     acts.appendChild(wa);
     acts.appendChild(mail);
     info.appendChild(acts);
-    info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Rim belt u binnen 24\u00a0uur terug · U beslist pas na de offerte"));
+    info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Op werkdagen binnen 24\u00a0uur teruggebeld · U beslist pas na de offerte"));
     top.appendChild(info);
     detail.appendChild(top);
 
@@ -2962,6 +2962,7 @@ function rtKwVoorKeuze(maten, k) {
       dl.appendChild(el("dd", null, s[s.length - 1].textContent.replace(/(\d) (?=kW|m²|dB)/g, "$1\u00a0")));
     });
     specs.appendChild(dl);
+    if (dl.querySelector(".v4-tip")) specs.appendChild(el("p", "td-note", "Bij een onderstreept woord staat een korte uitleg: tik of wijs erop."));
     body.appendChild(specs);
 
     var side = el("div", "td-side");
@@ -3377,8 +3378,8 @@ function rtKwVoorKeuze(maten, k) {
   var month = new Date().getMonth();
   var mode = month >= 4 && month <= 8 ? "cool" : "warm";
   var SUB = {
-    cool: "Koel en stil, ook op de warmste zomerdag. Binnen 24\u00a0uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.",
-    warm: "Behaaglijk warm deze winter, met een warmtepomp: een airco die ook verwarmt. Binnen 24\u00a0uur belt Rim u zelf terug en bespreekt hij wat bij uw woning past.",
+    cool: "Koel en stil, ook op de warmste zomerdag. Op werkdagen belt Rim u binnen 24\u00a0uur zelf terug en bespreekt hij wat bij uw woning past.",
+    warm: "Behaaglijk warm deze winter, met een warmtepomp: een airco die ook verwarmt. Op werkdagen belt Rim u binnen 24\u00a0uur zelf terug en bespreekt hij wat bij uw woning past.",
   };
   var tempEl = document.getElementById("v4-temp");
   var lblEl = document.getElementById("v4-thlbl");
@@ -3513,7 +3514,7 @@ function rtKwVoorKeuze(maten, k) {
     mini.setAttribute("aria-hidden", show ? "false" : "true");
     var a = mini.querySelector("a");
     if (a) a.tabIndex = show ? 0 : -1;
-    // gsm: geen gouden knop "Aanvraag starten" in de balk onderaan zolang er een formulier in beeld is
+    // gsm: geen gouden knop "Offerte aanvragen" in de balk onderaan zolang er een formulier in beeld is
     var formulier =
       inView(document.getElementById("calculator")) ||
       inView(document.querySelector("section.page-active #lead-form")) ||
@@ -3566,7 +3567,7 @@ function rtKwVoorKeuze(maten, k) {
     help.className = "v4-help";
     help.innerHTML =
       '<span class="v3-avatar"><img src="assets/img/rim-reijners.webp" alt="Rim Reijners"></span><h3>Twijfelt u tussen modellen?</h3><p>Rim helpt u kiezen tijdens het gratis plaatsbezoek. Hij kijkt naar uw ruimte, uw isolatie en waar het toestel kan hangen.</p>' +
-      '<a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="nieuw">Gratis plaatsbezoek aanvragen <span class="ar">&rarr;</span></a>';
+      '<a class="btn btn-gold btn-sm" href="#calculator" data-start-dienst="nieuw">Offerte aanvragen <span class="ar">&rarr;</span></a>';
     grid.appendChild(help);
     help.querySelector("a").addEventListener("click", function (e) {
       e.preventDefault();
@@ -3587,13 +3588,21 @@ function rtKwVoorKeuze(maten, k) {
     "Geluidsniveau buiten": "In dB(A), gemeten aan de buitenunit.",
     Koudemiddel: "Het middel in het toestel dat de warmte verplaatst. R32 is het gangbare koudemiddel in nieuwe toestellen.",
   };
-  document.querySelectorAll(".device-specs > div > span:first-child").forEach(function (sp) {
+  // ook de tabel op een toestelpagina die al openstond bij het laden (die is opgebouwd vóór deze uitleg bestond)
+  document.querySelectorAll(".device-specs > div > span:first-child, .td-specs dt > span:first-child").forEach(function (sp) {
     var t = TIPS[sp.textContent.trim()];
     if (!t) return;
     sp.classList.add("v4-tip");
     sp.setAttribute("tabindex", "0");
     sp.setAttribute("data-tip", t);
     sp.setAttribute("aria-label", sp.textContent.trim() + ": " + t);
+  });
+  document.querySelectorAll(".td-specs").forEach(function (sp) {
+    if (!sp.querySelector(".v4-tip") || sp.querySelector(".td-note")) return;
+    var p = document.createElement("p");
+    p.className = "td-note";
+    p.textContent = "Bij een onderstreept woord staat een korte uitleg: tik of wijs erop.";
+    sp.appendChild(p);
   });
   var side = document.querySelector(".toestellen-sidebar");
   if (side) {
@@ -3614,7 +3623,7 @@ function rtKwVoorKeuze(maten, k) {
   window.rtLeadDone = function (naam) {
     var d = document.getElementById("v4-lead-done");
     if (!d) return;
-    document.getElementById("v4-lead-title").textContent = naam ? "Bedankt, " + naam + "!" : "Bedankt!";
+    document.getElementById("v4-lead-title").textContent = naam ? "Bedankt, " + naam : "Bedankt";
     d.hidden = false;
     d.classList.remove("in");
     requestAnimationFrame(function () {
