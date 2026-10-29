@@ -3668,7 +3668,15 @@ function rtKwVoorKeuze(maten, k) {
 (function () {
   var raster = document.getElementById("rl-raster");
   if (!raster) return;
-  var tegels = Array.prototype.slice.call(raster.querySelectorAll(".rl-tegel"));
+  var alleTegels = Array.prototype.slice.call(raster.querySelectorAll(".rl-tegel"));
+  // De eerste 6 foto's staan groot in de kijker bovenaan (blok IN DE KIJKER hieronder). Rim (29-10-2026): geen dubbele
+  // foto's, dus die 6 komen niet nog eens in het raster. Zonder JavaScript blijven ze gewoon in het raster staan.
+  var kijkerEl = document.getElementById("rl-kijker");
+  var kijkerTegels = kijkerEl ? alleTegels.slice(0, 6) : [];
+  kijkerTegels.forEach(function (t) {
+    t.parentNode.removeChild(t);
+  });
+  var tegels = alleTegels.slice(kijkerTegels.length);
   var knoppen = Array.prototype.slice.call(document.querySelectorAll(".rl-filter"));
   var status = document.getElementById("rl-status");
   var NAMEN = { daikin: "Daikin", lg: "LG", me: "Mitsubishi Electric", mhi: "MHI", nuova: "Nuova", toshiba: "Toshiba" };
@@ -3780,10 +3788,10 @@ function rtKwVoorKeuze(maten, k) {
   kies("");
 
   // IN DE KIJKER (Rims keuze van 29-10-2026): de eerste 6 foto's van het raster, groot, met uitleg en de offerteknop
-  var kijker = document.getElementById("rl-kijker");
-  if (!kijker) return;
+  var kijker = kijkerEl;
+  if (!kijker || !kijkerTegels.length) return;
   var vak = kijker.querySelector(".rl-kijker-foto");
-  var uitgelicht = tegels.slice(0, 6).map(function (t, i) {
+  var uitgelicht = kijkerTegels.map(function (t, i) {
     var b = t.querySelector(".rl-open"),
       img = b.querySelector("img");
     var el = document.createElement("img");
