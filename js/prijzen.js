@@ -35,8 +35,8 @@ var RT_PRIJZEN = {
     //   Premium: de mooiste modellen: LG H-serie (Deluxe), Artcool Mirror en Gallery (schilderij), Daikin boven de Perfera
     //   (Stylish, Emura) en Mitsubishi Electric boven de AY (EF Premium Design, LN Diamond).
     // De volgorde staat vast (geen automatische wissel meer); binnen elke wens is Voordelig < Beste prijs-kwaliteit < Premium.
-    // Rim (29-10-2026): "Extra stil en zuinig" enkel Mitsubishi en Daikin; "Mooi design" altijd een mooie binnenunit,
-    // de voordeligste die de volgorde laat kloppen (Stellar met spiegelpaneel, Perfera, Stylish).
+    // Rim (29-10-2026): "Extra stil en zuinig" enkel Mitsubishi en Daikin; "Mooi design" enkel Daikin, Mitsubishi en LG,
+    // altijd een mooie binnenunit, de voordeligste die de volgorde laat kloppen (Sensira, Perfera, Stylish).
     { id: "prijs", vraag: "Zo voordelig mogelijk", uitleg: "Een eenvoudig toestel tegen een scherpe prijs", markeer: "voordelig",
       voorstellen: { voordelig: "Nuova Infinity AI Smart", kwaliteit: "LG Standard Plus DualCool Special P · PZ-serie", premium: "LG Artcool AI Air Mirror" } },
     { id: "kwaliteit", vraag: "Goede prijs-kwaliteit", uitleg: "Een gekend merk, goede verhouding prijs en kwaliteit", markeer: "kwaliteit",
@@ -44,7 +44,7 @@ var RT_PRIJZEN = {
     { id: "stil", vraag: "Extra stil en zuinig", uitleg: "Stil en zuinig in gebruik", markeer: "premium",
       voorstellen: { voordelig: "Daikin Sensira", kwaliteit: "Mitsubishi Electric MSZ-AY Compact", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
     { id: "design", vraag: "Mooi design", uitleg: "Een toestel dat mooi in uw interieur past", markeer: "premium",
-      voorstellen: { voordelig: "Nuova Stellar Inverter", kwaliteit: "Daikin Perfera", premium: "Daikin Stylish" } },
+      voorstellen: { voordelig: "Daikin Sensira", kwaliteit: "Daikin Perfera", premium: "Daikin Stylish" } },
   ],
   toestellen: [
     { merk: "Nuova", model: "Nuova Infinity AI Smart", naam: "Infinity AI Smart", multi: "nuova-inf",
