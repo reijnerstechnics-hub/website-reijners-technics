@@ -370,28 +370,7 @@
       var m = modelByName(w.voorstellen[nv]);
       if (m) results[nv] = calculate(m);
     });
-    // Rim (29-10-2026): de volgorde in prijs moet kloppen (Voordelig ≤ Beste prijs-kwaliteit ≤ Premium).
-    // Welk toestel goedkoper uitkomt, hangt soms af van het aantal kamers (bv. Comfora en Diamond):
-    // dan wisselen de toestellen van plaats. Bij "op maat" (geen bedrag) blijft de volgorde uit js/prijzen.js.
-    var opPrijs = NIVEAUS.map(function (nv) {
-      return results[nv];
-    });
-    if (
-      opPrijs.every(function (r) {
-        return r && !r.opMaat;
-      })
-    ) {
-      opPrijs
-        .map(function (r, i) {
-          return { r: r, i: i };
-        })
-        .sort(function (a, b) {
-          return a.r.lo - b.r.lo || a.i - b.i;
-        })
-        .forEach(function (x, i) {
-          results[NIVEAUS[i]] = x.r;
-        });
-    }
+    // Rims indeling (29-10-2026): elk niveau heeft vaste toestellen (zie js/prijzen.js), dus geen automatische wissel.
     if (!results[state.gekozen]) state.gekozen = results[w.markeer] ? w.markeer : NIVEAUS[0];
 
     var list = roomList();

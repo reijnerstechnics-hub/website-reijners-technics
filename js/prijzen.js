@@ -24,22 +24,25 @@ var RT_PRIJZEN = {
   maxPerBuitenunit: 5,
   multiMaxAansluiting: 1.3,
   niveaus: {
-    voordelig: { titel: "Voordelig", uitleg: "Betrouwbaar en scherp geprijsd" },
+    voordelig: { titel: "Voordelig", uitleg: "Een eenvoudig model, scherp geprijsd" },
     kwaliteit: { titel: "Beste prijs-kwaliteit", uitleg: "Een gekend merk, goede verhouding prijs en kwaliteit" },
-    premium: { titel: "Premium", uitleg: "Het meest uitgebreide model" },
+    premium: { titel: "Premium", uitleg: "De mooiste en meest uitgebreide modellen" },
   },
   wensen: [
-    // Rim (27-10-2026): Daikin en Mitsubishi minstens bij "Beste prijs-kwaliteit"; enkel hun kale instapmodellen bij "Voordelig".
-    { id: "prijs", vraag: "Zo voordelig mogelijk", uitleg: "Een betrouwbaar toestel tegen een scherpe prijs", markeer: "voordelig",
-      voorstellen: { voordelig: "Nuova Infinity AI Smart", kwaliteit: "Mitsubishi Electric MSZ-AY Compact", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
-    // Rim (29-10-2026): bij 2 of 3 kamers was Comfora duurder dan de Diamond, dus "wisselen". Het prijsadvies zet de drie
-    // voorstellen bovendien zelf in volgorde van prijs (js/prijscalculator.js), want bij 1 kamer is de Comfora net goedkoper.
+    // Rims indeling (29-10-2026), per niveau enkel deze toestellen:
+    //   Voordelig: alles van Nuova en de kale instapmodellen van elk merk (LG WZ/EZ, Daikin Sensira/FTXF, ME MSZ-HR, MHI ZSP, Toshiba Yukai);
+    //   Beste prijs-kwaliteit: Mitsubishi Electric (MSZ-AY), Daikin vanaf de Perfera, LG de PM-modellen (Standard Plus);
+    //   Premium: de mooiste modellen: LG H-serie (Deluxe), Artcool Mirror en Gallery (schilderij), Daikin boven de Perfera
+    //   (Stylish, Emura) en Mitsubishi Electric boven de AY (EF Premium Design, LN Diamond).
+    // De volgorde staat vast (geen automatische wissel meer); binnen elke wens is Voordelig < Beste prijs-kwaliteit < Premium.
+    { id: "prijs", vraag: "Zo voordelig mogelijk", uitleg: "Een eenvoudig toestel tegen een scherpe prijs", markeer: "voordelig",
+      voorstellen: { voordelig: "Nuova Infinity AI Smart", kwaliteit: "LG Standard Plus DualCool Special P · PZ-serie", premium: "LG Artcool AI Air Mirror" } },
     { id: "kwaliteit", vraag: "Goede prijs-kwaliteit", uitleg: "Een gekend merk, goede verhouding prijs en kwaliteit", markeer: "kwaliteit",
-      voorstellen: { voordelig: "Daikin Sensira", kwaliteit: "Mitsubishi Electric MSZ-LN Diamond", premium: "Daikin Comfora" } },
+      voorstellen: { voordelig: "Daikin Sensira", kwaliteit: "Daikin Perfera", premium: "Daikin Stylish" } },
     { id: "stil", vraag: "Extra stil en zuinig", uitleg: "Stil en zuinig in gebruik", markeer: "premium",
       voorstellen: { voordelig: "Nuova Stellar Inverter", kwaliteit: "Mitsubishi Electric MSZ-AY Compact", premium: "Mitsubishi Electric MSZ-LN Diamond" } },
-    { id: "design", vraag: "Mooi design", uitleg: "Een toestel dat mooi in uw interieur past", markeer: "kwaliteit",
-      voorstellen: { voordelig: "Nuova Stellar Inverter", kwaliteit: "Mitsubishi Electric MSZ-EF Premium Design", premium: "Daikin Emura" } },
+    { id: "design", vraag: "Mooi design", uitleg: "Een toestel dat mooi in uw interieur past", markeer: "premium",
+      voorstellen: { voordelig: "Nuova Stellar Inverter", kwaliteit: "Daikin Perfera", premium: "Daikin Emura" } },
   ],
   toestellen: [
     { merk: "Nuova", model: "Nuova Infinity AI Smart", naam: "Infinity AI Smart", multi: "nuova-inf",

@@ -3778,4 +3778,95 @@ function rtKwVoorKeuze(maten, k) {
   });
 
   kies("");
+
+  // IN DE KIJKER (Rims keuze van 29-10-2026): de eerste 6 foto's van het raster, groot, met uitleg en de offerteknop
+  var kijker = document.getElementById("rl-kijker");
+  if (!kijker) return;
+  var vak = kijker.querySelector(".rl-kijker-foto");
+  var uitgelicht = tegels.slice(0, 6).map(function (t, i) {
+    var b = t.querySelector(".rl-open"),
+      img = b.querySelector("img");
+    var el = document.createElement("img");
+    el.alt = img.alt;
+    el.width = 1200;
+    el.height = 900;
+    el.dataset.src = b.dataset.groot || img.getAttribute("src");
+    if (!i) {
+      el.src = el.dataset.src;
+      el.className = "on";
+    } else el.loading = "lazy";
+    vak.appendChild(el);
+    var uitleg = b.dataset.uitleg || img.alt;
+    return {
+      el: el,
+      merk: NAMEN[t.dataset.merk] || "",
+      // de kop: het eerste stuk van de uitleg ("LG-wandmodel in roze uitvoering")
+      titel: uitleg.split(". ")[0].split(", ")[0].replace(/\.$/, ""),
+      foto: { src: el.dataset.src, alt: img.alt, label: NAMEN[t.dataset.merk] || "", uitleg: uitleg, link: b.dataset.toestel || "", offerte: true },
+    };
+  });
+  var nu = 0;
+  function toonKijker(k) {
+    uitgelicht[nu].el.classList.remove("on");
+    nu = (k + uitgelicht.length) % uitgelicht.length;
+    var f = uitgelicht[nu];
+    if (!f.el.getAttribute("src")) f.el.src = f.el.dataset.src;
+    f.el.classList.add("on");
+    kijker.querySelector(".rl-kijker-merk").textContent = "In de kijker" + (f.merk ? " · " + f.merk : "");
+    kijker.querySelector(".rl-kijker-titel").textContent = f.titel;
+    kijker.querySelector(".rl-kijker-tel").textContent = nu + 1 + " / " + uitgelicht.length;
+    // de volgende alvast laden
+    var v = uitgelicht[(nu + 1) % uitgelicht.length].el;
+    if (!v.getAttribute("src")) v.src = v.dataset.src;
+  }
+  kijker.querySelector(".rl-kijker-p").addEventListener("click", function () {
+    toonKijker(nu - 1);
+    wacht();
+  });
+  kijker.querySelector(".rl-kijker-n").addEventListener("click", function () {
+    toonKijker(nu + 1);
+    wacht();
+  });
+  vak.addEventListener("click", function () {
+    if (window.rtZoomViewer)
+      window.rtZoomViewer().open(
+        uitgelicht.map(function (f) {
+          return f.foto;
+        }),
+        nu,
+        vak
+      );
+  });
+  // vanzelf wisselen: enkel als de kijker in beeld is, niet als de muis of de focus erop staat,
+  // en niet als de bezoeker minder beweging wil
+  var stil = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var inBeeld = false,
+    erop = false,
+    klok = null;
+  function wacht() {
+    clearInterval(klok);
+    klok = null;
+    if (!stil && inBeeld && !erop)
+      klok = setInterval(function () {
+        toonKijker(nu + 1);
+      }, 6000);
+  }
+  ["mouseenter", "focusin"].forEach(function (ev) {
+    kijker.addEventListener(ev, function () {
+      erop = true;
+      wacht();
+    });
+  });
+  ["mouseleave", "focusout"].forEach(function (ev) {
+    kijker.addEventListener(ev, function () {
+      erop = false;
+      wacht();
+    });
+  });
+  if ("IntersectionObserver" in window)
+    new IntersectionObserver(function (e) {
+      inBeeld = e[0].isIntersecting;
+      wacht();
+    }).observe(kijker);
+  toonKijker(0);
 })();

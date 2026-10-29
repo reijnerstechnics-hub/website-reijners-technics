@@ -10419,3 +10419,130 @@ img.td-zoomable:focus-visible {
     margin-top: 6px;
   }
 }
+
+/* ---------- realisaties: "In de kijker" bovenaan (Rims keuze van 29-10-2026, voorstel C) ----------
+   Eén grote foto (4:3, volledig in beeld) met uitleg en de offerteknop; daaronder alle foto's in 4:3, zodat er van
+   geen enkele foto iets wegvalt. Geen merklabels op de kleine foto's: het merk staat in de kijker en in de grote weergave. */
+.rl-kijker {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+  margin: 0 0 32px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: var(--sh-2);
+}
+.rl-kijker-foto {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  border: 0;
+  background: var(--surface-alt);
+  cursor: zoom-in;
+}
+.rl-kijker-foto:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+.rl-kijker-foto img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.rl-kijker-foto img.on {
+  opacity: 1;
+}
+.rl-kijker-tekst {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px;
+}
+.rl-kijker-tekst .v3-kicker {
+  margin: 0;
+}
+.rl-kijker-titel {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.25;
+  min-height: 2.5em; /* twee regels, zodat de knop niet verspringt bij een kortere kop */
+}
+.rl-kijker-tekst p {
+  margin: 0;
+  color: var(--body);
+  line-height: 1.6;
+}
+.rl-kijker-offerte {
+  align-self: flex-start;
+}
+.rl-kijker-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+.rl-kijker-nav button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.rl-kijker-nav button:hover {
+  border-color: var(--ink);
+}
+.rl-kijker-nav span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+.rl-open {
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+}
+.rl-open img {
+  object-position: 50% 50%;
+}
+.rl-merk {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rl-kijker-foto img {
+    transition: none;
+  }
+}
+@media (max-width: 860px) {
+  .rl-kijker {
+    grid-template-columns: minmax(0, 1fr); /* niet breder dan het scherm, ook met een lange knoptekst */
+    margin-bottom: 24px;
+  }
+  .rl-kijker-tekst {
+    padding: 20px;
+    gap: 10px;
+  }
+  .rl-kijker-titel {
+    font-size: 1.2rem;
+  }
+}
+@media (max-width: 700px) {
+  .rl-open {
+    border-radius: 8px;
+  }
+  .rl-kijker-offerte {
+    align-self: stretch;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+  }
+}
