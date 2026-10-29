@@ -345,11 +345,6 @@ var RT_MEDIA ={
   "Toshiba Haori": {
     "fotos": [
       {
-        "src": "assets/img/t-toshiba-haori-2.webp",
-        "label": "Lichtgrijs",
-        "alt": "Toshiba Haori binnenunit met lichtgrijze stoffen hoes"
-      },
-      {
         "src": "assets/img/t-toshiba-haori-3.webp",
         "label": "Donkergrijs",
         "alt": "Toshiba Haori binnenunit met donkergrijze stoffen hoes"
