@@ -2453,7 +2453,9 @@ function rtKwVoorKeuze(maten, k) {
       '<div class="td-zoom-vlak"><img alt="" draggable="false"></div>' +
       '<button type="button" class="td-zoom-btn p" aria-label="Vorige foto">&lsaquo;</button><button type="button" class="td-zoom-btn n" aria-label="Volgende foto">&rsaquo;</button>' +
       // uitleg onder de foto (Realisaties) en eventueel een link naar het toestel
-      '<div class="td-zoom-onder" hidden><p class="td-zoom-uitleg"></p><a class="td-zoom-link" href="#" hidden>Bekijk dit toestel <span aria-hidden="true">&rarr;</span></a></div>' +
+      '<div class="td-zoom-onder" hidden><p class="td-zoom-uitleg"></p><a class="td-zoom-link" href="#" hidden>Bekijk dit toestel <span aria-hidden="true">&rarr;</span></a>' +
+      // Realisaties (Rims keuze van 29-10-2026): wie een foto mooi vindt, vraagt meteen een offerte aan
+      '<p class="td-zoom-offerte" hidden><span>Zo&rsquo;n toestel bij mij?</span> <a class="btn btn-gold btn-sm" href="#calculator">Offerte aanvragen <span class="ar" aria-hidden="true">&rarr;</span></a></p></div>' +
       '<p class="td-zoom-hint">Knijp of scrol om in te zoomen, sleep om te verschuiven</p>';
     document.body.appendChild(box);
     var vlak = box.querySelector(".td-zoom-vlak");
@@ -2493,7 +2495,8 @@ function rtKwVoorKeuze(maten, k) {
       // uitleg en link onderaan (enkel als de foto er een heeft, bv. op Realisaties)
       var onder = box.querySelector(".td-zoom-onder");
       var link = box.querySelector(".td-zoom-link");
-      onder.hidden = !lijst[i].uitleg && !lijst[i].link;
+      onder.hidden = !lijst[i].uitleg && !lijst[i].link && !lijst[i].offerte;
+      box.querySelector(".td-zoom-offerte").hidden = !lijst[i].offerte;
       box.querySelector(".td-zoom-uitleg").textContent = lijst[i].uitleg || "";
       link.hidden = !lijst[i].link;
       if (lijst[i].link) link.setAttribute("href", lijst[i].link);
@@ -2510,6 +2513,13 @@ function rtKwVoorKeuze(maten, k) {
       if (opener) opener.focus({ preventScroll: true });
     }
     box.querySelector(".x").addEventListener("click", sluit);
+    // "Offerte aanvragen" (Realisaties): viewer dicht, dan het gewone aanvraagformulier voor een nieuwe airco
+    box.querySelector(".td-zoom-offerte a").addEventListener("click", function (e) {
+      e.preventDefault();
+      opener = null;
+      sluit();
+      if (window.rtGoToOffer) window.rtGoToOffer("nieuw", "");
+    });
     // "Bekijk dit toestel": eerst de viewer dicht, daarna doet de gewone #link zijn werk
     box.querySelector(".td-zoom-link").addEventListener("click", function () {
       opener = null;
@@ -3654,6 +3664,39 @@ function rtKwVoorKeuze(maten, k) {
   var status = document.getElementById("rl-status");
   var NAMEN = { daikin: "Daikin", lg: "LG", me: "Mitsubishi Electric", mhi: "MHI", nuova: "Nuova", toshiba: "Toshiba" };
   var merk = "";
+  // eerst een twintigtal foto's (op gsm 12), de rest via "Toon meer foto's" (Rims keuze van 29-10-2026)
+  var meerKnop = document.getElementById("rl-meer");
+  function stap() {
+    return window.innerWidth <= 700 ? 12 : 20;
+  }
+  var tonen = stap();
+  function past(t) {
+    return !merk || t.dataset.merk === merk;
+  }
+  function toonTot() {
+    var n = 0;
+    tegels.forEach(function (t) {
+      if (!past(t)) return;
+      n++;
+      t.classList.toggle("rl-later", n > tonen);
+    });
+    if (meerKnop) {
+      var rest = n - tonen;
+      meerKnop.hidden = rest <= 0;
+      var tel = meerKnop.querySelector(".rl-meer-n");
+      if (tel) tel.textContent = "(" + Math.max(rest, 0) + ")";
+    }
+  }
+  if (meerKnop)
+    meerKnop.addEventListener("click", function () {
+      var eerste = tegels.filter(function (t) {
+        return past(t) && t.classList.contains("rl-later");
+      })[0];
+      tonen += stap();
+      toonTot();
+      // de focus naar de eerste nieuwe foto, zodat toetsenbord en schermlezer verder kunnen
+      if (eerste) eerste.querySelector(".rl-open").focus({ preventScroll: true });
+    });
 
   // aantal foto's per knop; een merk zonder foto's krijgt geen knop
   knoppen.forEach(function (k) {
@@ -3673,10 +3716,12 @@ function rtKwVoorKeuze(maten, k) {
     });
     var n = 0;
     tegels.forEach(function (t) {
-      var ok = !merk || t.dataset.merk === merk;
+      var ok = past(t);
       t.hidden = !ok;
       if (ok) n++;
     });
+    tonen = stap();
+    toonTot();
     // met een merk gekozen is het merklabel op elke tegel overbodig: rustiger zonder
     raster.classList.toggle("rl-een-merk", !!merk);
     if (status) status.textContent = n + (n === 1 ? " foto" : " foto's") + (merk ? " van " + NAMEN[merk] : "");
@@ -3692,7 +3737,11 @@ function rtKwVoorKeuze(maten, k) {
   document.addEventListener(
     "click",
     function (e) {
-      if (e.target.closest && e.target.closest('a[href="#aansluitingen"]')) kies("");
+      if (e.target.closest && e.target.closest('a[href="#aansluitingen"]')) {
+        kies("");
+        tonen = tegels.length; // die foto staat achteraan: alles tonen
+        toonTot();
+      }
     },
     true
   );
@@ -3713,6 +3762,7 @@ function rtKwVoorKeuze(maten, k) {
         label: NAMEN[t.dataset.merk] || "",
         uitleg: b.dataset.uitleg || img.alt,
         link: b.dataset.toestel || "",
+        offerte: true,
       };
     });
     window.rtZoomViewer().open(lijst, zichtbaar.indexOf(knop.closest(".rl-tegel")), knop);
