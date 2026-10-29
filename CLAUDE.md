@@ -9,10 +9,11 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - Rechtsvorm: Reijners Technics **BV** (besloten vennootschap sinds 1-4-2025, volgens de KBO). RPR Antwerpen, afdeling Tongeren-Borgloon: de bevoegde rechtbank voor Dilsen-Stokkem volgens territoriale-bevoegdheid.just.fgov.be. Beide staan onderaan de site en in de privacyverklaring (Rims vraag, 24-10-2026).
 - Instagram: @reijnerstechnics (op de site sinds 23-10-2026). Er is nog geen Facebookpagina.
 - Eigen webadres (bv. reijnerstechnics.be): pas als Rims eigen foto's volledig op de site staan (Rim, 24-10-2026). Tot dan enkel het vercel.app-adres.
-- Werkgebied: Dilsen-Stokkem, Maaseik, Bree, Genk, Hasselt, Tongeren en omgeving.
+- Werkgebied: Dilsen-Stokkem, Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt, Peer en omgeving (Rim, 29-10-2026: Lanaken, Bilzen en Peer blijven, overal dezelfde lijst, ook in de voettekst).
 - Merken: Daikin, LG, Mitsubishi Electric, Mitsubishi Heavy Industries (MHI), Nuova en Toshiba. Onderhoud en herstelling doet Rim ook voor andere merken, zoals Samsung of Fujitsu (24-10-2026).
 - **Niet** in het aanbod (bewust overal verwijderd): lucht/water-warmtepompen, warmtepompboilers, het merk Ariston. Ook geen foto's van Gree of Olimpia Splendid (op 22-10-2026 van de site gehaald). Voeg ze nooit opnieuw toe.
-- Beloftes op de site: gratis plaatsbezoek, binnen 24 uur teruggebeld door Rim zelf, rechtstreeks met de installateur, u beslist pas na de offerte.
+- Beloftes op de site: gratis plaatsbezoek, op werkdagen binnen 24 uur teruggebeld door Rim zelf (Rim, 29-10-2026: altijd met "op werkdagen"), rechtstreeks met de installateur, u beslist pas na de offerte.
+- De knop voor een aanvraag voor een nieuwe airco heet overal "Offerte aanvragen" (Rim, 29-10-2026). "Onderhoud aanvragen", "Herstelling aanvragen" en "Offerte voor dit model" blijven. Geen beweringen zonder bron zoals "het populairste", "fluisterstil", "topmodel" of "het beste wat er is" (Rim, 29-10-2026).
 - Op Rims vraag weggehaald (24-10-2026), want zonder bron: "Nazorg gegarandeerd", "u behoudt uw garantie", "geen wachttijden", "Binnen 1 tot 2 dagen klaar", "20-30% besparing" en "5-10 jaar langer". Zet ze niet terug.
 - Rim is altijd zelf het aanspreekpunt. Fabio Lomma (eigen zaak: Lomma Technics) plaatst mee, maar is geen aanspreekpunt (Rim, 22-10-2026).
 - De foto van Rim en Fabio samen wil Rim niet op de site (22-10-2026). Er komt ook geen fotootje van Fabio uit die foto: zijn kaartje (team, op Contact) houdt de letters "FL". De bewerkte versies in `voorbeeld/ronde-1/nieuw/` gebruik je niet.
