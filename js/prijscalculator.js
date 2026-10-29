@@ -446,7 +446,7 @@
     var gk = results[state.gekozen];
     h += '<div class="pc-lead pc-vs-lead">';
     if (state.sent) {
-      h += '<b>Bedankt! Rim belt u binnen 24\u00a0uur terug.</b><span class="pc-muted">Dan plannen we samen het gratis plaatsbezoek.</span>';
+      h += '<b>Bedankt. Rim belt u op werkdagen binnen 24\u00a0uur terug.</b><span class="pc-muted">Dan plannen we samen het gratis plaatsbezoek.</span>';
     } else {
       h +=
         "<div><b>" +
@@ -456,7 +456,7 @@
         esc(gk.model.cfg.merk + " " + gk.model.cfg.naam) +
         " &middot; " +
         (gk.opMaat ? "prijs op maat" : "richtprijs " + eur(gk.lo)) +
-        '</b><span class="pc-muted">Rim belt u binnen 24\u00a0uur terug en komt gratis langs. Daarna krijgt u een vaste offerte.</span></div>' +
+        '</b><span class="pc-muted">Rim belt u op werkdagen binnen 24\u00a0uur terug en komt gratis langs. Daarna krijgt u een vaste offerte.</span></div>' +
         '<div class="pc-vs-form">' +
         '<div class="field"><label for="pc-naam">Naam</label><input id="pc-naam" type="text" autocomplete="name"></div>' +
         '<div class="field"><label for="pc-tel">Telefoon</label><input id="pc-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="04xx xx xx xx"></div>' +
