@@ -11,8 +11,10 @@
      Vast, licht kleurenschema (niet afhankelijk van het systeemthema van de bezoeker). */
 :root {
   /* lettertypes: titels met schreef, tekst zonder (geladen in index.html via Google Fonts) */
-  --font-kop: "Source Serif 4", Georgia, "Times New Roman", serif;
-  --font-tekst: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  /* Lettertypes en kleuren: sinds 2-11-2026 de huisstijl "Warm vakwerk" (Merriweather + PT Sans, blauw en goud), die
+     achteraan dit bestand (blok HUISSTIJL) deze waarden overschrijft. Hieronder staan de oude waarden als terugval. */
+  --font-kop: "Merriweather", "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-tekst: "PT Sans", "Source Sans 3", "Segoe UI", Arial, sans-serif;
   --ink: #16283d;
   --body: #3d4c5a;
   --muted: #5f6e7b;
@@ -10546,3 +10548,1155 @@ img.td-zoomable:focus-visible {
     white-space: normal;
   }
 }
+
+/* =====================================================================
+   HUISSTIJL "Warm vakwerk" (Rims keuze van 30-10/2-11-2026, voorstel 3 van de ui-ontwerper).
+   Licht papier, het blauw en goud van het logo; Merriweather (koppen) en PT Sans (tekst), zie de
+   Google Fonts-link in index.html. Overschrijft enkel kleuren, lettertypes en vormtaal van alles hierboven.
+   ===================================================================== */
+:root {
+  --font-kop: "Merriweather", Georgia, "Times New Roman", serif;
+  --font-tekst: "PT Sans", "Segoe UI", Arial, sans-serif;
+  --ink: #1b2f44;
+  --ink-2: #12202f;
+  --body: #3b4a58;
+  --muted: #5e6b76;
+  --paper: #f8f5ee;
+  --surface: #ffffff;
+  --surface-alt: #efe9dd;
+  --line: #e2dbcd;
+  --gold: #dc9a2c;
+  --gold-dark: #c4851f;
+  --gold-tint: #fbf0dc;
+  --gold-text: #7a5417;
+  --sky: #2a6a99;
+  --sky-tint: #e6eef5;
+  --focus: #2a6a99;
+  --sh-1: 0 1px 2px rgba(27, 47, 68, 0.06), 0 6px 18px rgba(27, 47, 68, 0.06);
+  --sh-2: 0 2px 6px rgba(27, 47, 68, 0.08), 0 18px 44px rgba(27, 47, 68, 0.14);
+  --r: 14px;
+}
+
+/* ---------- basis ---------- */
+body {
+  background: var(--paper);
+  color: var(--body);
+  font-size: 17px;
+  line-height: 1.58;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-kop);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+h1 {
+  font-weight: 800;
+}
+::selection {
+  background: rgba(220, 154, 44, 0.3);
+}
+.v3-kicker,
+.v2-kicker,
+.eyebrow,
+.device-brand,
+.kw-kop span,
+.v4-stop .when,
+.td-prijs-lbl,
+.wb-from {
+  color: var(--gold-text);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.on-dark .v3-kicker {
+  color: #e9c27a;
+}
+
+/* ---------- kopbalk ---------- */
+.v2-topstrip {
+  background: var(--ink);
+}
+header.site {
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: none;
+}
+header.site .brand {
+  color: var(--ink);
+  font-weight: 700;
+}
+header.site .logo-mark {
+  background: none;
+  padding: 0;
+  height: 32px;
+}
+.nav-toggle span {
+  background: var(--ink);
+}
+nav.links a {
+  color: var(--body);
+}
+@media (min-width: 841px) {
+  nav.links a {
+    color: var(--body);
+    font-weight: 600;
+  }
+  nav.links a:hover,
+  .links a.active {
+    color: var(--ink);
+    border-color: var(--gold);
+  }
+}
+
+/* ---------- knoppen ---------- */
+.btn {
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.98rem;
+  padding: 13px 24px;
+}
+.btn-gold,
+.hz-btn,
+.v4-mini .btn {
+  background: var(--gold);
+  color: var(--ink);
+  box-shadow: none;
+}
+.btn-gold:hover,
+.hz-btn:hover {
+  background: var(--gold-dark);
+  color: var(--ink);
+  box-shadow: 0 8px 20px rgba(220, 154, 44, 0.3);
+}
+.btn-outline,
+.v3-btn-line,
+.v2-btn-line {
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+}
+.btn-outline:hover,
+.v3-btn-line:hover,
+.v2-btn-line:hover {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.on-dark .btn-outline,
+.v2-band .v2-btn-ghost,
+.v2-btn-ghost {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #fff;
+}
+.v2-btn-ghost:hover {
+  border-color: #fff;
+}
+.hz-btn {
+  border-radius: 8px;
+}
+
+/* ---------- home: bovenkant (licht, warm) ---------- */
+section.v3-hero {
+  background: var(--surface-alt);
+  color: var(--body);
+  padding: 56px 0 130px;
+}
+section.v3-hero::before,
+section.v2-phead::before,
+.rt-warm section.v3-hero::before,
+.rt-cool section.v3-hero::before,
+.rt-warm section.v2-phead::before,
+.rt-cool section.v2-phead::before {
+  display: none;
+}
+.v3-hero::after {
+  background: var(--paper);
+  height: 70px;
+}
+.v3-hero h1 {
+  color: var(--ink);
+  font-size: clamp(2.3rem, 4.1vw, 3.2rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+.v3-hero h1 .u::after {
+  height: 0.12em;
+  bottom: 0.04em;
+}
+.v3-lead {
+  color: var(--body);
+  font-size: 1.15rem;
+}
+.v3-pick-lbl {
+  color: var(--muted);
+}
+.v3-pick {
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r);
+  color: var(--ink);
+  box-shadow: var(--sh-1);
+}
+.v3-pick:hover,
+.v3-pick:focus-visible {
+  background: var(--gold-tint);
+  border-color: var(--gold);
+  box-shadow: var(--sh-2);
+}
+.v3-pick .ic {
+  background: var(--gold-tint);
+  color: var(--gold-text);
+  border-radius: 8px;
+}
+.v3-pick small {
+  color: var(--muted);
+}
+.v3-pick .go {
+  color: var(--gold-text);
+}
+.v3-pick.hl {
+  background: var(--gold-tint);
+  border-color: var(--gold);
+}
+.v3-checks {
+  color: var(--body);
+}
+.v3-checks li::before {
+  color: var(--gold-dark);
+}
+.v4-mode {
+  background: #fff;
+  border-color: var(--line);
+}
+.v4-mode button {
+  color: var(--body);
+}
+.v4-mode button[aria-pressed="true"] {
+  background: var(--ink);
+  color: #fff;
+}
+.rt-warm .v4-mode button[data-m="warm"] svg {
+  color: var(--gold);
+}
+.rt-cool .v4-mode button[data-m="cool"] svg {
+  color: #9cc9ea;
+}
+.v3-richtprijs {
+  color: var(--body);
+}
+.v3-richtprijs b {
+  color: var(--gold-text);
+}
+.v3-richtprijs a {
+  color: var(--ink);
+}
+.hz-bar {
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--sh-1);
+}
+.hz-bar:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(220, 154, 44, 0.35);
+}
+.hz-tip {
+  color: var(--muted);
+}
+.v3-frame {
+  border-color: rgba(220, 154, 44, 0.5);
+  border-radius: 18px;
+}
+.nh-rot-box.v3-main-ph {
+  border-radius: 18px;
+  box-shadow: var(--sh-2);
+}
+.v3-sub-ph {
+  border-color: #fff;
+  border-radius: 12px;
+}
+.v3-glass {
+  border-radius: 12px;
+  backdrop-filter: none;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.v3-glass .ic {
+  border-radius: 8px;
+}
+.v3-avatar {
+  background: var(--ink);
+}
+
+/* ---------- home: merken, tegels ---------- */
+.v3-mq-track .nm {
+  color: #6f7678;
+  font-weight: 700;
+}
+.v3-tile {
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+.v3-tile:hover {
+  box-shadow: var(--sh-2);
+}
+.v3-tile.big .tx,
+.v3-tile.ph .cap {
+  border-radius: 10px;
+}
+.v3-tile.dark {
+  background: var(--ink);
+}
+.v3-tile.gold {
+  background: var(--gold-tint);
+  border-color: #ecd9b4;
+}
+.v3-tile .num em {
+  color: var(--gold-dark);
+}
+
+/* ---------- home: zo werkt het ---------- */
+section.v3-sec.v3-white {
+  background: #fff;
+}
+.v4-stop {
+  border-radius: var(--r);
+}
+.v4-stop > img {
+  border-radius: var(--r) 0 0 var(--r);
+}
+.v4-stop.on::before,
+.v4-stop.past::before {
+  color: var(--ink);
+}
+.v4-stop.end {
+  background: var(--ink);
+}
+.v4-stop.end .big {
+  background: radial-gradient(circle at 50% 50%, rgba(220, 154, 44, 0.3), transparent 70%);
+}
+
+/* ---------- home: offerteblok en formulier ---------- */
+section.v3-offer {
+  background: var(--ink);
+  border-radius: 20px;
+  color: #d3dde6;
+}
+.v3-rim {
+  border-radius: var(--r);
+}
+.v3-fcard .calc-card {
+  border-radius: 16px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+}
+.calc-card,
+.pc-card,
+#lead-form {
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: var(--sh-1);
+}
+.option-btn,
+.pc-opt {
+  border-radius: 10px;
+}
+.option-btn:hover,
+.pc-opt:hover {
+  border-color: var(--gold);
+}
+.v2-ic {
+  border-radius: 8px;
+}
+.field input,
+.field select,
+.field textarea {
+  border: 1.5px solid #b9b1a3;
+  border-radius: 8px;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--sky);
+}
+
+/* ---------- andere pagina's: kop, band, voettekst ---------- */
+section.v2-phead {
+  background: var(--surface-alt);
+  padding: 44px 0 100px;
+}
+.v2-phead::after {
+  background: var(--paper);
+  height: 56px;
+}
+.v2-phead h1 {
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  font-size: clamp(2rem, 3.8vw, 3rem);
+}
+.v2-phead p {
+  color: var(--body);
+}
+.v2-crumb,
+.v2-crumb a {
+  color: var(--muted);
+}
+.v2-crumb b {
+  color: var(--ink);
+}
+.v2-phead .v2-usp li {
+  color: var(--body);
+}
+.v2-phead .v2-usp b {
+  color: var(--ink);
+}
+.v2-phead .v2-usp li::before {
+  background: var(--gold-tint);
+  color: var(--gold-text);
+}
+.v2-band {
+  background: var(--ink);
+  border-radius: 18px;
+}
+.cta-banner {
+  background: var(--ink);
+}
+footer.v2-footer {
+  background: var(--ink-2);
+  color: #b8c4cf;
+}
+footer.v2-footer .wrap {
+  color: #b8c4cf;
+}
+.v4-mini {
+  background: rgba(27, 47, 68, 0.96);
+}
+
+/* ---------- diensten ---------- */
+.dn-tegel {
+  border-radius: var(--r);
+  box-shadow: var(--sh-1);
+}
+.dn-meer .faq-q {
+  border-radius: 10px;
+}
+
+/* ---------- toestellen ---------- */
+.merk-tegel,
+.device-card,
+.toestellen-sidebar,
+.contact-card,
+.team-card,
+.ct-act,
+.ct-steplist li,
+.td-box,
+.td-specs dl,
+.td-prijs,
+.rl-kijker,
+.td-mini,
+.zoek-leeg {
+  border-radius: var(--r);
+  box-shadow: var(--sh-1);
+}
+.td-box,
+.td-specs dl,
+.td-prijs,
+.ct-steplist li {
+  box-shadow: none;
+}
+.merk-tegel.on {
+  box-shadow: 0 0 0 2px var(--gold);
+}
+.device-photo {
+  border-radius: 10px;
+}
+.device-kw {
+  background: var(--gold-tint);
+  border-color: #ecd9b4;
+  border-radius: 10px;
+}
+.kw-maten span,
+.device-kw-groot .kw-maten button {
+  border-radius: 7px;
+  border-color: var(--gold);
+}
+.kw-btn {
+  border-radius: 8px;
+}
+.td-keys span {
+  border-radius: 8px;
+}
+.rl-filter {
+  border-radius: 10px;
+}
+.rl-open {
+  border-radius: 10px;
+}
+.rl-kijker-nav button {
+  border-radius: 10px;
+}
+
+/* ---------- contact ---------- */
+.ct-act:hover,
+.ct-act:focus-visible {
+  border-color: var(--gold);
+}
+.ct-act .ic {
+  border-radius: 10px;
+}
+.ct-act-gold {
+  box-shadow: none;
+}
+.ct-act-gold:hover,
+.ct-act-gold:focus-visible {
+  box-shadow: 0 8px 20px rgba(220, 154, 44, 0.3);
+}
+.ct-rim {
+  border-radius: var(--r);
+}
+.ct-rim figcaption {
+  background: linear-gradient(to top, rgba(27, 47, 68, 0.8), rgba(27, 47, 68, 0));
+}
+
+/* ---------- welkomstvenster ---------- */
+.welcome-bubble {
+  border-radius: 14px 14px 4px 14px;
+}
+.wb-opt {
+  border-radius: 8px;
+}
+
+/* ---------- gsm: lichter en rustiger ---------- */
+@media (max-width: 860px) {
+  section.v3-hero {
+    padding: 24px 0 88px;
+  }
+  .v3-hero h1 {
+    font-size: 2.15rem;
+  }
+  .v3-lead {
+    font-size: 1.05rem;
+  }
+  .v3-shead h2,
+  .v4-journey-l h2,
+  .v3-offer h2 {
+    font-size: 1.7rem;
+    line-height: 1.2;
+  }
+  section.v3-sec {
+    padding: 52px 0;
+  }
+  section.v2-phead {
+    padding: 28px 0 72px;
+  }
+  .nh-rot-box.v3-main-ph,
+  .v3-pick,
+  .device-card,
+  .dn-tegel,
+  .ct-act,
+  .merk-tegel {
+    box-shadow: none;
+  }
+  .btn-gold:hover,
+  .ct-act-gold:hover {
+    box-shadow: none;
+  }
+}
+
+
+/* =====================================================================
+   BEWEGING (Rims keuze van 2-11-2026): de sfeer bovenaan Home wisselt mee met Koelen/Verwarmen, de foto's
+   komen tot leven (lucht uit het toestel; of het filmpje van Higgsfield als dat er is), de kop verschijnt
+   letter voor letter, blokken schuiven in bij het scrollen, magnetische knoppen, 3D-kaarten, zachte
+   paginaovergang. Werking in js/beweging.js. Computer: alles; gsm en tablet: de lichte versie;
+   "minder beweging": niets.
+   ===================================================================== */
+:root {
+  --up-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- 1. Bovenaan Home: de sfeer wisselt mee met Koelen/Verwarmen ---------- */
+section.v3-hero {
+  isolation: isolate;
+  transition: background 1.4s ease;
+}
+/* een zachte kleurwas over de hele bovenkant die van kleur wisselt */
+.up-sfeer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.9;
+  background:
+    radial-gradient(900px 560px at 85% 25%, var(--up-sfeer-a, rgba(255, 170, 60, 0.22)), transparent 62%),
+    radial-gradient(700px 480px at 15% 95%, var(--up-sfeer-b, rgba(255, 120, 40, 0.14)), transparent 60%);
+  transition: opacity 1.2s ease;
+  animation: up-adem 9s ease-in-out infinite alternate;
+}
+body.rt-cool .up-sfeer {
+  --up-sfeer-a: rgba(90, 190, 255, 0.26);
+  --up-sfeer-b: rgba(120, 220, 255, 0.14);
+}
+body.rt-warm .up-sfeer {
+  --up-sfeer-a: rgba(255, 170, 60, 0.24);
+  --up-sfeer-b: rgba(255, 120, 40, 0.14);
+}
+@keyframes up-adem {
+  to {
+    transform: scale(1.06) translate(-1%, 1%);
+  }
+}
+/* sneeuw (koelen) of warme vonkjes (verwarmen) in de lucht, getekend op een canvas (computer) */
+.up-deeltjes {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.up-deeltjes.aan {
+  opacity: 1;
+}
+/* lichtvlek die de muis volgt */
+.up-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(560px 560px at var(--mx, 70%) var(--my, 40%), var(--up-glow-k, rgba(227, 166, 62, 0.16)), transparent 62%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+body.rt-cool .up-glow {
+  --up-glow-k: rgba(120, 200, 255, 0.16);
+}
+section.v3-hero:hover .up-glow,
+section.v3-offer:hover .up-glow {
+  opacity: 1;
+}
+section.v3-offer {
+  position: relative;
+  isolation: isolate;
+}
+section.v3-offer > .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+/* de kop verschijnt letter voor letter */
+.up-woord {
+  display: inline-block;
+  white-space: nowrap;
+}
+.up-letter {
+  display: inline-block;
+}
+/* het lampje "Koelt/Verwarmt" niet bovenaan Home: daar staan al kaartjes op de foto; wel op de toestelpagina */
+.v3-main-ph .up-adem-lbl {
+  display: none;
+}
+html.up-js:not(.up-klaar) .up-letter {
+  opacity: 0;
+  transform: translateY(0.5em) rotate(4deg);
+  animation: up-letter 0.6s var(--up-ease) forwards;
+  animation-delay: calc(var(--i, 0) * 28ms + 120ms);
+}
+@keyframes up-letter {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+html.up-js:not(.up-klaar) .v3-hero .v3-lead,
+html.up-js:not(.up-klaar) .v3-hero .v3-pick-lbl,
+html.up-js:not(.up-klaar) .v3-hero .v3-picks,
+html.up-js:not(.up-klaar) .v3-hero .hz,
+html.up-js:not(.up-klaar) .v3-hero .v3-richtprijs,
+html.up-js:not(.up-klaar) .v3-hero .v3-checks {
+  animation: up-in 0.9s var(--up-ease) both;
+}
+.v3-hero .v3-lead { animation-delay: 0.55s; }
+.v3-hero .v3-pick-lbl { animation-delay: 0.65s; }
+.v3-hero .v3-picks { animation-delay: 0.72s; }
+.v3-hero .hz { animation-delay: 0.82s; }
+.v3-hero .v3-richtprijs { animation-delay: 0.9s; }
+.v3-hero .v3-checks { animation-delay: 0.98s; }
+@keyframes up-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+html.up-js:not(.up-klaar) .v3-visual {
+  animation: up-visual 1.2s 0.35s var(--up-ease) both;
+}
+@keyframes up-visual {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+}
+/* de grote foto zoomt traag in terwijl ze getoond wordt (ook op gsm) */
+.nh-rot-box.v3-main-ph img.rot.on {
+  animation: up-kenburns 7s linear forwards;
+}
+@keyframes up-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+/* ---------- 2. Uw eigen foto komt tot leven: lucht uit het toestel op de foto ---------- */
+.up-adem-laag {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.up-adem-laag i {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: calc(var(--w) * 0.5);
+  margin-left: calc(var(--w) * -0.5);
+  border-radius: 50%;
+  filter: blur(7px);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+/* koelen: witblauwe nevel die naar beneden en naar voren stroomt */
+body.rt-cool .up-adem-laag i {
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.9), rgba(200, 230, 255, 0.5) 55%, rgba(200, 230, 255, 0) 100%);
+  animation: up-koel 3.8s ease-out infinite;
+  animation-delay: var(--d);
+}
+@keyframes up-koel {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+  18% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-18%, 160%) scale(1.9);
+  }
+}
+/* verwarmen: zachte warme gloed die trilt en opstijgt */
+body.rt-warm .up-adem-laag i {
+  background: radial-gradient(closest-side, rgba(255, 214, 150, 0.75), rgba(255, 170, 80, 0.35) 55%, rgba(255, 170, 80, 0) 100%);
+  animation: up-warm 4.2s ease-in-out infinite;
+  animation-delay: var(--d);
+}
+@keyframes up-warm {
+  0% {
+    opacity: 0;
+    transform: translate(0, 10%) scale(0.6);
+  }
+  25% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6%, 95%) scale(1.6);
+  }
+}
+/* een klein lampje op de foto: "het toestel werkt" */
+.up-adem-lbl {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(22, 40, 61, 0.78);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+.up-adem-lbl::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7fd0ff;
+  box-shadow: 0 0 0 0 rgba(127, 208, 255, 0.7);
+  animation: up-puls 1.6s ease-out infinite;
+}
+body.rt-warm .up-adem-lbl::before {
+  background: #ffb04a;
+  box-shadow: 0 0 0 0 rgba(255, 176, 74, 0.7);
+}
+@keyframes up-puls {
+  to {
+    box-shadow: 0 0 0 9px rgba(127, 208, 255, 0);
+  }
+}
+
+/* ---------- 3. Het toestel dat leeft op de toestelpagina (klep open, lucht stroomt) ---------- */
+.up-live {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 10%, #ffffff 0%, #eef2f6 55%, #dfe6ec 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+.up-live.aan {
+  opacity: 1;
+}
+.up-live img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: up-live-zoom 7s ease-in-out infinite alternate;
+}
+@keyframes up-live-zoom {
+  to {
+    transform: scale(1.08) translateY(-2%);
+  }
+}
+.up-live .up-adem-laag i {
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.95), rgba(214, 232, 247, 0.55) 55%, rgba(214, 232, 247, 0) 100%);
+  animation: up-koel 3.6s ease-out infinite;
+  animation-delay: var(--d);
+}
+.up-live-lbl {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(22, 40, 61, 0.86);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.up-live-lbl::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4fd37a;
+  box-shadow: 0 0 0 0 rgba(79, 211, 122, 0.7);
+  animation: up-puls 1.6s ease-out infinite;
+}
+.td-media .device-photo {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease, box-shadow 0.35s ease;
+}
+.td-media .device-photo.up-tilt {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  box-shadow: 0 30px 60px rgba(15, 29, 46, 0.18);
+}
+.td-media .device-photo .up-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.35) 48%, transparent 60%);
+  transform: translateX(-120%);
+  transition: transform 0.9s var(--up-ease);
+}
+.td-media .device-photo:hover .up-sheen {
+  transform: translateX(120%);
+}
+
+/* ---------- 4. Scrollen brengt alles tot leven ---------- */
+.v3-anim .rv {
+  transform: translateY(28px) scale(0.985);
+  transition:
+    opacity 0.9s ease,
+    transform 0.9s var(--up-ease),
+    box-shadow 0.35s var(--up-ease);
+  transition-delay: var(--d, 0ms);
+}
+.v3-anim .rv.in {
+  transform: none;
+}
+.v3-anim .rv .v3-kicker::before {
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.8s 0.25s var(--up-ease);
+}
+.v3-anim .rv.in .v3-kicker::before {
+  transform: scaleX(1);
+}
+.v3-anim .rv h2 {
+  clip-path: inset(0 0 100% 0);
+  transform: translateY(0.6em);
+  transition: clip-path 0.9s 0.1s var(--up-ease), transform 0.9s 0.1s var(--up-ease);
+}
+.v3-anim .rv.in h2 {
+  clip-path: inset(-0.2em 0 -0.3em 0);
+  transform: none;
+}
+[data-up-par] {
+  will-change: transform;
+}
+.up-par-kader {
+  overflow: hidden;
+}
+.up-par-kader > img,
+.up-par-kader > [data-up-par] {
+  transform: scale(1.12) translate3d(0, var(--up-y, 0px), 0);
+}
+/* de fotostrook op Home schuift mee met het scrollen (bovenop het trage drijven) */
+.v4-strip {
+  transform: translate3d(var(--up-strip, 0px), 0, 0);
+  will-change: transform;
+}
+.up-tel {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 5. Knoppen en kaarten met diepte ---------- */
+.btn,
+.ct-act,
+.v3-pick,
+.device-card,
+.dn-tegel,
+.rl-open,
+.v3-tile,
+.pc-vs {
+  transition:
+    transform 0.35s var(--up-ease),
+    box-shadow 0.35s var(--up-ease),
+    border-color 0.25s ease,
+    background-color 0.25s ease;
+}
+.btn-gold,
+.ct-act-gold,
+.v3-pick.hl {
+  position: relative;
+  overflow: hidden;
+}
+.btn-gold::after,
+.ct-act-gold::after,
+.v3-pick.hl::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  bottom: -40%;
+  left: -30%;
+  width: 28%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-18deg) translateX(-100%);
+  pointer-events: none;
+}
+.btn-gold:hover::after,
+.ct-act-gold:hover::after,
+.v3-pick.hl:hover::after {
+  animation: up-glans 0.9s var(--up-ease);
+}
+@keyframes up-glans {
+  to {
+    transform: skewX(-18deg) translateX(620%);
+  }
+}
+/* magnetische knop: de gouden knop trekt lichtjes naar de muis (de verschuiving zet het script) */
+.up-magneet {
+  transition: transform 0.25s var(--up-ease), box-shadow 0.35s var(--up-ease);
+  transform: translate(var(--mgx, 0px), var(--mgy, 0px));
+}
+.btn-gold:hover,
+.btn-gold:focus-visible {
+  box-shadow: 0 14px 30px rgba(227, 166, 62, 0.4);
+}
+.device-card:hover,
+.dn-tegel:hover,
+.pc-vs:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 24px 48px rgba(15, 29, 46, 0.14);
+}
+/* toestellenlijst: de kaart kantelt in 3D en de foto komt naar voren (computer) */
+.device-card.up-3d {
+  transform-style: preserve-3d;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--ty, 0px));
+  transition: transform 0.2s ease, box-shadow 0.35s var(--up-ease);
+}
+.device-card.up-3d:hover {
+  --ty: -6px;
+  box-shadow: 0 28px 56px rgba(15, 29, 46, 0.18);
+}
+.device-card.up-3d .device-photo {
+  transform: translateZ(0);
+  transition: transform 0.35s var(--up-ease);
+}
+.device-card.up-3d:hover .device-photo {
+  transform: translateZ(26px);
+}
+.device-card .device-photo img,
+.dn-foto img,
+.v3-tile img,
+.ct-rim img {
+  transition: transform 0.9s var(--up-ease);
+}
+.dn-tegel:hover .dn-foto img,
+.v3-tile:hover img {
+  transform: scale(1.04);
+}
+.rl-open:hover img {
+  transform: scale(1.06);
+}
+.rl-open:hover {
+  box-shadow: 0 18px 36px rgba(15, 29, 46, 0.2);
+}
+.v3-mq-view {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* ---------- 6. Van pagina naar pagina ---------- */
+section[data-page] {
+  transition: opacity 0.28s ease, transform 0.28s var(--up-ease);
+}
+html.up-weg section[data-page].page-active {
+  opacity: 0;
+  transform: translateY(10px);
+}
+html.up-komt section[data-page].page-active {
+  animation: up-komt 0.55s var(--up-ease) both;
+}
+@keyframes up-komt {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+.up-balk {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  z-index: 9999;
+  background: var(--gold);
+  box-shadow: 0 0 12px rgba(227, 166, 62, 0.8);
+  transition: width 0.35s var(--up-ease), opacity 0.4s ease;
+  opacity: 0;
+}
+html.up-weg .up-balk,
+html.up-komt .up-balk {
+  opacity: 1;
+}
+html.up-weg .up-balk {
+  width: 60%;
+}
+html.up-komt .up-balk {
+  width: 100%;
+  opacity: 0;
+}
+
+/* ---------- 7. Lichter op gsm en tablet, niets bij "minder beweging" ---------- */
+@media (max-width: 1023px), (hover: none) {
+  .up-deeltjes,
+  .up-glow {
+    display: none;
+  }
+  .up-par-kader > img,
+  .up-par-kader > [data-up-par] {
+    transform: none;
+  }
+  .v4-strip {
+    transform: none;
+  }
+  .td-media .device-photo.up-tilt,
+  .device-card.up-3d {
+    transform: none;
+    box-shadow: none;
+  }
+  .v3-anim .rv {
+    transform: translateY(18px);
+    transition-duration: 0.6s;
+  }
+  html.up-js:not(.up-klaar) .up-letter {
+    animation-delay: calc(var(--i, 0) * 18ms + 80ms);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .up-deeltjes,
+  .up-glow,
+  .up-live,
+  .up-balk,
+  .up-adem-laag,
+  .up-adem-lbl {
+    display: none !important;
+  }
+  .up-sfeer {
+    animation: none;
+  }
+  .up-letter,
+  .v3-hero .v3-lead,
+  .v3-hero .v3-pick-lbl,
+  .v3-hero .v3-picks,
+  .v3-hero .hz,
+  .v3-hero .v3-richtprijs,
+  .v3-hero .v3-checks,
+  .v3-visual,
+  .nh-rot-box.v3-main-ph img.rot.on,
+  html.up-komt section[data-page].page-active {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+  .v3-anim .rv h2 {
+    clip-path: none;
+    transform: none;
+  }
+  .up-par-kader > img,
+  .up-par-kader > [data-up-par],
+  .v4-strip {
+    transform: none;
+  }
+}
+
+/* ---------- 8. De filmpjes van Higgsfield bovenaan Home (voorbeeld versie 3) ---------- */
+.nh-rot-box.v3-main-ph .up-clip {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+  pointer-events: none;
+}
+.nh-rot-box.v3-main-ph .up-clip.aan {
+  opacity: 1;
+}
+/* speelt een filmpje, dan geen nevel over de foto en geen inzoomen van de foto eronder */
+.nh-rot-box.v3-main-ph.up-speelt .up-adem-laag {
+  display: none;
+}
+.nh-rot-box.v3-main-ph.up-speelt img.rot.on {
+  animation: none;
+}
+

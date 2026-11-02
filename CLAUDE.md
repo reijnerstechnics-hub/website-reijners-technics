@@ -42,7 +42,13 @@ Dit bestand lezen alle sessies en alle agents van het team. Hoe de site technisc
 - Richtprijzen: Rim wil ze rond de prijzen van andere airco-installateurs (online opgezocht, met bron). Zet er altijd duidelijk bij dat het een richtprijs is en dat de echte prijs pas in de offerte komt, nadat Rim is langs geweest.
 - Antwoorden aan Rim: in eenvoudig Nederlands, zonder vakjargon. Rim is geen ontwikkelaar.
 
-## Huisstijl (voorlopig, nog niet vastgelegd)
+## Huisstijl (Rims keuze van 2-11-2026: "Warm vakwerk"; nog niet online)
+
+- **Gekozen (2-11-2026, branch `wauw-02-11`):** voorstel 3 "Warm vakwerk" van de ui-ontwerper (`voorbeeld/huisstijl-2026-10-30/3.css`, nu achteraan `css/style.css` onder het kopje HUISSTIJL): licht papier `#f8f5ee`, crème bovenkant `#efe9dd`, blauw `#1b2f44`, goud `#dc9a2c` enkel voor knoppen en vlakken, donker goud `#7a5417` voor kleine tekst; Merriweather (koppen) en PT Sans (tekst) via Google Fonts. De kleurvarianten 3b-3e staan ook in die map (Rim koos de gewone 3). De oude tekst hieronder beschrijft de vorige stijl.
+- **Beweging (Rims keuze van 2-11-2026, `js/beweging.js` + blok BEWEGING achteraan `css/style.css`):** bovenaan Home wisselt de sfeer mee met Koelen/Verwarmen (kleurwas, sneeuw of warme vonkjes op computer), de kop verschijnt letter voor letter, blokken schuiven in bij het scrollen, magnetische gouden knoppen, 3D-kaarten in de toestellenlijst, zachte paginaovergang, op de toestelpagina kantelt de foto en bij Daikin Perfera/Stylish/Perfera-vloermodel toont ze eerst de open klep. Gsm en tablet krijgen de lichte versie; "minder beweging" zet alles uit. Geen video van merken en niets over Rims foto's heen (Rim, 30-10).
+- **Filmpjes van Higgsfield (2-11-2026, `assets/video/`):** de 8 foto's bovenaan Home zijn met Higgsfield (Seedance 2.5, Rims betaald Plus-abonnement) tot 5 seconden film gemaakt: de klep opent en er stroomt lucht (warm voor de winterreeks, koel voor de zomerreeks). Ze spelen over de foto zodra die aan de beurt is (`js/beweging.js`, blok DE FILMPJES), 150-420 KB per stuk als webm + mp4. Bron, opdrachtteksten en originelen: `voorbeeld/higgsfield-2026-11-02/` (buiten git). Rim wil de resterende credits bewaren; Realisaties, Diensten en de toestellen krijgen later filmpjes.
+
+## Huisstijl (oude tekst, tot 2-11-2026)
 
 - **De kleuren en lettertypes zijn nog niet definitief.** Rim wil dat het team ze eerst kritisch beoordeelt: misschien werkt een ander lettertype of een andere kleurencombinatie beter.
   - Een alternatief stel je altijd voor met een voorbeeld in `voorbeeld/` en screenshots op computer en gsm. Rim kiest.
