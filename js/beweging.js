@@ -130,84 +130,7 @@
     });
   }
 
-  // ---------- 3. Rims eigen foto's komen tot leven: lucht uit het toestel op de foto ----------
-  // per foto bovenaan Home: waar de uitblaasopening zit, in % van de foto (x1 tot x2, hoogte y)
-  var VENT = {
-    "g-s-eee01264090f": [[34, 69, 55]],
-    "g-s-e5cb7ad05186": [[27, 74, 61]],
-    "g-s-1feaeb8d86c5": [[6, 28, 61], [85, 93, 57]],
-    "g-n76": [[17, 83, 65]],
-    "g-n91": [[35, 68, 56]],
-    "s-06545912d880": [[35, 69, 47]],
-    "h-s-ba3f2d8e25e8": [[31, 73, 62]],
-    "g-s-f8ba56652202": [[31, 70, 56]],
-  };
-  function naamVan(src) {
-    var m = /\/([^\/]+)\.webp/.exec(src || "");
-    return m ? m[1] : "";
-  }
-  // zet de nevel op de plaats van het toestel, rekening houdend met hoe de foto in het vak is bijgesneden (cover)
-  function ademOp(vak, laag) {
-    var img = vak.querySelector("img.rot.on");
-    laag.innerHTML = "";
-    if (!img || !img.naturalWidth) return;
-    var vents = VENT[naamVan(img.getAttribute("src"))];
-    if (!vents) return;
-    var bw = vak.clientWidth,
-      bh = vak.clientHeight,
-      iw = img.naturalWidth,
-      ih = img.naturalHeight;
-    var s = Math.max(bw / iw, bh / ih);
-    var pos = (getComputedStyle(img).objectPosition || "50% 50%").split(" ");
-    var px = parseFloat(pos[0]) / 100,
-      py = parseFloat(pos[1] || "50%") / 100;
-    var ox = (bw - iw * s) * px,
-      oy = (bh - ih * s) * py;
-    vents.forEach(function (v) {
-      var x1 = ox + (v[0] / 100) * iw * s,
-        x2 = ox + (v[1] / 100) * iw * s,
-        y = oy + (v[2] / 100) * ih * s;
-      var breed = x2 - x1;
-      var aantal = Math.max(3, Math.round(breed / 45));
-      for (var k = 0; k < aantal; k++) {
-        var b = document.createElement("i");
-        b.style.setProperty("--x", (x1 + (breed * (k + 0.5)) / aantal).toFixed(0) + "px");
-        b.style.setProperty("--y", y.toFixed(0) + "px");
-        b.style.setProperty("--w", (Math.min(90, breed / aantal) * 1.6).toFixed(0) + "px");
-        b.style.setProperty("--d", ((k % 4) * 0.7 + Math.random() * 0.4).toFixed(2) + "s");
-        laag.appendChild(b);
-      }
-    });
-  }
-  var vak = document.querySelector(".nh-rot-box.v3-main-ph");
-  if (vak) {
-    var laag = document.createElement("div");
-    laag.className = "up-adem-laag";
-    vak.appendChild(laag);
-    var lbl = document.createElement("span");
-    lbl.className = "up-adem-lbl";
-    vak.appendChild(lbl);
-    function lblTekst() {
-      lbl.textContent = document.body.classList.contains("rt-warm") ? "Verwarmt" : "Koelt";
-    }
-    lblTekst();
-    var her = function () {
-      ademOp(vak, laag);
-      lblTekst();
-    };
-    // de wissel van foto's zet de class "on" om: dan de nevel verplaatsen
-    new MutationObserver(function () {
-      clearTimeout(her.t);
-      her.t = setTimeout(her, 60);
-    }).observe(vak, { attributes: true, subtree: true, attributeFilter: ["class", "src"] });
-    document.addEventListener("rt-seizoen", function () {
-      setTimeout(her, 400);
-    });
-    window.addEventListener("resize", her);
-    var eerste = vak.querySelector("img.rot.on");
-    if (eerste && !eerste.complete) eerste.addEventListener("load", her, { once: true });
-    her();
-  }
+  // (Rim, 2-11-2026: bovenaan Home enkel de sfeerwissel; geen lucht over de foto's en geen filmpjes.)
 
   // ---------- 4. toestelpagina: de hoofdfoto kantelt, en het toestel leeft (klep open) ----------
   var LIVE = {
@@ -411,101 +334,66 @@
 })();
 
 // ============================================================================
-// DE FILMPJES BOVENAAN HOME (Higgsfield, gemaakt van Rims eigen foto's op 2-11-2026; bron en werkwijze in
-// voorbeeld/higgsfield-2026-11-02/README.md, buiten git). Elke foto in het grote fotovak die een filmpje heeft,
-// krijgt een <video> erbovenop dat speelt zodra die foto aan de beurt is. De foto blijft eronder staan
-// (en is het stilstaand beeld voor wie "minder beweging" heeft ingesteld of een trage verbinding).
+// "BEKIJK HET TOESTEL IN WERKING" OP DE TOESTELPAGINA (Rims keuze van 2-11-2026). Een filmpje per model,
+// gemaakt met Higgsfield van de productfoto (klep opent, lucht stroomt). Enkel voor modellen in CLIPS;
+// de bestanden staan in assets/video/ als webm en mp4. Bron en werkwijze: voorbeeld/higgsfield-2026-11-02/
+// README.md (buiten git). De bezoeker kiest zelf: een knop onder de foto speelt het filmpje over de foto.
 // ============================================================================
 (function () {
   "use strict";
-  var rustig = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (rustig) return;
   var MAP = "assets/video/";
-  // fotobestand -> filmpje (zonder extensie); warme reeks: warm filmpje, koele reeks: koel filmpje
-  var CLIPS = {
-    "g-s-eee01264090f": "home-01-lg-baksteen-warm",
-    "g-s-e5cb7ad05186": "home-02-daikin-balken-warm",
-    "g-s-1feaeb8d86c5": "home-03-lg-gallery-haard-warm",
-    "g-n76": "home-04-daikin-hout-warm",
-    "g-n91": "home-05-daikin-raam-koel",
-    "s-06545912d880": "home-06-lg-deluxe-planken-koel",
-    "h-s-ba3f2d8e25e8": "home-07-daikin-stylish-zwart-koel",
-    "g-s-f8ba56652202": "home-08-nuova-raam-koel",
-  };
-  var vak = document.querySelector(".nh-rot-box.v3-main-ph");
-  if (!vak) return;
-  var videos = {};
-  function naam(img) {
-    var m = /\/([^\/]+)\.webp/.exec(img.getAttribute("src") || img.dataset.src || "");
-    return m ? m[1] : "";
-  }
-  function videoVoor(img) {
-    var n = naam(img);
-    var clip = CLIPS[n];
-    if (!clip) return null;
-    if (videos[n]) return videos[n];
-    var v = document.createElement("video");
-    v.className = "up-clip";
-    v.muted = true;
-    v.loop = true;
-    v.playsInline = true;
-    v.setAttribute("playsinline", "");
-    v.preload = "none";
-    v.setAttribute("aria-hidden", "true");
-    var s1 = document.createElement("source");
-    s1.src = MAP + clip + "-web.webm";
-    s1.type = "video/webm";
-    var s2 = document.createElement("source");
-    s2.src = MAP + clip + "-web.mp4";
-    s2.type = "video/mp4";
-    v.appendChild(s1);
-    v.appendChild(s2);
-    // zelfde uitsnede als de foto (object-position van de foto overnemen)
-    v.style.objectPosition = getComputedStyle(img).objectPosition;
-    vak.appendChild(v);
-    videos[n] = v;
-    return v;
-  }
-  var huidig = null;
-  function wissel() {
-    var img = vak.querySelector("img.rot.on");
-    var v = img ? videoVoor(img) : null;
-    if (v === huidig) return;
-    if (huidig) {
-      huidig.classList.remove("aan");
-      var oud = huidig;
-      setTimeout(function () {
-        if (oud !== huidig) oud.pause();
-      }, 900);
-    }
-    huidig = v;
-    vak.classList.toggle("up-speelt", !!v);
-    if (!v) return;
-    if (v.preload === "none") v.preload = "auto";
-    v.currentTime = 0;
-    var p = v.play();
-    if (p && p.catch) p.catch(function () {});
-    v.classList.add("aan");
-  }
-  // de buurfoto's hun filmpje alvast laten laden
-  function voorladen() {
-    vak.querySelectorAll("img.rot").forEach(function (img) {
-      var v = videoVoor(img);
-      if (v && v.preload === "none") v.preload = "auto";
+  // model (zoals data-model op de kaart) -> bestandsnaam zonder -web.webm/.mp4
+  // Nog leeg: de filmpjes worden gemaakt zodra er Higgsfield-credits zijn (december 2026). Voeg per model toe, bv.
+  //   "Daikin Perfera": "toestel-daikin-perfera",
+  // zodra assets/video/toestel-daikin-perfera-web.webm en -web.mp4 bestaan.
+  var CLIPS = {};
+  function plaats() {
+    var sec = document.querySelector('section[data-page="toestel"].page-active');
+    var media = sec && sec.querySelector(".td-media");
+    var foto = media && media.querySelector(".device-photo");
+    if (!foto || media.querySelector(".up-werking")) return;
+    var model = window.rtHuidigToestel || "";
+    var clip = CLIPS[model];
+    if (!clip) return;
+    var knop = document.createElement("button");
+    knop.type = "button";
+    knop.className = "up-werking";
+    knop.setAttribute("aria-pressed", "false");
+    knop.innerHTML = '<span class="ic" aria-hidden="true">&#9654;</span><span class="tx">Bekijk het toestel in werking</span>';
+    foto.insertAdjacentElement("afterend", knop);
+    var v = null;
+    knop.addEventListener("click", function () {
+      var aan = knop.getAttribute("aria-pressed") !== "true";
+      if (!v) {
+        v = document.createElement("video");
+        v.className = "up-clip";
+        v.muted = true;
+        v.loop = true;
+        v.playsInline = true;
+        v.setAttribute("playsinline", "");
+        v.setAttribute("aria-label", "Het toestel in werking: de klep opent en de lucht stroomt");
+        var s1 = document.createElement("source");
+        s1.src = MAP + clip + "-web.webm";
+        s1.type = "video/webm";
+        var s2 = document.createElement("source");
+        s2.src = MAP + clip + "-web.mp4";
+        s2.type = "video/mp4";
+        v.appendChild(s1);
+        v.appendChild(s2);
+        foto.appendChild(v);
+      }
+      knop.setAttribute("aria-pressed", aan ? "true" : "false");
+      knop.querySelector(".tx").textContent = aan ? "Terug naar de foto" : "Bekijk het toestel in werking";
+      foto.classList.toggle("up-speelt", aan);
+      if (aan) {
+        v.currentTime = 0;
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+      } else v.pause();
     });
   }
-  new MutationObserver(function () {
-    clearTimeout(wissel.t);
-    wissel.t = setTimeout(wissel, 40);
-  }).observe(vak, { attributes: true, subtree: true, attributeFilter: ["class", "src"] });
-  // enkel spelen als het vak in beeld is (anders pauzeren: batterij en data)
-  if ("IntersectionObserver" in window)
-    new IntersectionObserver(function (e) {
-      if (e[0].isIntersecting) {
-        wissel();
-        if (huidig) huidig.play().catch(function () {});
-        setTimeout(voorladen, 2500);
-      } else if (huidig) huidig.pause();
-    }).observe(vak);
-  wissel();
+  window.addEventListener("hashchange", function () {
+    setTimeout(plaats, 120);
+  });
+  setTimeout(plaats, 350);
 })();

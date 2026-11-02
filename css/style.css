@@ -11239,18 +11239,6 @@ html.up-js:not(.up-klaar) .v3-visual {
     transform: translateY(30px) scale(0.96);
   }
 }
-/* de grote foto zoomt traag in terwijl ze getoond wordt (ook op gsm) */
-.nh-rot-box.v3-main-ph img.rot.on {
-  animation: up-kenburns 7s linear forwards;
-}
-@keyframes up-kenburns {
-  from {
-    transform: scale(1);
-  }
-  to {
-    transform: scale(1.06);
-  }
-}
 
 /* ---------- 2. Uw eigen foto komt tot leven: lucht uit het toestel op de foto ---------- */
 .up-adem-laag {
@@ -11677,26 +11665,109 @@ html.up-komt .up-balk {
   }
 }
 
-/* ---------- 8. De filmpjes van Higgsfield bovenaan Home (voorbeeld versie 3) ---------- */
-.nh-rot-box.v3-main-ph .up-clip {
+/* ---------- 8. "Bekijk het toestel in werking" op de toestelpagina (filmpje van Higgsfield over de foto) ---------- */
+.td-media .device-photo .up-clip {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 3;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #fff;
   opacity: 0;
-  transition: opacity 0.9s ease;
+  transition: opacity 0.6s ease;
   pointer-events: none;
 }
-.nh-rot-box.v3-main-ph .up-clip.aan {
+.td-media .device-photo.up-speelt .up-clip {
   opacity: 1;
 }
-/* speelt een filmpje, dan geen nevel over de foto en geen inzoomen van de foto eronder */
-.nh-rot-box.v3-main-ph.up-speelt .up-adem-laag {
-  display: none;
+.up-werking {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 2px;
+  min-height: 44px;
+  padding: 0 16px 0 8px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-tekst);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
 }
-.nh-rot-box.v3-main-ph.up-speelt img.rot.on {
-  animation: none;
+.up-werking .ic {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--gold);
+  color: #2b1c05;
+  font-size: 0.8rem;
+  padding-left: 2px;
+}
+.up-werking:hover {
+  border-color: var(--ink);
+}
+.up-werking[aria-pressed="true"] .ic {
+  background: var(--ink);
+  color: #fff;
+  font-size: 0;
+  padding-left: 0;
+}
+.up-werking[aria-pressed="true"] .ic::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: currentColor;
+  border-radius: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .up-werking {
+    display: none;
+  }
 }
 
+/* "Zie dit toestel in uw kamer" op de toestelpagina (WhatsApp met een foto van de muur; Rim, 2-11-2026) */
+.td-kamer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--body);
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.35s var(--up-ease), box-shadow 0.35s var(--up-ease);
+}
+.td-kamer:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: var(--sh-1);
+}
+.td-kamer .ic {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #e6f6ec;
+  color: #1f9d55;
+}
+.td-kamer b {
+  display: block;
+  font-family: var(--font-kop);
+  color: var(--ink);
+  font-size: 1rem;
+}
+.td-kamer small {
+  display: block;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  margin-top: 2px;
+}

@@ -2954,6 +2954,18 @@ function rtKwVoorKeuze(maten, k) {
     acts.appendChild(wa);
     acts.appendChild(mail);
     info.appendChild(acts);
+    // "Zie dit toestel in uw kamer" (Rims keuze van 2-11-2026): de klant stuurt via WhatsApp een foto van zijn muur,
+    // Rim stuurt een beeld terug met het toestel erin gemonteerd (gemaakt met Higgsfield), samen met de offerte.
+    var kamer = el("a", "td-kamer", "");
+    kamer.href =
+      "https://wa.me/32491113313?text=" +
+      encodeURIComponent("Hallo Rim, ik wil graag zien hoe de " + model + " in mijn kamer zou staan. Ik stuur u hierbij een foto van de muur.");
+    kamer.target = "_blank";
+    kamer.rel = "noopener";
+    kamer.innerHTML =
+      '<span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/></svg></span>' +
+      '<span><b>Zie dit toestel in uw kamer</b><small>Stuur een foto van uw muur via WhatsApp. Rim stuurt u een beeld terug met dit toestel erin, gratis, samen met de offerte.</small></span>';
+    info.appendChild(kamer);
     info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Op werkdagen binnen 24\u00a0uur teruggebeld · U beslist pas na de offerte"));
     top.appendChild(info);
     detail.appendChild(top);
