@@ -33,6 +33,10 @@
   var MODEL_3D = "";
   var KLEUREN = { wit: "#f1f1ec", bruin: "#6b4a2b", zwart: "#232323", antraciet: "#3d4248" };
   var KAMERNAMEN = ["Woonkamer", "Slaapkamer", "Keuken", "Bureau", "Andere kamer"];
+  // "de woonkamer", maar "het bureau"
+  function deKamer(k) {
+    return (k.naam === "Bureau" ? "het " : "de ") + k.naam.toLowerCase();
+  }
   var MONTAGE = {
     beugel: "op een muurbeugel aan de gevel",
     balk: "op een balk op de grond",
@@ -488,6 +492,9 @@
       b.type = "button";
       b.setAttribute("aria-pressed", k === huidig ? "true" : "false");
       b.addEventListener("click", function () {
+        s.querySelectorAll("button").forEach(function (x) {
+          x.setAttribute("aria-pressed", x === b ? "true" : "false");
+        });
         fn(k);
       });
       s.appendChild(b);
@@ -503,6 +510,17 @@
       );
     balk.appendChild(
       knop(stap === 3 ? "Naar het overzicht →" : "Volgende →", "gold", function () {
+        if (stap === 3 && modus === "foto") {
+          var zonder = plan.kamers.filter(function (k) {
+            return k.goot.zichtbaar && !k.goot.punten.length;
+          });
+          if (zonder.length)
+            melding(
+              "Voor " +
+                zonder.map(deKamer).join(" en ") +
+                " is nog geen goot getekend. Tik op de gevel waar de leiding door de muur komt, of kies “Geen goot zichtbaar”. U kunt ook zonder verder gaan."
+            );
+        }
         zetStap(stap + 1);
       })
     );
@@ -669,7 +687,7 @@
           );
         } else if (!k.foto) {
           start(
-            "Neem een foto van de muur in de " + k.naam.toLowerCase(),
+            "Neem een foto van de muur in " + deKamer(k),
             "Recht van voren en bij daglicht werkt het best. Daarna sleept u de binnenunit op de juiste plek.",
             function (file) {
               laadFoto(file, function (bm, W, H) {
@@ -762,10 +780,10 @@
           var uitleg = kk.goot.zichtbaar
             ? kk.goot.punten.length
               ? "Tik de volgende hoekpunten aan tot aan de buitenunit. Het laatste stuk loopt vanzelf naar de unit."
-              : "Tik op de gevel waar de leiding door de muur komt (achter de binnenunit in de " +
-                kk.naam.toLowerCase() +
+              : "Tik op de gevel waar de leiding door de muur komt (achter de binnenunit in " +
+                deKamer(kk) +
                 "), en dan de hoekpunten van de goot tot aan de buitenunit."
-            : "Voor de " + kk.naam.toLowerCase() + " loopt de leiding binnenin: geen goot aan de gevel.";
+            : "Voor " + deKamer(kk) + " loopt de leiding binnenin: geen goot aan de gevel.";
           var lengte = gootLengteFoto(kk);
           werk(gv.W, gv.H, uitleg + (lengte ? " Geschat: ± " + m2(lengte) + " m goot. " + INBEGREPEN : ""), function (balk) {
             balk.appendChild(
@@ -1058,9 +1076,10 @@
       if (stap === 1) {
         kamerRij(kamersVak, toon);
         hint.textContent =
-          "Sleep de binnenunit van de " +
-          kamer().naam.toLowerCase() +
-          " naar de muur waar ze (aan de binnenkant) komt te hangen. Sleep ernaast om het huis te draaien, knijp of scrol om in te zoomen.";
+          (!o.binnenKan || o.type === "buiten"
+            ? "Sleep het blokje van " + deKamer(kamer()) + " naar de muur waar de leiding naar buiten komt (de doorvoer)."
+            : "Sleep de binnenunit van " + deKamer(kamer()) + " naar de muur waar ze (aan de binnenkant) komt te hangen.") +
+          " Sleep ernaast om het huis te draaien, knijp of scrol om in te zoomen.";
         navKnoppen(balk);
       } else if (stap === 2) {
         hint.textContent =
@@ -1080,10 +1099,10 @@
           ? "De goot loopt van de doorvoer achter de binnenunit langs de gevel naar de buitenunit. Geschat: ± " +
             m2(gootLengte3d(k)) +
             " m" +
-            (plan.kamers.length > 1 ? " voor de " + k.naam.toLowerCase() : "") +
+            (plan.kamers.length > 1 ? " voor " + deKamer(k) : "") +
             ". " +
             INBEGREPEN
-          : "Voor de " + k.naam.toLowerCase() + " loopt de leiding binnenin: geen goot aan de gevel.";
+          : "Voor " + deKamer(k) + " loopt de leiding binnenin: geen goot aan de gevel.";
         balk.appendChild(
           seg("Kleur van de goot", { wit: "Wit", bruin: "Bruin", zwart: "Zwart", antraciet: "Antraciet" }, plan.gootKleur, function (v) {
             plan.gootKleur = v;

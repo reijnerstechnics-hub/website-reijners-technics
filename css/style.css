@@ -12006,6 +12006,9 @@ html.up-komt .up-balk {
   color: #c9d4de;
 }
 .zb-klein a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: #fff;
   text-decoration: underline;
 }
@@ -12110,7 +12113,7 @@ button.td-kamer {
   padding: 0 12px 6px;
 }
 .zb-kamers button {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 14px;
   border: 1.5px solid rgba(255, 255, 255, 0.4);
   border-radius: 999px;
@@ -12200,6 +12203,9 @@ button.td-kamer {
   }
   .zb-stappen .lang {
     display: none;
+  }
+  .zb-werk .zb-vlak {
+    justify-content: flex-start; /* de foto bovenaan, niet zwevend in het midden */
   }
 }
 .zb-stappen em {
