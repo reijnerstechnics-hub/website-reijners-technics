@@ -426,6 +426,22 @@ function sendLead(data) {
     // een toestel gekozen op Toestellen hoort enkel bij een nieuwe airco, niet bij onderhoud of herstelling
     var mEl = document.getElementById("calc-model");
     if (mEl) mEl.hidden = !(window.rtModel && state.dienst === "nieuw");
+    toonPlan();
+  }
+  // het plaatsingsplan uit "Plan uw plaatsing" (js/zicht.js) gaat mee met de aanvraag
+  function toonPlan() {
+    var mEl = document.getElementById("calc-model");
+    if (!mEl) return;
+    var pEl = document.getElementById("calc-plan");
+    if (!pEl) {
+      pEl = document.createElement("p");
+      pEl.id = "calc-plan";
+      pEl.className = "v4-model calc-plan";
+      mEl.insertAdjacentElement("afterend", pEl);
+    }
+    var aan = window.rtPlan && state.dienst === "nieuw";
+    pEl.hidden = !aan;
+    pEl.textContent = aan ? "Uw plaatsingsplan gaat mee: " + window.rtPlan.split("\n").slice(2).join(" · ") : "";
   }
 
   // stap 1: dienst kiezen (1 klik, gaat automatisch door)
@@ -473,6 +489,7 @@ function sendLead(data) {
     lines.push("- " + label("dienst", s.dienst));
     // het toestel (met vermogen en kleur) dat de bezoeker op een toestelpagina koos
     if (s.dienst === "nieuw" && window.rtModel) lines.push("- Toestel: " + window.rtModel);
+    if (s.dienst === "nieuw" && window.rtPlan) lines.push("- Plaatsingsplan: " + window.rtPlan.split("\n").slice(2).join("; "));
     if (s.ruimtes) lines.push("- Kamers: " + roomsLabel(s.ruimtes));
     if (s.grootte) lines.push("- Oppervlakte per kamer: " + label("grootte", s.grootte));
     if (s.probleem && s.probleem.length)
@@ -540,6 +557,7 @@ function sendLead(data) {
       telefoon: telefoon,
       gemeente: gemeente,
       model: state.dienst === "nieuw" ? window.rtModel || "" : "",
+      plaatsingsplan: state.dienst === "nieuw" ? window.rtPlan || "" : "",
       source: "aanvraagformulier",
       submittedAt: new Date().toISOString(),
     };
@@ -701,6 +719,7 @@ function sendLead(data) {
     };
     // ook hier het gekozen toestel, zodat Rim de twee mails niet zelf moet koppelen
     if (state.dienst === "nieuw" && window.rtModel) copy.model = window.rtModel;
+    if (state.dienst === "nieuw" && window.rtPlan) copy.plaatsingsplan = window.rtPlan;
     for (var k in extra) copy[k] = extra[k];
     sendLead(copy).then(ok).catch(fail);
   });
@@ -797,8 +816,11 @@ window.rtGoToOffer = function (d, model) {
         return;
       }
       window.rtModel = "";
+      window.rtPlan = "";
       var m = document.getElementById("calc-model");
       if (m) m.hidden = true;
+      var pl = document.getElementById("calc-plan");
+      if (pl) pl.hidden = true;
     },
     true
   );
@@ -2985,10 +3007,10 @@ function rtKwVoorKeuze(maten, k) {
     kamer.innerHTML =
       '<span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/></svg></span>' +
       "<span><b>" +
-      (isBuiten ? "Zie deze buitenunit aan uw gevel" : binnenKan ? "Zie dit toestel bij u thuis" : "Zie de buitenunit aan uw gevel") +
-      "</b><small>Op een foto van uw " +
-      (binnenKan ? "muur of gevel" : "gevel") +
-      ", of op een 3D-voorbeeldhuis. Gratis, en uw foto blijft op uw gsm.</small></span>";
+      "Plan uw plaatsing bij u thuis" +
+      "</b><small>Zet zelf de " +
+      (binnenKan ? "binnen- en buitenunit" : "buitenunit") +
+      " op foto’s van uw huis of in een 3D-huis, teken de goot en stuur het plan naar Rim. Gratis, en uw foto’s blijven op uw gsm.</small></span>";
     info.appendChild(kamer);
     info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Op werkdagen binnen 24\u00a0uur teruggebeld · U beslist pas na de offerte"));
     top.appendChild(info);

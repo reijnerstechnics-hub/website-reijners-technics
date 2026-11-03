@@ -1,17 +1,20 @@
 // =====================================================================
-// "ZIE DIT TOESTEL BIJ U THUIS" (Rims keuzes van 3-11-2026)
+// "PLAN UW PLAATSING" (Rims keuzes van 3-11-2026)
 // ---------------------------------------------------------------------
-// Op elke toestelpagina opent de kaart "Zie dit toestel bij u thuis" dit venster, met twee delen:
-//   1. Op uw eigen foto: de klant kiest (of neemt) een foto van zijn muur of gevel, het toestel
-//      wordt uit de productfoto geknipt (witte achtergrond weg) en hij sleept het op de juiste plek,
-//      maakt het groter of kleiner (knijpen, scrollen of de schuif) en spiegelt het.
-//      De foto blijft op zijn gsm: er wordt niets verstuurd tot hij zelf op "Stuur naar Rim" tikt
-//      (dan via het deelmenu van de gsm, bv. WhatsApp; op een computer: bewaren + WhatsApp openen).
-//   2. 3D-voorbeeldhuis: een huis in 3D (three.js, laadt pas als de klant dat deel opent) waar hij de
-//      buitenunit over de gevel sleept, het huis draait, inzoomt en de gevelkleur kiest.
-//      De buitenunit is nu zelf getekend; zodra het 3D-model uit Higgsfield klaar is (december 2026),
-//      vervangt laadModel(url) hieronder de getekende unit door dat model (GLB).
-// Wordt geopend door js/main.js (toestelpagina) met window.rtZicht.open({...}).
+// Op elke toestelpagina opent de kaart "Plan uw plaatsing bij u thuis" dit venster. De klant maakt in
+// vier stappen zijn eigen plan, op eigen foto's of in een 3D-voorbeeldhuis:
+//   1. Binnenunit(s): per kamer (tot 3, voor een multi-split) waar de binnenunit komt;
+//   2. Buitenunit: waar, en hoe: op een muurbeugel, op een balk op de grond of op een plat dak;
+//   3. Leiding en goot: het pad van de goot langs de gevel (op de foto tikt de klant de punten aan,
+//      in het 3D-huis tekent de site de goot zelf), de kleur (wit, bruin, zwart, antraciet) en de
+//      geschatte lengte (5 m zit in de richtprijs, meer rekenen we na het plaatsbezoek);
+//   4. Overzicht: de beelden en het lijstje, naar Rim via WhatsApp of mee in het offerteformulier
+//      (window.rtPlan, zie js/main.js).
+// De foto's blijven op de gsm van de klant: er wordt niets verstuurd tot hij zelf deelt.
+// Het toestel wordt uit de productfoto geknipt (witte achtergrond weg, zie uitsnede). three.js laadt pas
+// als de klant het 3D-huis opent. De buitenunit in 3D is nu zelf getekend; zodra het 3D-model uit
+// Higgsfield klaar is (december 2026) vult u MODEL_3D in en vervangt laadModel de getekende unit.
+// Geopend door js/main.js met window.rtZicht.open({...}).
 // =====================================================================
 (function () {
   "use strict";
@@ -27,8 +30,18 @@
     toshiba: "assets/img/toshiba-multi.webp",
   };
   // Later (december 2026): het 3D-model van de buitenunit uit Higgsfield, bv. "assets/3d/buitenunit.glb".
-  // Zolang dit leeg is, tekent de site de buitenunit zelf.
   var MODEL_3D = "";
+  var KLEUREN = { wit: "#f1f1ec", bruin: "#6b4a2b", zwart: "#232323", antraciet: "#3d4248" };
+  var KAMERNAMEN = ["Woonkamer", "Slaapkamer", "Keuken", "Bureau", "Andere kamer"];
+  var MONTAGE = {
+    beugel: "op een muurbeugel aan de gevel",
+    balk: "op een balk op de grond",
+    dak: "op een balk op het platte dak",
+    anders: "anders (bespreken we bij het plaatsbezoek)",
+  };
+  var BUITEN_M = 0.85; // echte breedte van een buitenunit (m), voor de schatting van de gootlengte op een foto
+  var INBEGREPEN = "5 m leiding zit in de richtprijs; meer rekenen we na het plaatsbezoek.";
+  var MAX_KAMERS = 3;
 
   function el(tag, cls, html) {
     var e = document.createElement(tag);
@@ -41,6 +54,9 @@
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
+  }
+  function m2(x) {
+    return (Math.round(x * 2) / 2).toFixed(1).replace(".", ",").replace(",0", "");
   }
 
   // ---------------------------------------------------------------------
@@ -61,7 +77,7 @@
       var c = document.createElement("canvas");
       c.width = w;
       c.height = h;
-      var ctx = c.getContext("2d");
+      var ctx = c.getContext("2d", { willReadFrequently: true });
       ctx.drawImage(im, 0, 0);
       try {
         ctx.getImageData(0, 0, 1, 1);
@@ -230,11 +246,8 @@
   }
 
   // ---------------------------------------------------------------------
-  // Het beeld delen: op een gsm via het deelmenu (WhatsApp, ...), anders bewaren + WhatsApp openen.
+  // Delen en bewaren
   // ---------------------------------------------------------------------
-  function bestandsnaam(model) {
-    return "reijners-technics-" + slug(model) + ".jpg";
-  }
   function bewaar(blob, naam) {
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -246,9 +259,7 @@
       a.remove();
     }, 2000);
   }
-  function deel(blob, model, waar, melding) {
-    var tekst = "Hallo Rim, zo zou de " + model + " bij mij " + waar + " staan (zie foto). Kunt u mij een offerte sturen?";
-    var naam = bestandsnaam(model);
+  function deel(blob, naam, tekst, melding) {
     var file = null;
     try {
       file = new File([blob], naam, { type: "image/jpeg" });
@@ -258,18 +269,48 @@
       return;
     }
     bewaar(blob, naam);
-    melding("De foto is bewaard (map Downloads). Voeg ze toe in het WhatsApp-gesprek dat nu opent.");
-    window.open(WA + encodeURIComponent(tekst + " De foto heb ik net bewaard en stuur ik hierbij mee."), "_blank", "noopener");
+    melding("Het plan is bewaard als foto (map Downloads). Voeg ze toe in het WhatsApp-gesprek dat nu opent.");
+    window.open(WA + encodeURIComponent(tekst + "\n\nHet plan heb ik net bewaard als foto en stuur ik hierbij mee."), "_blank", "noopener");
   }
 
   // ---------------------------------------------------------------------
-  // Het venster
+  // Het venster en het plan
   // ---------------------------------------------------------------------
   var box = null,
     opener = null,
-    huidig = null,
+    o = null, // het toestel: model, merk, type, binnen (src), binnenKan, buiten (src of null)
+    plan = null,
+    modus = "foto",
+    stap = 1,
+    knipBinnen = null,
+    knipBuiten = null,
     fotoDeel = null,
-    drieDeel = null;
+    drieDeel = null,
+    overDeel = null;
+
+  function nieuweKamer(i) {
+    return {
+      naam: KAMERNAMEN[Math.min(i, KAMERNAMEN.length - 1)],
+      foto: null,
+      W: 0,
+      H: 0,
+      stand: null,
+      goot: { punten: [], zichtbaar: true },
+      d3: { s: 1.6 + i * 2.6, y: 2.7 },
+    };
+  }
+  function nieuwPlan() {
+    return {
+      kamers: [nieuweKamer(0)],
+      actief: 0,
+      gevel: { foto: null, W: 0, H: 0, stand: null, montage: "beugel" },
+      gootKleur: "wit",
+      buiten3d: { type: "muur", s: 6.6, y: 2.4, x: 0, z: 0 },
+    };
+  }
+  function kamer() {
+    return plan.kamers[plan.actief];
+  }
 
   function maakBox() {
     if (box) return box;
@@ -277,20 +318,31 @@
     box.hidden = true;
     box.setAttribute("role", "dialog");
     box.setAttribute("aria-modal", "true");
-    box.setAttribute("aria-label", "Zie dit toestel bij u thuis");
+    box.setAttribute("aria-label", "Plan uw plaatsing");
     box.innerHTML =
       '<div class="zb-top"><b class="zb-titel"></b><button type="button" class="zb-x" aria-label="Sluiten">&times;</button></div>' +
       '<div class="zb-tabs" role="tablist">' +
-      '<button type="button" class="zb-tab" role="tab" data-deel="foto" aria-selected="true">Op uw eigen foto</button>' +
-      '<button type="button" class="zb-tab" role="tab" data-deel="3d" aria-selected="false">3D-voorbeeldhuis</button></div>' +
-      '<div class="zb-deel zb-foto" role="tabpanel"></div>' +
-      '<div class="zb-deel zb-3d" role="tabpanel" hidden></div>' +
+      '<button type="button" class="zb-tab" role="tab" data-modus="foto" aria-selected="true">Met eigen foto’s</button>' +
+      '<button type="button" class="zb-tab" role="tab" data-modus="3d" aria-selected="false">In een 3D-huis</button></div>' +
+      '<ol class="zb-stappen">' +
+      '<li><button type="button" data-stap="1"><span>1</span> <em class="lang">Binnenunit</em><em class="kort">Binnen</em></button></li>' +
+      '<li><button type="button" data-stap="2"><span>2</span> <em class="lang">Buitenunit</em><em class="kort">Buiten</em></button></li>' +
+      '<li><button type="button" data-stap="3"><span>3</span> Goot</button></li>' +
+      '<li><button type="button" data-stap="4"><span>4</span> <em class="lang">Overzicht</em><em class="kort">Plan</em></button></li></ol>' +
+      '<div class="zb-deel zb-foto"></div>' +
+      '<div class="zb-deel zb-3d" hidden></div>' +
+      '<div class="zb-deel zb-over" hidden></div>' +
       '<p class="zb-melding" aria-live="polite" hidden></p>';
     document.body.appendChild(box);
     box.querySelector(".zb-x").addEventListener("click", sluit);
     box.querySelectorAll(".zb-tab").forEach(function (t) {
       t.addEventListener("click", function () {
-        kiesDeel(t.dataset.deel);
+        zetModus(t.dataset.modus);
+      });
+    });
+    box.querySelectorAll(".zb-stappen button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        zetStap(+b.dataset.stap);
       });
     });
     document.addEventListener("keydown", function (e) {
@@ -301,6 +353,7 @@
     });
     fotoDeel = maakFotoDeel(box.querySelector(".zb-foto"));
     drieDeel = maakDrieDeel(box.querySelector(".zb-3d"));
+    overDeel = maakOverDeel(box.querySelector(".zb-over"));
     return box;
   }
   function melding(t) {
@@ -308,30 +361,66 @@
     m.textContent = t || "";
     m.hidden = !t;
     clearTimeout(m._t);
-    if (t) m._t = setTimeout(function () { m.hidden = true; }, 7000);
+    if (t)
+      m._t = setTimeout(function () {
+        m.hidden = true;
+      }, 8000);
   }
-  function kiesDeel(naam) {
+  function zetModus(m) {
+    modus = m;
     box.querySelectorAll(".zb-tab").forEach(function (t) {
-      t.setAttribute("aria-selected", t.dataset.deel === naam ? "true" : "false");
+      t.setAttribute("aria-selected", t.dataset.modus === m ? "true" : "false");
     });
-    box.querySelector(".zb-foto").hidden = naam !== "foto";
-    box.querySelector(".zb-3d").hidden = naam !== "3d";
-    if (naam === "3d") drieDeel.start(huidig);
-    else fotoDeel.toon();
+    zetStap(stap);
   }
-  function open(o) {
+  function zetStap(n) {
+    stap = Math.max(1, Math.min(4, n));
+    box.querySelectorAll(".zb-stappen button").forEach(function (b) {
+      b.setAttribute("aria-current", +b.dataset.stap === stap ? "step" : "false");
+    });
+    var foto = stap < 4 && modus === "foto",
+      drie = stap < 4 && modus === "3d";
+    box.querySelector(".zb-foto").hidden = !foto;
+    box.querySelector(".zb-3d").hidden = !drie;
+    box.querySelector(".zb-over").hidden = stap !== 4;
+    if (foto) fotoDeel.toon();
+    if (drie) drieDeel.start();
+    else drieDeel.stop();
+    if (stap === 4) overDeel.toon();
+  }
+  function open(opts) {
     maakBox();
-    huidig = o;
+    o = opts;
+    plan = nieuwPlan();
+    knipBinnen = knipBuiten = null;
     opener = document.activeElement;
-    var enkelBuiten = o.type === "buiten" || o.binnenKan === false;
-    box.querySelector(".zb-titel").textContent =
-      o.type === "buiten" ? "Deze buitenunit aan uw gevel" : enkelBuiten ? "De buitenunit van de " + o.model + " aan uw gevel" : "De " + o.model + " bij u thuis";
+    box.querySelector(".zb-titel").textContent = "Plan uw plaatsing: " + o.model;
     melding("");
-    fotoDeel.reset(o);
-    kiesDeel("foto");
+    // de uitsnedes alvast maken
+    if (o.binnenKan && o.type !== "buiten")
+      uitsnede(o.binnen, "boven", function (c) {
+        knipBinnen = c;
+        herteken();
+      });
+    var buitenKlaar = function (c) {
+      knipBuiten = c;
+      herteken();
+    };
+    if (o.buiten) uitsnede(o.buiten, "alles", buitenKlaar);
+    else if (o.type === "buiten") uitsnede(o.binnen, "alles", buitenKlaar);
+    else
+      uitsnede(o.binnen || "", "onder", function (c) {
+        if (c) return buitenKlaar(c);
+        uitsnede(MERK_BUITEN[o.merk] || MERK_BUITEN.daikin, "alles", buitenKlaar);
+      });
+    zetModus("foto");
+    zetStap(1);
     box.hidden = false;
     document.documentElement.style.overflow = "hidden";
     box.querySelector(".zb-x").focus();
+  }
+  function herteken() {
+    if (box && !box.hidden && stap < 4 && modus === "foto") fotoDeel.toon();
   }
   function sluit() {
     if (!box || box.hidden) return;
@@ -341,149 +430,209 @@
     if (opener && opener.focus) opener.focus();
   }
 
-  // ---------------------------------------------------------------------
-  // Deel 1: op uw eigen foto
-  // ---------------------------------------------------------------------
-  function maakFotoDeel(root) {
-    root.innerHTML =
-      '<div class="zb-start">' +
-      '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/></svg>' +
-      '<h3>Neem een foto van uw muur of gevel</h3>' +
-      '<p class="zb-uitleg">Recht van voren en bij daglicht werkt het best. Daarna sleept u het toestel op de juiste plek.</p>' +
-      '<label class="zb-btn gold zb-kies">Kies of neem een foto<input type="file" accept="image/*" hidden></label>' +
-      '<p class="zb-klein">Uw foto blijft op uw gsm of computer. Er wordt niets verstuurd tot u zelf op &ldquo;Stuur naar Rim&rdquo; tikt.</p>' +
-      '<p class="zb-klein">Liever dat Rim het doet? <a class="zb-wa" href="#" target="_blank" rel="noopener">Stuur uw foto via WhatsApp</a>, u krijgt een beeld terug met het toestel erin.</p>' +
-      "</div>" +
-      '<div class="zb-werk" hidden>' +
-      '<div class="zb-vlak"><canvas class="zb-canvas" aria-label="Uw foto met het toestel erop"></canvas><p class="zb-hint">Sleep het toestel naar de juiste plek. Knijp of scrol om het groter of kleiner te maken.</p></div>' +
-      '<div class="zb-balk">' +
-      '<div class="zb-seg zb-welk" role="group" aria-label="Welk deel van het toestel"><button type="button" data-welk="binnen" aria-pressed="true">Binnenunit</button><button type="button" data-welk="buiten" aria-pressed="false">Buitenunit</button></div>' +
-      '<label class="zb-schuif">Grootte <input type="range" min="8" max="90" value="30" aria-label="Grootte van het toestel"></label>' +
-      '<button type="button" class="zb-btn zb-spiegel">Spiegelen</button>' +
-      '<label class="zb-btn zb-ander">Andere foto<input type="file" accept="image/*" hidden></label>' +
-      '<button type="button" class="zb-btn zb-bewaar">Bewaar</button>' +
-      '<button type="button" class="zb-btn gold zb-stuur">Stuur naar Rim</button>' +
-      "</div></div>";
-    var start = root.querySelector(".zb-start"),
-      werk = root.querySelector(".zb-werk"),
-      vlak = root.querySelector(".zb-vlak"),
-      canvas = root.querySelector(".zb-canvas"),
-      ctx = canvas.getContext("2d"),
-      welk = root.querySelector(".zb-welk"),
-      schuif = root.querySelector(".zb-schuif input");
-    var o = null,
-      foto = null, // ImageBitmap of Image
-      knip = null, // canvas met het uitgeknipte toestel
-      stand = { x: 0.5, y: 0.5, b: 0.3, spiegel: false }, // midden (deel van de foto) en breedte (deel van de fotobreedte)
-      welkNu = "binnen",
-      blobKlaar = null,
-      blobTimer = null;
-
-    root.querySelectorAll('input[type="file"]').forEach(function (inp) {
-      inp.addEventListener("change", function () {
-        if (inp.files && inp.files[0]) laadFoto(inp.files[0]);
-        inp.value = "";
-      });
-    });
-    welk.querySelectorAll("button").forEach(function (b) {
+  // de rij met kamers (stap 1 en 3): kiezen, hernoemen, toevoegen, weghalen
+  function kamerRij(root, wissel) {
+    var rij = el("div", "zb-kamers");
+    plan.kamers.forEach(function (k, i) {
+      var b = el("button", null, k.naam);
+      b.type = "button";
+      b.setAttribute("aria-pressed", i === plan.actief ? "true" : "false");
       b.addEventListener("click", function () {
-        kiesWelk(b.dataset.welk);
+        if (i === plan.actief) {
+          // nog eens tikken: de naam wisselen
+          var j = (KAMERNAMEN.indexOf(k.naam) + 1) % KAMERNAMEN.length;
+          k.naam = KAMERNAMEN[j];
+        }
+        plan.actief = i;
+        wissel();
       });
+      rij.appendChild(b);
     });
-    schuif.addEventListener("input", function () {
-      stand.b = schuif.value / 100;
-      teken();
-    });
-    root.querySelector(".zb-spiegel").addEventListener("click", function () {
-      stand.spiegel = !stand.spiegel;
-      teken();
-    });
-    root.querySelector(".zb-bewaar").addEventListener("click", function () {
-      maakBlob(function (blob) {
-        bewaar(blob, bestandsnaam(o.model));
-        melding("De foto is bewaard (map Downloads).");
+    if (plan.kamers.length < MAX_KAMERS && (stap === 1 || modus === "3d")) {
+      var plus = el("button", "plus", "+ Kamer");
+      plus.type = "button";
+      plus.title = "Nog een binnenunit (multi-split)";
+      plus.addEventListener("click", function () {
+        plan.kamers.push(nieuweKamer(plan.kamers.length));
+        plan.actief = plan.kamers.length - 1;
+        wissel();
       });
+      rij.appendChild(plus);
+    }
+    if (plan.kamers.length > 1 && stap === 1) {
+      var min = el("button", "min", "Kamer weg");
+      min.type = "button";
+      min.addEventListener("click", function () {
+        plan.kamers.splice(plan.actief, 1);
+        plan.actief = Math.max(0, plan.actief - 1);
+        wissel();
+      });
+      rij.appendChild(min);
+    }
+    var tip = el("span", "zb-kamertip", stap === 1 ? "Tik nog eens op de kamer om de naam te wisselen." : "");
+    rij.appendChild(tip);
+    root.appendChild(rij);
+  }
+  function knop(tekst, cls, fn) {
+    var b = el("button", "zb-btn" + (cls ? " " + cls : ""), tekst);
+    b.type = "button";
+    b.addEventListener("click", fn);
+    return b;
+  }
+  function seg(label, opties, huidig, fn) {
+    var s = el("div", "zb-seg");
+    s.setAttribute("role", "group");
+    s.setAttribute("aria-label", label);
+    Object.keys(opties).forEach(function (k) {
+      var b = el("button", null, opties[k]);
+      b.type = "button";
+      b.setAttribute("aria-pressed", k === huidig ? "true" : "false");
+      b.addEventListener("click", function () {
+        fn(k);
+      });
+      s.appendChild(b);
     });
-    root.querySelector(".zb-stuur").addEventListener("click", function () {
-      // het beeld staat meestal al klaar (zie teken), zodat het deelmenu meteen opent
-      if (blobKlaar) deel(blobKlaar, o.model, welkNu === "buiten" ? "aan de gevel" : "in de kamer", melding);
-      else
-        maakBlob(function (blob) {
-          deel(blob, o.model, welkNu === "buiten" ? "aan de gevel" : "in de kamer", melding);
-        });
-    });
+    return s;
+  }
+  function navKnoppen(balk) {
+    if (stap > 1)
+      balk.appendChild(
+        knop("← Vorige", "", function () {
+          zetStap(stap - 1);
+        })
+      );
+    balk.appendChild(
+      knop(stap === 3 ? "Naar het overzicht →" : "Volgende →", "gold", function () {
+        zetStap(stap + 1);
+      })
+    );
+  }
+  function gootLengteFoto(k) {
+    var g = plan.gevel;
+    if (!k.goot.zichtbaar || k.goot.punten.length < 1 || !g.stand) return 0;
+    var mpp = BUITEN_M / (g.stand.b * g.W);
+    var pts = k.goot.punten.concat([gootEind()]);
+    var len = 0;
+    for (var i = 1; i < pts.length; i++) len += Math.hypot((pts[i].x - pts[i - 1].x) * g.W, (pts[i].y - pts[i - 1].y) * g.H) * mpp;
+    return len + 0.5;
+  }
+  // waar de goot op de foto in de buitenunit komt: onderaan in het midden
+  function gootEind() {
+    var s = plan.gevel.stand;
+    var h = knipBuiten ? (s.b * plan.gevel.W * knipBuiten.height) / knipBuiten.width / plan.gevel.H : s.b * 0.7;
+    return { x: s.x, y: s.y + h * 0.45 };
+  }
 
-    function reset(opts) {
-      o = opts;
-      foto = null;
-      knip = null;
-      blobKlaar = null;
-      start.hidden = false;
-      werk.hidden = true;
-      var binnenKan = !!o.binnen && o.binnenKan !== false && o.type !== "buiten";
-      welk.hidden = !binnenKan;
-      welkNu = binnenKan ? "binnen" : "buiten";
-      welk.querySelectorAll("button").forEach(function (b) {
-        b.setAttribute("aria-pressed", b.dataset.welk === welkNu ? "true" : "false");
+  // ---------------------------------------------------------------------
+  // Tekenen op een foto: toestel met schaduw, de montage en de goten
+  // ---------------------------------------------------------------------
+  function tekenToestel(ctx, knip, stand, W, H) {
+    if (!knip || !stand) return;
+    var b = stand.b * W;
+    var h = (b * knip.height) / knip.width;
+    ctx.save();
+    ctx.translate(stand.x * W, stand.y * H);
+    if (stand.spiegel) ctx.scale(-1, 1);
+    ctx.shadowColor = "rgba(0,0,0,0.32)";
+    ctx.shadowBlur = b * 0.08;
+    ctx.shadowOffsetY = b * 0.035;
+    ctx.drawImage(knip, -b / 2, -h / 2, b, h);
+    ctx.restore();
+  }
+  function tekenMontage(ctx, W, H) {
+    var g = plan.gevel,
+      s = g.stand;
+    if (!s || !knipBuiten || g.montage === "anders") return;
+    var b = s.b * W,
+      h = (b * knipBuiten.height) / knipBuiten.width;
+    var cx = s.x * W,
+      onder = s.y * H + h / 2;
+    ctx.save();
+    ctx.fillStyle = "#4a4f55";
+    ctx.strokeStyle = "rgba(0,0,0,0.35)";
+    ctx.lineWidth = Math.max(1, b * 0.006);
+    if (g.montage === "beugel") {
+      // twee L-beugels: een staander tegen de muur en een ligger onder het toestel
+      [-0.3, 0.3].forEach(function (f) {
+        var x = cx + f * b;
+        ctx.fillRect(x - b * 0.02, onder - h * 0.1, b * 0.04, h * 0.75);
+        ctx.fillRect(x - b * 0.02, onder - b * 0.03, b * 0.04 + b * 0.16, b * 0.035);
+        ctx.strokeRect(x - b * 0.02, onder - h * 0.1, b * 0.04, h * 0.75);
       });
-      start.querySelector("h3").textContent = binnenKan ? "Neem een foto van uw muur of gevel" : "Neem een foto van uw gevel";
-      root.querySelector(".zb-wa").href =
-        WA + encodeURIComponent("Hallo Rim, ik wil graag zien hoe de " + o.model + " bij mij zou staan. Ik stuur u hierbij een foto van de muur.");
+    } else {
+      // een balk (kunststof of beton) onder het toestel, op de grond of op het platte dak
+      ctx.fillStyle = "#5a5e63";
+      ctx.fillRect(cx - b * 0.56, onder - b * 0.02, b * 1.12, b * 0.09);
+      ctx.strokeRect(cx - b * 0.56, onder - b * 0.02, b * 1.12, b * 0.09);
+      ctx.fillStyle = "#3e4247";
+      ctx.fillRect(cx - b * 0.56, onder + b * 0.07, b * 1.12, b * 0.025);
     }
-    function toon() {
-      if (foto) past();
-    }
-    function kiesWelk(w) {
-      welkNu = w;
-      welk.querySelectorAll("button").forEach(function (b) {
-        b.setAttribute("aria-pressed", b.dataset.welk === w ? "true" : "false");
-      });
-      stand.b = w === "buiten" ? 0.22 : 0.3;
-      schuif.value = Math.round(stand.b * 100);
-      laadKnip();
-    }
-    function laadKnip() {
-      knip = null;
-      var mijn = ++knipNr; // een oudere, trage uitsnede mag een nieuwere niet overschrijven
-      function klaar(c) {
-        if (mijn !== knipNr) return;
-        knip = c;
-        teken();
+    ctx.restore();
+  }
+  function tekenGoten(ctx, W, H, actiefOok) {
+    var g = plan.gevel;
+    if (!g.stand) return;
+    var dikte = Math.max(3, g.stand.b * W * 0.085);
+    plan.kamers.forEach(function (k, i) {
+      if (!k.goot.zichtbaar || !k.goot.punten.length) return;
+      var pts = k.goot.punten.concat([gootEind()]);
+      ctx.save();
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "rgba(0,0,0,0.3)";
+      ctx.lineWidth = dikte + 2;
+      pad(ctx, pts, W, H);
+      ctx.stroke();
+      ctx.strokeStyle = KLEUREN[plan.gootKleur];
+      ctx.lineWidth = dikte;
+      pad(ctx, pts, W, H);
+      ctx.stroke();
+      // de doorvoer: een bolletje met de naam van de kamer
+      var p0 = pts[0];
+      ctx.fillStyle = i === plan.actief && actiefOok ? "#dc9a2c" : "#fff";
+      ctx.strokeStyle = "#1b2f44";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(p0.x * W, p0.y * H, dikte * 0.9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      if (plan.kamers.length > 1) {
+        ctx.font = "bold " + Math.round(dikte * 1.6) + "px sans-serif";
+        ctx.fillStyle = "#fff";
+        ctx.strokeStyle = "rgba(0,0,0,0.6)";
+        ctx.lineWidth = 3;
+        ctx.strokeText(k.naam, p0.x * W + dikte * 1.2, p0.y * H - dikte * 0.6);
+        ctx.fillText(k.naam, p0.x * W + dikte * 1.2, p0.y * H - dikte * 0.6);
       }
-      if (welkNu === "binnen") {
-        if (!o.binnen) return teken();
-        return uitsnede(o.binnen, o.type === "buiten" ? "alles" : "boven", klaar);
-      }
-      if (o.buiten) return uitsnede(o.buiten, "alles", klaar);
-      if (o.type === "buiten") return uitsnede(o.binnen, "alles", klaar);
-      // geen eigen buitenunit-foto: de buitenunit uit de setfoto, anders die van het merk
-      uitsnede(o.binnen || "", "onder", function (c) {
-        if (c) return klaar(c);
-        uitsnede(MERK_BUITEN[o.merk] || MERK_BUITEN.daikin, "alles", klaar);
-      });
-    }
-    var knipNr = 0;
-    function laadFoto(file) {
-      var klaar = function (bm) {
-        foto = bm;
-        // de tekencanvas krijgt de grootte van de foto (hoogstens 1600 px), de css schaalt ze passend
-        var s = Math.min(1, 1600 / Math.max(bm.width, bm.height));
-        canvas.width = Math.round(bm.width * s);
-        canvas.height = Math.round(bm.height * s);
-        stand = { x: 0.5, y: 0.45, b: welkNu === "buiten" ? 0.22 : 0.3, spiegel: false };
-        schuif.value = Math.round(stand.b * 100);
-        start.hidden = true;
-        werk.hidden = false;
-        past();
-        laadKnip();
-      };
-      if (window.createImageBitmap) {
-        createImageBitmap(file, { imageOrientation: "from-image" }).then(klaar, function () {
-          viaImage(file, klaar);
-        });
-      } else viaImage(file, klaar);
-    }
-    function viaImage(file, klaar) {
+      ctx.restore();
+    });
+  }
+  function pad(ctx, pts, W, H) {
+    ctx.beginPath();
+    pts.forEach(function (p, i) {
+      if (i) ctx.lineTo(p.x * W, p.y * H);
+      else ctx.moveTo(p.x * W, p.y * H);
+    });
+  }
+  function tekenKamerBeeld(ctx, k) {
+    ctx.drawImage(k.foto.img || k.foto, 0, 0, k.W, k.H);
+    tekenToestel(ctx, knipBinnen, k.stand, k.W, k.H);
+  }
+  function tekenGevelBeeld(ctx, metGoot, actiefOok) {
+    var g = plan.gevel;
+    ctx.drawImage(g.foto.img || g.foto, 0, 0, g.W, g.H);
+    tekenMontage(ctx, g.W, g.H);
+    if (metGoot) tekenGoten(ctx, g.W, g.H, actiefOok);
+    tekenToestel(ctx, knipBuiten, g.stand, g.W, g.H);
+  }
+
+  // een foto uit het bestandsveld laden (met de juiste draaiing), hoogstens 1600 px
+  function laadFoto(file, cb) {
+    var klaar = function (bm) {
+      var s = Math.min(1, 1600 / Math.max(bm.width, bm.height));
+      cb(bm, Math.round(bm.width * s), Math.round(bm.height * s));
+    };
+    var viaImage = function () {
       var url = URL.createObjectURL(file);
       var im = new Image();
       im.onload = function () {
@@ -495,92 +644,286 @@
         melding("Deze foto kon niet geopend worden. Probeer een andere foto (jpg of png).");
       };
       im.src = url;
+    };
+    if (window.createImageBitmap) createImageBitmap(file, { imageOrientation: "from-image" }).then(klaar, viaImage);
+    else viaImage();
+  }
+
+  // ---------------------------------------------------------------------
+  // Deel A: met eigen foto's (stap 1 tot 3)
+  // ---------------------------------------------------------------------
+  function maakFotoDeel(root) {
+    var canvas = el("canvas", "zb-canvas"),
+      ctx = canvas.getContext("2d");
+    canvas.setAttribute("aria-label", "Uw foto met het toestel erop");
+    function toon() {
+      root.innerHTML = "";
+      var k = kamer();
+      if (stap === 1) {
+        kamerRij(root, toon);
+        if (!o.binnenKan || o.type === "buiten") {
+          start(
+            o.type === "buiten" ? "Welke kamers krijgen een binnenunit?" : "Deze binnenunit komt in het plafond",
+            "Kies hierboven de kamer(s). Waar de unit precies komt, bekijkt Rim met u tijdens het gratis plaatsbezoek. Ga verder met de buitenunit.",
+            null
+          );
+        } else if (!k.foto) {
+          start(
+            "Neem een foto van de muur in de " + k.naam.toLowerCase(),
+            "Recht van voren en bij daglicht werkt het best. Daarna sleept u de binnenunit op de juiste plek.",
+            function (file) {
+              laadFoto(file, function (bm, W, H) {
+                k.foto = bm;
+                k.W = W;
+                k.H = H;
+                k.stand = { x: 0.5, y: 0.4, b: 0.3, spiegel: false };
+                toon();
+              });
+            }
+          );
+        } else {
+          werk(k.W, k.H, "Sleep de binnenunit naar de juiste plek. Knijp of scrol om ze groter of kleiner te maken.", function (balk) {
+            balk.appendChild(
+              knop("Spiegelen", "", function () {
+                k.stand.spiegel = !k.stand.spiegel;
+                teken();
+              })
+            );
+            balk.appendChild(
+              bestandKnop("Andere foto", function (file) {
+                laadFoto(file, function (bm, W, H) {
+                  k.foto = bm;
+                  k.W = W;
+                  k.H = H;
+                  toon();
+                });
+              })
+            );
+            navKnoppen(balk);
+          });
+        }
+      } else if (stap === 2) {
+        var g = plan.gevel;
+        if (!g.foto) {
+          start(
+            "Neem een foto van uw gevel, waar de buitenunit komt",
+            "Zet u even verder van het huis, zodat ook de plek van de leiding erop staat. Daarna sleept u de buitenunit op zijn plaats en kiest u hoe hij staat.",
+            function (file) {
+              laadFoto(file, function (bm, W, H) {
+                g.foto = bm;
+                g.W = W;
+                g.H = H;
+                g.stand = { x: 0.5, y: 0.55, b: 0.2, spiegel: false };
+                toon();
+              });
+            }
+          );
+        } else {
+          werk(g.W, g.H, "Sleep de buitenunit naar de juiste plek en kies hieronder hoe hij staat.", function (balk) {
+            balk.appendChild(
+              seg("Hoe staat de buitenunit", { beugel: "Muurbeugel", balk: "Balk op de grond", dak: "Plat dak", anders: "Anders" }, g.montage, function (v) {
+                g.montage = v;
+                toon();
+              })
+            );
+            balk.appendChild(
+              knop("Spiegelen", "", function () {
+                g.stand.spiegel = !g.stand.spiegel;
+                teken();
+              })
+            );
+            balk.appendChild(
+              bestandKnop("Andere foto", function (file) {
+                laadFoto(file, function (bm, W, H) {
+                  g.foto = bm;
+                  g.W = W;
+                  g.H = H;
+                  plan.kamers.forEach(function (x) {
+                    x.goot.punten = [];
+                  });
+                  toon();
+                });
+              })
+            );
+            navKnoppen(balk);
+          });
+        }
+      } else if (stap === 3) {
+        var gv = plan.gevel;
+        if (!gv.foto) {
+          start("Eerst de buitenunit", "Voor de goot hebben we de foto van uw gevel nodig, met de buitenunit erop (stap 2).", null, [
+            knop("← Naar stap 2", "gold", function () {
+              zetStap(2);
+            }),
+          ]);
+        } else {
+          if (plan.kamers.length > 1) kamerRij(root, toon);
+          var kk = kamer();
+          var uitleg = kk.goot.zichtbaar
+            ? kk.goot.punten.length
+              ? "Tik de volgende hoekpunten aan tot aan de buitenunit. Het laatste stuk loopt vanzelf naar de unit."
+              : "Tik op de gevel waar de leiding door de muur komt (achter de binnenunit in de " +
+                kk.naam.toLowerCase() +
+                "), en dan de hoekpunten van de goot tot aan de buitenunit."
+            : "Voor de " + kk.naam.toLowerCase() + " loopt de leiding binnenin: geen goot aan de gevel.";
+          var lengte = gootLengteFoto(kk);
+          werk(gv.W, gv.H, uitleg + (lengte ? " Geschat: ± " + m2(lengte) + " m goot. " + INBEGREPEN : ""), function (balk) {
+            balk.appendChild(
+              seg("Kleur van de goot", { wit: "Wit", bruin: "Bruin", zwart: "Zwart", antraciet: "Antraciet" }, plan.gootKleur, function (v) {
+                plan.gootKleur = v;
+                teken();
+              })
+            );
+            balk.appendChild(
+              knop("Punt weg", "", function () {
+                kk.goot.punten.pop();
+                toon();
+              })
+            );
+            balk.appendChild(
+              knop(kk.goot.zichtbaar ? "Geen goot zichtbaar" : "Toch een goot", "", function () {
+                kk.goot.zichtbaar = !kk.goot.zichtbaar;
+                toon();
+              })
+            );
+            navKnoppen(balk);
+          });
+        }
+      }
     }
-    // de canvas passend in het vlak, met dezelfde verhouding als de foto
+    function start(kop, tekst, metBestand, extraKnoppen) {
+      var s = el("div", "zb-start");
+      s.innerHTML =
+        '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/></svg>' +
+        "<h3></h3><p class=\"zb-uitleg\"></p>";
+      s.querySelector("h3").textContent = kop;
+      s.querySelector(".zb-uitleg").textContent = tekst;
+      if (metBestand) s.appendChild(bestandKnop("Kies of neem een foto", metBestand, "gold zb-kies"));
+      var rij = el("div", "zb-startknoppen");
+      (extraKnoppen || []).forEach(function (b) {
+        rij.appendChild(b);
+      });
+      if (!metBestand && !extraKnoppen) {
+        rij.appendChild(
+          knop("Volgende →", "gold", function () {
+            zetStap(stap + 1);
+          })
+        );
+      }
+      if (rij.children.length) s.appendChild(rij);
+      if (metBestand)
+        s.appendChild(
+          el(
+            "p",
+            "zb-klein",
+            "Uw foto blijft op uw gsm of computer. Er wordt niets verstuurd tot u zelf op “Stuur naar Rim” tikt."
+          )
+        );
+      root.appendChild(s);
+    }
+    function bestandKnop(tekst, fn, cls) {
+      var l = el("label", "zb-btn " + (cls || ""), tekst);
+      var inp = el("input");
+      inp.type = "file";
+      inp.accept = "image/*";
+      inp.hidden = true;
+      inp.addEventListener("change", function () {
+        if (inp.files && inp.files[0]) fn(inp.files[0]);
+        inp.value = "";
+      });
+      l.appendChild(inp);
+      return l;
+    }
+    var vlak = null,
+      hint = null;
+    function werk(W, H, hintTekst, vulBalk) {
+      var w = el("div", "zb-werk");
+      vlak = el("div", "zb-vlak");
+      canvas.width = W;
+      canvas.height = H;
+      vlak.appendChild(canvas);
+      hint = el("p", "zb-hint", "");
+      hint.textContent = hintTekst;
+      vlak.appendChild(hint);
+      w.appendChild(vlak);
+      var balk = el("div", "zb-balk");
+      vulBalk(balk);
+      w.appendChild(balk);
+      root.appendChild(w);
+      past();
+      teken();
+    }
     function past() {
+      if (!vlak || !vlak.isConnected) return;
       var r = vlak.getBoundingClientRect();
-      var hint = vlak.querySelector(".zb-hint").getBoundingClientRect().height + 8;
+      var hh = hint.getBoundingClientRect().height + 8;
       var bw = Math.max(100, r.width - 16),
-        bh = Math.max(100, r.height - hint - 16);
+        bh = Math.max(100, r.height - hh - 16);
       var s = Math.min(bw / canvas.width, bh / canvas.height);
       canvas.style.width = Math.round(canvas.width * s) + "px";
       canvas.style.height = Math.round(canvas.height * s) + "px";
     }
     window.addEventListener("resize", function () {
-      if (foto && !root.hidden && !box.hidden) past();
+      if (box && !box.hidden && !root.hidden) past();
     });
     function teken() {
-      if (!foto) return;
       var W = canvas.width,
         H = canvas.height;
       ctx.clearRect(0, 0, W, H);
-      ctx.drawImage(foto.img || foto, 0, 0, W, H);
-      if (knip) {
-        var b = stand.b * W;
-        var h = (b * knip.height) / knip.width;
-        var cx = stand.x * W,
-          cy = stand.y * H;
-        ctx.save();
-        ctx.translate(cx, cy);
-        if (stand.spiegel) ctx.scale(-1, 1);
-        ctx.shadowColor = "rgba(0,0,0,0.32)";
-        ctx.shadowBlur = b * 0.08;
-        ctx.shadowOffsetY = b * 0.035;
-        ctx.drawImage(knip, -b / 2, -h / 2, b, h);
-        ctx.restore();
-      }
-      blobKlaar = null;
-      clearTimeout(blobTimer);
-      blobTimer = setTimeout(function () {
-        maakBlob(function (bl) {
-          blobKlaar = bl;
-        });
-      }, 400);
+      if (stap === 1) tekenKamerBeeld(ctx, kamer());
+      else tekenGevelBeeld(ctx, stap === 3, true);
     }
-    function maakBlob(cb) {
-      canvas.toBlob(
-        function (bl) {
-          if (bl) cb(bl);
-        },
-        "image/jpeg",
-        0.88
-      );
-    }
-    // slepen (één vinger of de muis) en knijpen (twee vingers), scrollen op de computer
+    // slepen (één vinger of de muis), knijpen (twee vingers), scrollen; in stap 3: tikken = een punt
     var vingers = {},
-      vorigeAfstand = 0;
+      vorigeAfstand = 0,
+      startPunt = null,
+      bewogen = false;
+    function standNu() {
+      return stap === 1 ? kamer().stand : plan.gevel.stand;
+    }
     canvas.addEventListener("pointerdown", function (e) {
       vingers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      startPunt = { x: e.clientX, y: e.clientY };
+      bewogen = false;
       canvas.setPointerCapture(e.pointerId);
       e.preventDefault();
     });
     canvas.addEventListener("pointermove", function (e) {
-      if (!vingers[e.pointerId] || !foto) return;
+      if (!vingers[e.pointerId]) return;
       var ids = Object.keys(vingers);
       var r = canvas.getBoundingClientRect();
+      if (Math.hypot(e.clientX - startPunt.x, e.clientY - startPunt.y) > 6) bewogen = true;
+      if (stap === 3) return;
+      var st = standNu();
+      if (!st) return;
       if (ids.length === 1) {
         var v = vingers[e.pointerId];
-        stand.x += (e.clientX - v.x) / r.width;
-        stand.y += (e.clientY - v.y) / r.height;
-        stand.x = Math.max(0, Math.min(1, stand.x));
-        stand.y = Math.max(0, Math.min(1, stand.y));
+        st.x = Math.max(0, Math.min(1, st.x + (e.clientX - v.x) / r.width));
+        st.y = Math.max(0, Math.min(1, st.y + (e.clientY - v.y) / r.height));
         v.x = e.clientX;
         v.y = e.clientY;
         teken();
-      } else if (ids.length >= 2) {
+      } else {
         vingers[e.pointerId] = { x: e.clientX, y: e.clientY };
         var a = vingers[ids[0]],
           b = vingers[ids[1]];
         var af = Math.hypot(a.x - b.x, a.y - b.y);
         if (vorigeAfstand) {
-          stand.b = Math.max(0.08, Math.min(0.9, stand.b * (af / vorigeAfstand)));
-          schuif.value = Math.round(stand.b * 100);
+          st.b = Math.max(0.06, Math.min(0.9, st.b * (af / vorigeAfstand)));
           teken();
         }
         vorigeAfstand = af;
       }
     });
     function los(e) {
+      if (stap === 3 && vingers[e.pointerId] && !bewogen && e.type === "pointerup") {
+        var k = kamer();
+        if (k.goot.zichtbaar) {
+          var r = canvas.getBoundingClientRect();
+          k.goot.punten.push({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height });
+          toon();
+        }
+      }
       delete vingers[e.pointerId];
       vorigeAfstand = 0;
     }
@@ -589,77 +932,86 @@
     canvas.addEventListener(
       "wheel",
       function (e) {
-        if (!foto) return;
+        var st = standNu();
+        if (stap === 3 || !st) return;
         e.preventDefault();
-        stand.b = Math.max(0.08, Math.min(0.9, stand.b * (e.deltaY < 0 ? 1.06 : 0.94)));
-        schuif.value = Math.round(stand.b * 100);
+        st.b = Math.max(0.06, Math.min(0.9, st.b * (e.deltaY < 0 ? 1.06 : 0.94)));
         teken();
       },
       { passive: false }
     );
-    return { reset: reset, toon: toon };
+    // beelden voor het overzicht
+    function beeldKamer(k) {
+      if (!k.foto) return null;
+      var c = document.createElement("canvas");
+      c.width = k.W;
+      c.height = k.H;
+      tekenKamerBeeld(c.getContext("2d"), k);
+      return c;
+    }
+    function beeldGevel() {
+      var g = plan.gevel;
+      if (!g.foto) return null;
+      var c = document.createElement("canvas");
+      c.width = g.W;
+      c.height = g.H;
+      tekenGevelBeeld(c.getContext("2d"), true, false);
+      return c;
+    }
+    return { toon: toon, beeldKamer: beeldKamer, beeldGevel: beeldGevel };
   }
 
   // ---------------------------------------------------------------------
-  // Deel 2: het 3D-voorbeeldhuis (three.js laadt pas hier)
+  // Deel B: het 3D-voorbeeldhuis (three.js laadt pas hier). Voorgevel, zijgevel en een aanbouw met
+  // plat dak. Stap 1: de binnenunit (schim) per kamer op een muur; stap 2: de buitenunit tegen een
+  // muur (beugel), op de grond (balk) of op het platte dak (balk); stap 3: de goot tekent zichzelf.
   // ---------------------------------------------------------------------
   function maakDrieDeel(root) {
-    root.innerHTML =
-      '<div class="zb-vlak zb-3d-vlak"><p class="zb-laden">Het 3D-huis laadt&hellip;</p>' +
-      '<p class="zb-hint">Sleep de buitenunit over de gevel. Sleep ernaast om het huis te draaien, knijp of scrol om in te zoomen.</p></div>' +
-      '<div class="zb-balk">' +
-      '<div class="zb-seg zb-gevel" role="group" aria-label="Gevel"><button type="button" data-gevel="baksteen" aria-pressed="true">Baksteen</button><button type="button" data-gevel="wit" aria-pressed="false">Wit</button><button type="button" data-gevel="grijs" aria-pressed="false">Grijs</button></div>' +
-      '<div class="zb-seg zb-plek" role="group" aria-label="Plaats van de buitenunit"><button type="button" data-plek="muur" aria-pressed="true">Aan de muur</button><button type="button" data-plek="grond" aria-pressed="false">Op de grond</button></div>' +
-      '<button type="button" class="zb-btn zb-bewaar">Bewaar</button>' +
-      '<button type="button" class="zb-btn gold zb-stuur">Stuur naar Rim</button>' +
-      "</div>";
-    var vlak = root.querySelector(".zb-3d-vlak"),
-      laden = root.querySelector(".zb-laden");
-    var T = null, // three
+    var vlak = el("div", "zb-vlak zb-3d-vlak"),
+      laden = el("p", "zb-laden", "Het 3D-huis laadt…"),
+      hint = el("p", "zb-hint", ""),
+      balk = el("div", "zb-balk"),
+      kamersVak = el("div");
+    vlak.appendChild(laden);
+    vlak.appendChild(hint);
+    root.appendChild(kamersVak);
+    root.appendChild(vlak);
+    root.appendChild(balk);
+    var T = null,
       scene,
       camera,
       renderer,
-      huis,
+      wandMat,
       unit,
-      muren = [],
-      gevelVlak,
+      schimmen = [],
+      gootGroep,
+      vlakken = [], // de onzichtbare sleepvlakken
+      gras,
       bezig = false,
       actief = false,
-      vuil = true,
-      o = null;
-    var HUIS = { b: 9, d: 7, h: 5.4 }; // breedte, diepte, hoogte van de muren (meter)
-    var zicht = { yaw: 0.42, pitch: 0.3, r: 15 };
-    var plek = "muur";
-    var unitPos = { x: 1.9, y: 2.9 };
-
-    root.querySelectorAll(".zb-gevel button").forEach(function (b) {
-      b.addEventListener("click", function () {
-        root.querySelectorAll(".zb-gevel button").forEach(function (x) {
-          x.setAttribute("aria-pressed", x === b ? "true" : "false");
-        });
-        zetGevel(b.dataset.gevel);
-      });
-    });
-    root.querySelectorAll(".zb-plek button").forEach(function (b) {
-      b.addEventListener("click", function () {
-        root.querySelectorAll(".zb-plek button").forEach(function (x) {
-          x.setAttribute("aria-pressed", x === b ? "true" : "false");
-        });
-        plek = b.dataset.plek;
-        zetUnit();
-      });
-    });
-    root.querySelector(".zb-bewaar").addEventListener("click", function () {
-      beeld(function (bl) {
-        bewaar(bl, bestandsnaam(o.model));
-        melding("Het beeld is bewaard (map Downloads).");
-      });
-    });
-    root.querySelector(".zb-stuur").addEventListener("click", function () {
-      beeld(function (bl) {
-        deel(bl, o.model, "aan de gevel", melding);
-      });
-    });
+      vuil = true;
+    var HUIS = { b: 9, d: 7, h: 5.4 },
+      AANB = { x0: 4.5, x1: 8.5, z0: -3.5, z1: 0.5, h: 3.0 };
+    var zicht = { yaw: 0.62, pitch: 0.28, r: 17 };
+    // de muren "uitgerold": s loopt langs de voorgevel (0-9), de zijgevel (9-12), de aanbouw (12-16, 16-20)
+    var WANDEN = [
+      { naam: "de voorgevel", s0: 0, s1: 9, p: [-4.5, 3.5], d: [1, 0], n: [0, 1], h: HUIS.h },
+      { naam: "de zijgevel", s0: 9, s1: 12, p: [4.5, 3.5], d: [0, -1], n: [1, 0], h: HUIS.h },
+      { naam: "de aanbouw (voorkant)", s0: 12, s1: 16, p: [4.5, 0.5], d: [1, 0], n: [0, 1], h: AANB.h },
+      { naam: "de aanbouw (zijkant)", s0: 16, s1: 20, p: [8.5, 0.5], d: [0, -1], n: [1, 0], h: AANB.h },
+    ];
+    function wandBij(s) {
+      for (var i = 0; i < WANDEN.length; i++) if (s <= WANDEN[i].s1) return WANDEN[i];
+      return WANDEN[WANDEN.length - 1];
+    }
+    function punt(s, y, uit) {
+      var w = wandBij(s),
+        t = Math.max(0, Math.min(w.s1 - w.s0, s - w.s0));
+      return new T.Vector3(w.p[0] + w.d[0] * t + w.n[0] * uit, y, w.p[1] + w.d[1] * t + w.n[1] * uit);
+    }
+    function hoek(w) {
+      return Math.atan2(w.n[0], w.n[1]);
+    }
 
     function laadThree(cb) {
       if (window.THREE) return cb(true);
@@ -677,27 +1029,80 @@
       };
       document.head.appendChild(s);
     }
-    function start(opts) {
-      o = opts;
+    function start() {
       actief = true;
       laden.hidden = false;
       laadThree(function (ok) {
         if (!ok) {
-          laden.textContent = "Het 3D-huis kon niet laden (geen verbinding?). Probeer het straks opnieuw of gebruik uw eigen foto.";
+          laden.textContent = "Het 3D-huis kon niet laden (geen verbinding?). Probeer het straks opnieuw of gebruik uw eigen foto’s.";
           return;
         }
         if (!scene) bouw();
         laden.hidden = true;
+        toon();
         past();
-        vuil = true;
         lus();
       });
     }
     function stop() {
       actief = false;
     }
+    // de knoppen en de uitleg per stap
+    function toon() {
+      if (!scene) return;
+      kamersVak.innerHTML = "";
+      balk.innerHTML = "";
+      zetSchimmen();
+      zetUnit();
+      zetGoten();
+      if (stap === 1) {
+        kamerRij(kamersVak, toon);
+        hint.textContent =
+          "Sleep de binnenunit van de " +
+          kamer().naam.toLowerCase() +
+          " naar de muur waar ze (aan de binnenkant) komt te hangen. Sleep ernaast om het huis te draaien, knijp of scrol om in te zoomen.";
+        navKnoppen(balk);
+      } else if (stap === 2) {
+        hint.textContent =
+          "Sleep de buitenunit tegen een muur (muurbeugel), op de grond (balk) of op het platte dak van de aanbouw (balk). Nu: " +
+          montage3dTekst() +
+          ".";
+        balk.appendChild(
+          seg("Gevel", { baksteen: "Baksteen", wit: "Wit", grijs: "Grijs" }, gevelNu, function (v) {
+            zetGevel(v);
+          })
+        );
+        navKnoppen(balk);
+      } else if (stap === 3) {
+        if (plan.kamers.length > 1) kamerRij(kamersVak, toon);
+        var k = kamer();
+        hint.textContent = k.goot.zichtbaar
+          ? "De goot loopt van de doorvoer achter de binnenunit langs de gevel naar de buitenunit. Geschat: ± " +
+            m2(gootLengte3d(k)) +
+            " m" +
+            (plan.kamers.length > 1 ? " voor de " + k.naam.toLowerCase() : "") +
+            ". " +
+            INBEGREPEN
+          : "Voor de " + k.naam.toLowerCase() + " loopt de leiding binnenin: geen goot aan de gevel.";
+        balk.appendChild(
+          seg("Kleur van de goot", { wit: "Wit", bruin: "Bruin", zwart: "Zwart", antraciet: "Antraciet" }, plan.gootKleur, function (v) {
+            plan.gootKleur = v;
+            zetGoten();
+            vuil = true;
+          })
+        );
+        balk.appendChild(
+          knop(k.goot.zichtbaar ? "Geen goot zichtbaar" : "Toch een goot", "", function () {
+            k.goot.zichtbaar = !k.goot.zichtbaar;
+            toon();
+          })
+        );
+        navKnoppen(balk);
+      }
+      vuil = true;
+    }
 
-    // ---- texturen, zelf getekend (geen bestanden nodig)
+    // ---- texturen, zelf getekend
     function canvasTex(w, h, tekenaar) {
       var c = document.createElement("canvas");
       c.width = w;
@@ -709,7 +1114,7 @@
     }
     function baksteenTex() {
       return canvasTex(512, 512, function (c, w, h) {
-        c.fillStyle = "#cfc3b3"; // voeg
+        c.fillStyle = "#cfc3b3";
         c.fillRect(0, 0, w, h);
         var bh = 32,
           bw = 96,
@@ -718,10 +1123,7 @@
           var off = rij % 2 ? bw / 2 : 0;
           for (var x = -bw; x < w + bw; x += bw) {
             var t = Math.random();
-            var r = 150 + Math.round(t * 40),
-              g = 78 + Math.round(t * 22),
-              b = 60 + Math.round(t * 16);
-            c.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+            c.fillStyle = "rgb(" + (150 + Math.round(t * 40)) + "," + (78 + Math.round(t * 22)) + "," + (60 + Math.round(t * 16)) + ")";
             c.fillRect(x + off + voeg / 2, rij * bh + voeg / 2, bw - voeg, bh - voeg);
           }
         }
@@ -763,7 +1165,6 @@
         }
       });
     }
-    // de voorkant van de buitenunit: ventilatoropening met lamellen, rechts de rooster
     function unitTex() {
       return canvasTex(512, 352, function (c, w, h) {
         c.fillStyle = "#d9d8d2";
@@ -778,7 +1179,6 @@
         c.beginPath();
         c.arc(cx, cy, R, 0, Math.PI * 2);
         c.fill();
-        // ventilatorbladen
         c.fillStyle = "#4b4f55";
         for (var i = 0; i < 5; i++) {
           c.save();
@@ -795,7 +1195,6 @@
         c.beginPath();
         c.arc(cx, cy, 22, 0, Math.PI * 2);
         c.fill();
-        // beschermrooster: ringen en spaken
         c.strokeStyle = "rgba(220,220,215,0.85)";
         c.lineWidth = 3;
         for (var r = 26; r < R; r += 18) {
@@ -809,18 +1208,37 @@
           c.lineTo(cx + Math.cos((k * Math.PI) / 4) * R, cy + Math.sin((k * Math.PI) / 4) * R);
           c.stroke();
         }
-        // rechts: horizontale lamellen
         c.fillStyle = "#c9c8c1";
         for (var y = 40; y < h - 40; y += 14) c.fillRect(350, y, 130, 7);
       });
     }
+    function tekstSprite(tekst) {
+      var c = document.createElement("canvas");
+      c.width = 512;
+      c.height = 112;
+      var x = c.getContext("2d");
+      x.fillStyle = "rgba(27,47,68,0.9)";
+      x.beginPath();
+      x.roundRect ? x.roundRect(4, 4, 504, 104, 30) : x.rect(4, 4, 504, 104);
+      x.fill();
+      x.fillStyle = "#fff";
+      x.font = "bold 44px sans-serif";
+      x.textAlign = "center";
+      x.textBaseline = "middle";
+      x.fillText(tekst, 256, 58);
+      var t = new T.CanvasTexture(c);
+      var sp = new T.Sprite(new T.SpriteMaterial({ map: t, depthTest: false }));
+      sp.scale.set(3.2, 0.7, 1);
+      return sp;
+    }
 
+    var gevelNu = "baksteen";
     function bouw() {
       T = window.THREE;
       scene = new T.Scene();
       scene.background = new T.Color(0xdfe8ef);
-      scene.fog = new T.Fog(0xdfe8ef, 30, 70);
-      camera = new T.PerspectiveCamera(38, 1, 0.1, 120);
+      scene.fog = new T.Fog(0xdfe8ef, 34, 80);
+      camera = new T.PerspectiveCamera(38, 1, 0.1, 140);
       renderer = new T.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.shadowMap.enabled = true;
@@ -828,42 +1246,38 @@
       renderer.outputEncoding = T.sRGBEncoding;
       vlak.insertBefore(renderer.domElement, vlak.firstChild);
       renderer.domElement.className = "zb-canvas";
-      renderer.domElement.setAttribute("aria-label", "Een huis in 3D met de buitenunit tegen de gevel");
+      renderer.domElement.setAttribute("aria-label", "Een huis in 3D met de binnenunits, de buitenunit en de goot");
 
       scene.add(new T.HemisphereLight(0xeaf2fa, 0x7f8f6a, 0.85));
       var zon = new T.DirectionalLight(0xfff4e0, 1.05);
-      zon.position.set(8, 14, 12);
+      zon.position.set(10, 16, 14);
       zon.castShadow = true;
-      zon.shadow.mapSize.set(1024, 1024);
-      zon.shadow.camera.left = zon.shadow.camera.bottom = -12;
-      zon.shadow.camera.right = zon.shadow.camera.top = 12;
+      zon.shadow.mapSize.set(2048, 2048);
+      zon.shadow.camera.left = zon.shadow.camera.bottom = -14;
+      zon.shadow.camera.right = zon.shadow.camera.top = 14;
       zon.shadow.camera.near = 1;
-      zon.shadow.camera.far = 50;
-      zon.shadow.bias = -0.0015;
+      zon.shadow.camera.far = 60;
+      zon.shadow.bias = -0.0012;
       scene.add(zon);
 
-      // grond en oprit
-      var gras = grasTex();
-      gras.repeat.set(12, 12);
-      var grond = new T.Mesh(new T.PlaneGeometry(80, 80), new T.MeshStandardMaterial({ map: gras, roughness: 1 }));
-      grond.rotation.x = -Math.PI / 2;
-      grond.receiveShadow = true;
-      scene.add(grond);
+      var grasT = grasTex();
+      grasT.repeat.set(12, 12);
+      gras = new T.Mesh(new T.PlaneGeometry(80, 80), new T.MeshStandardMaterial({ map: grasT, roughness: 1 }));
+      gras.rotation.x = -Math.PI / 2;
+      gras.receiveShadow = true;
+      gras.userData.type = "grond";
+      scene.add(gras);
       var pad = new T.Mesh(new T.BoxGeometry(1.6, 0.04, 6), new T.MeshStandardMaterial({ color: 0xb9b4a8, roughness: 0.95 }));
       pad.position.set(1.0, 0.02, HUIS.d / 2 + 3);
       pad.receiveShadow = true;
       scene.add(pad);
 
-      huis = new T.Group();
-      scene.add(huis);
-      // muren (een doos; de voorgevel is de +z-kant)
-      var wandMat = new T.MeshStandardMaterial({ roughness: 0.95 });
+      wandMat = new T.MeshStandardMaterial({ roughness: 0.95 });
       var romp = new T.Mesh(new T.BoxGeometry(HUIS.b, HUIS.h, HUIS.d), wandMat);
       romp.position.y = HUIS.h / 2;
       romp.castShadow = romp.receiveShadow = true;
-      huis.add(romp);
-      muren.push(wandMat);
-      // dak: twee hellende vlakken met een nok in de x-richting, en twee puntgevels
+      scene.add(romp);
+      // het dak: twee hellende vlakken en twee puntgevels
       var dakH = 2.6,
         over = 0.45;
       var helling = Math.atan2(dakH, HUIS.d / 2);
@@ -875,7 +1289,7 @@
         v.position.set(0, HUIS.h + dakH / 2 - 0.03, (z * (HUIS.d / 2 + over)) / 2);
         v.rotation.x = z * helling;
         v.castShadow = v.receiveShadow = true;
-        huis.add(v);
+        scene.add(v);
       });
       var gevelVorm = new T.Shape();
       gevelVorm.moveTo(-HUIS.d / 2, 0);
@@ -887,63 +1301,99 @@
         g.position.set((x * HUIS.b) / 2, HUIS.h, 0);
         g.rotation.y = (x * Math.PI) / 2;
         g.castShadow = true;
-        huis.add(g);
+        scene.add(g);
       });
-      // ramen en de deur op de voorgevel
+      // de aanbouw met plat dak, rechts achteraan
+      var aanb = new T.Mesh(new T.BoxGeometry(AANB.x1 - AANB.x0, AANB.h, AANB.z1 - AANB.z0), wandMat);
+      aanb.position.set((AANB.x0 + AANB.x1) / 2, AANB.h / 2, (AANB.z0 + AANB.z1) / 2);
+      aanb.castShadow = aanb.receiveShadow = true;
+      scene.add(aanb);
+      var platDak = new T.Mesh(
+        new T.BoxGeometry(AANB.x1 - AANB.x0 + 0.3, 0.14, AANB.z1 - AANB.z0 + 0.3),
+        new T.MeshStandardMaterial({ color: 0x55504b, roughness: 1 })
+      );
+      platDak.position.set((AANB.x0 + AANB.x1) / 2 + 0.15, AANB.h + 0.07, (AANB.z0 + AANB.z1) / 2 + 0.15);
+      platDak.castShadow = platDak.receiveShadow = true;
+      scene.add(platDak);
+
+      // ramen en de deur
       var glas = new T.MeshStandardMaterial({ color: 0x2b3e50, roughness: 0.25, metalness: 0.35 });
       var kozijn = new T.MeshStandardMaterial({ color: 0xf4f2ec, roughness: 0.8 });
-      function raam(x, y, b, h) {
+      var dorpelMat = new T.MeshStandardMaterial({ color: 0x8e8a82 });
+      function raam(s, y, b, h) {
+        var w = wandBij(s),
+          rot = hoek(w);
         var k = new T.Mesh(new T.BoxGeometry(b + 0.16, h + 0.16, 0.08), kozijn);
-        k.position.set(x, y, HUIS.d / 2 + 0.02);
-        huis.add(k);
+        k.position.copy(punt(s, y, 0.02));
+        k.rotation.y = rot;
+        scene.add(k);
         var r = new T.Mesh(new T.BoxGeometry(b, h, 0.08), glas);
-        r.position.set(x, y, HUIS.d / 2 + 0.05);
-        huis.add(r);
-        var dorpel = new T.Mesh(new T.BoxGeometry(b + 0.3, 0.08, 0.2), new T.MeshStandardMaterial({ color: 0x8e8a82 }));
-        dorpel.position.set(x, y - h / 2 - 0.1, HUIS.d / 2 + 0.1);
-        dorpel.castShadow = true;
-        huis.add(dorpel);
+        r.position.copy(punt(s, y, 0.05));
+        r.rotation.y = rot;
+        scene.add(r);
+        var d = new T.Mesh(new T.BoxGeometry(b + 0.3, 0.08, 0.2), dorpelMat);
+        d.position.copy(punt(s, y - h / 2 - 0.1, 0.1));
+        d.rotation.y = rot;
+        d.castShadow = true;
+        scene.add(d);
       }
-      raam(-2.6, 1.55, 2.2, 1.5);
-      raam(-0.1, 1.55, 1.1, 1.5);
-      raam(-2.6, 3.95, 1.3, 1.3);
-      raam(-0.1, 3.95, 1.3, 1.3);
-      raam(2.4, 3.95, 1.3, 1.3);
+      raam(1.9, 1.55, 2.2, 1.5);
+      raam(4.4, 1.55, 1.1, 1.5);
+      raam(1.9, 3.95, 1.3, 1.3);
+      raam(4.4, 3.95, 1.3, 1.3);
+      raam(6.9, 3.95, 1.3, 1.3);
+      raam(10.5, 3.95, 1.3, 1.3);
+      raam(14.0, 1.5, 1.6, 1.3);
+      raam(18.0, 1.5, 1.2, 1.2);
       var deur = new T.Mesh(new T.BoxGeometry(1.05, 2.25, 0.1), new T.MeshStandardMaterial({ color: 0x3a4a58, roughness: 0.6 }));
-      deur.position.set(1.0, 1.125, HUIS.d / 2 + 0.04);
-      huis.add(deur);
+      deur.position.copy(punt(5.5, 1.125, 0.04));
+      scene.add(deur);
       var deurK = new T.Mesh(new T.BoxGeometry(1.25, 2.4, 0.06), kozijn);
-      deurK.position.set(1.0, 1.2, HUIS.d / 2 + 0.01);
-      huis.add(deurK);
-      var klink = new T.Mesh(new T.BoxGeometry(0.04, 0.16, 0.04), new T.MeshStandardMaterial({ color: 0xcfcfcf, metalness: 0.8, roughness: 0.3 }));
-      klink.position.set(1.4, 1.1, HUIS.d / 2 + 0.11);
-      huis.add(klink);
-      // het onzichtbare vlak waarop de buitenunit beweegt (net voor de gevel)
-      gevelVlak = new T.Mesh(new T.PlaneGeometry(HUIS.b, HUIS.h), new T.MeshBasicMaterial({ visible: false }));
-      gevelVlak.position.set(0, HUIS.h / 2, HUIS.d / 2 + 0.17);
-      huis.add(gevelVlak);
+      deurK.position.copy(punt(5.5, 1.2, 0.01));
+      scene.add(deurK);
 
+      // de onzichtbare sleepvlakken: elke muur, het platte dak
+      WANDEN.forEach(function (w) {
+        var len = w.s1 - w.s0;
+        var v = new T.Mesh(new T.PlaneGeometry(len, w.h), new T.MeshBasicMaterial({ visible: false }));
+        v.position.copy(punt((w.s0 + w.s1) / 2, w.h / 2, 0.01));
+        v.rotation.y = hoek(w);
+        v.userData = { type: "muur", wand: w };
+        scene.add(v);
+        vlakken.push(v);
+      });
+      var dakVlak = new T.Mesh(new T.PlaneGeometry(AANB.x1 - AANB.x0, AANB.z1 - AANB.z0), new T.MeshBasicMaterial({ visible: false }));
+      dakVlak.rotation.x = -Math.PI / 2;
+      dakVlak.position.set((AANB.x0 + AANB.x1) / 2, AANB.h + 0.15, (AANB.z0 + AANB.z1) / 2);
+      dakVlak.userData = { type: "dak" };
+      scene.add(dakVlak);
+      vlakken.push(dakVlak);
+      vlakken.push(gras);
+
+      gootGroep = new T.Group();
+      scene.add(gootGroep);
       zetGevel("baksteen");
       maakUnit();
-      zetUnit();
       if (MODEL_3D) laadModel(MODEL_3D);
     }
     function zetGevel(naam) {
       if (!T) return;
-      var m = muren[0];
+      gevelNu = naam;
+      var m = wandMat;
       if (naam === "baksteen") {
         m.map = baksteenTex();
         m.map.repeat.set(2.2, 2.2);
-        m.color.set(0xffffff);
       } else {
         m.map = pleisterTex(naam === "wit" ? "#efece4" : "#b7b5ae");
         m.map.repeat.set(3, 3);
-        m.color.set(0xffffff);
       }
+      m.color.set(0xffffff);
       m.needsUpdate = true;
       vuil = true;
+      if (stap === 2) toon();
     }
-    // de buitenunit: een doos met de getekende voorkant, een beugel aan de muur of voetjes op de grond
+
+    // ---- de buitenunit: een doos met de getekende voorkant, een beugel (muur) of een balk (grond, dak)
     var UNIT = { b: 0.86, h: 0.6, d: 0.32 };
     function maakUnit() {
       unit = new T.Group();
@@ -958,27 +1408,23 @@
       beugel.name = "beugel";
       [-0.28, 0.28].forEach(function (x) {
         var staand = new T.Mesh(new T.BoxGeometry(0.05, 0.45, 0.05), staal);
-        staand.position.set(x, -UNIT.h / 2 - 0.2, -UNIT.d / 2 + 0.025);
+        staand.position.set(x, -UNIT.h / 2 - 0.2, -UNIT.d / 2 - 0.03);
         staand.castShadow = true;
         beugel.add(staand);
-        var ligger = new T.Mesh(new T.BoxGeometry(0.05, 0.05, UNIT.d + 0.06), staal);
-        ligger.position.set(x, -UNIT.h / 2 - 0.025, 0.03);
+        var ligger = new T.Mesh(new T.BoxGeometry(0.05, 0.05, UNIT.d + 0.1), staal);
+        ligger.position.set(x, -UNIT.h / 2 - 0.025, 0);
         ligger.castShadow = true;
         beugel.add(ligger);
       });
       unit.add(beugel);
-      var voeten = new T.Group();
-      voeten.name = "voeten";
-      [-0.3, 0.3].forEach(function (x) {
-        var v = new T.Mesh(new T.BoxGeometry(0.08, 0.1, UNIT.d + 0.08), staal);
-        v.position.set(x, -UNIT.h / 2 - 0.05, 0);
-        v.castShadow = true;
-        voeten.add(v);
-      });
-      unit.add(voeten);
+      var balk = new T.Mesh(new T.BoxGeometry(UNIT.b + 0.2, 0.12, UNIT.d + 0.1), new T.MeshStandardMaterial({ color: 0x4a4e53, roughness: 0.9 }));
+      balk.position.set(0, -UNIT.h / 2 - 0.06, 0);
+      balk.castShadow = balk.receiveShadow = true;
+      balk.name = "balk";
+      unit.add(balk);
       scene.add(unit);
     }
-    // Later: het 3D-model uit Higgsfield (GLB). Vervangt de getekende doos; beugel en voetjes blijven.
+    // Later: het 3D-model uit Higgsfield (GLB). Vervangt de getekende doos; beugel en balk blijven.
     function laadModel(url) {
       if (!T || !unit) return;
       var s = document.createElement("script");
@@ -989,8 +1435,7 @@
           var doos = new T.Box3().setFromObject(m);
           var maat = new T.Vector3();
           doos.getSize(maat);
-          var s = UNIT.b / Math.max(maat.x, 0.001);
-          m.scale.setScalar(s);
+          m.scale.setScalar(UNIT.b / Math.max(maat.x, 0.001));
           doos.setFromObject(m);
           var mid = new T.Vector3();
           doos.getCenter(mid);
@@ -1007,27 +1452,138 @@
       };
       document.head.appendChild(s);
     }
+    function montage3dTekst() {
+      var u = plan.buiten3d;
+      if (u.type === "muur") return "op een muurbeugel aan " + wandBij(u.s).naam;
+      if (u.type === "dak") return "op een balk op het platte dak van de aanbouw";
+      return "op een balk op de grond bij " + wandBij(u.s).naam;
+    }
     function zetUnit() {
       if (!unit) return;
-      var muur = plek === "muur";
-      unit.getObjectByName("beugel").visible = muur;
-      unit.getObjectByName("voeten").visible = !muur;
-      var grens = HUIS.b / 2 - UNIT.b / 2 - 0.2;
-      unitPos.x = Math.max(-grens, Math.min(grens, unitPos.x));
-      if (muur) {
-        unitPos.y = Math.max(UNIT.h / 2 + 0.5, Math.min(HUIS.h - UNIT.h / 2 - 0.3, unitPos.y));
-        unit.position.set(unitPos.x, unitPos.y, HUIS.d / 2 + UNIT.d / 2 + 0.06);
+      var u = plan.buiten3d;
+      unit.getObjectByName("beugel").visible = u.type === "muur";
+      unit.getObjectByName("balk").visible = u.type !== "muur";
+      if (u.type === "dak") {
+        unit.position.set(u.x, AANB.h + 0.14 + 0.12 + UNIT.h / 2, u.z);
+        unit.rotation.y = 0;
       } else {
-        unit.position.set(unitPos.x, UNIT.h / 2 + 0.1, HUIS.d / 2 + UNIT.d / 2 + 0.12);
+        var w = wandBij(u.s);
+        var grens = UNIT.b / 2 + 0.15;
+        u.s = Math.max(w.s0 + grens, Math.min(w.s1 - grens, u.s));
+        if (u.type === "muur") {
+          u.y = Math.max(UNIT.h / 2 + 0.5, Math.min(w.h - UNIT.h / 2 - 0.3, u.y));
+          unit.position.copy(punt(u.s, u.y, UNIT.d / 2 + 0.06));
+        } else {
+          unit.position.copy(punt(u.s, 0.12 + UNIT.h / 2, UNIT.d / 2 + 0.2));
+        }
+        unit.rotation.y = hoek(w);
       }
       vuil = true;
     }
+    // ---- de binnenunits als schim op de muur (ze hangen aan de binnenkant), met de naam van de kamer
+    function zetSchimmen() {
+      schimmen.forEach(function (s) {
+        scene.remove(s);
+      });
+      schimmen = [];
+      plan.kamers.forEach(function (k, i) {
+        var g = new T.Group();
+        var body = new T.Mesh(
+          new T.BoxGeometry(0.9, 0.3, 0.22),
+          new T.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: i === plan.actief && stap === 1 ? 0.95 : 0.6, roughness: 0.5 })
+        );
+        body.name = "schim";
+        g.add(body);
+        var w = wandBij(k.d3.s);
+        k.d3.y = Math.max(0.6, Math.min(w.h - 0.4, k.d3.y));
+        k.d3.s = Math.max(w.s0 + 0.6, Math.min(w.s1 - 0.6, k.d3.s));
+        g.position.copy(punt(k.d3.s, k.d3.y, -0.11 + 0.04));
+        g.rotation.y = hoek(w);
+        var lab = tekstSprite("Binnenunit · " + k.naam);
+        lab.position.set(0, 0.62, 0.25);
+        g.add(lab);
+        g.userData.kamer = i;
+        scene.add(g);
+        schimmen.push(g);
+      });
+    }
+    // ---- de goot: van de doorvoer verticaal naar de hoogte van de buitenunit, dan langs de muren ernaartoe
+    function gootPad(k) {
+      var u = plan.buiten3d;
+      var s1 = k.d3.s,
+        y1 = k.d3.y - 0.05;
+      var pts = [];
+      var UIT = 0.06;
+      var s2, y2;
+      if (u.type === "muur") {
+        s2 = u.s;
+        y2 = u.y - UNIT.h / 2 + 0.08;
+      } else if (u.type === "grond") {
+        s2 = u.s;
+        y2 = 0.3;
+      } else {
+        // plat dak: langs de muren naar de aanbouw, onder de dakrand, dan omhoog en over het dak naar de unit
+        var best = null;
+        [WANDEN[2], WANDEN[3]].forEach(function (w) {
+          var t = w.d[0] ? u.x - w.p[0] : (u.z - w.p[1]) * w.d[1];
+          t = Math.max(0.3, Math.min(w.s1 - w.s0 - 0.3, t));
+          var p = punt(w.s0 + t, 0, 0);
+          var d = Math.hypot(p.x - u.x, p.z - u.z);
+          if (!best || d < best.d) best = { s: w.s0 + t, d: d };
+        });
+        s2 = best.s;
+        y2 = AANB.h - 0.25;
+      }
+      pts.push(punt(s1, y1, UIT));
+      pts.push(punt(s1, y2, UIT));
+      // langs de muren, met een hoekpunt bij elke overgang
+      var richting = s2 > s1 ? 1 : -1;
+      WANDEN.forEach(function (w) {
+        var grens = richting > 0 ? w.s1 : w.s0;
+        if ((richting > 0 && grens > s1 && grens < s2) || (richting < 0 && grens < s1 && grens > s2)) pts.push(punt(grens, y2, UIT));
+      });
+      pts.push(punt(s2, y2, UIT));
+      var len = Math.abs(y1 - y2) + Math.abs(s1 - s2) + 0.6;
+      if (u.type === "dak") {
+        var boven = punt(s2, AANB.h + 0.22, UIT);
+        pts.push(boven);
+        var eind = new T.Vector3(u.x, AANB.h + 0.22, u.z);
+        pts.push(eind);
+        len += AANB.h + 0.22 - y2 + boven.distanceTo(eind);
+      }
+      return { pts: pts, len: len };
+    }
+    function gootLengte3d(k) {
+      return k.goot.zichtbaar && T ? gootPad(k).len : 0;
+    }
+    function zetGoten() {
+      if (!gootGroep) return;
+      while (gootGroep.children.length) gootGroep.remove(gootGroep.children[0]);
+      var mat = new T.MeshStandardMaterial({ color: new T.Color(KLEUREN[plan.gootKleur]), roughness: 0.6 });
+      plan.kamers.forEach(function (k) {
+        if (!k.goot.zichtbaar) return;
+        var pts = gootPad(k).pts;
+        for (var i = 1; i < pts.length; i++) {
+          var a = pts[i - 1],
+            b = pts[i];
+          var l = a.distanceTo(b);
+          if (l < 0.01) continue;
+          var seg = new T.Mesh(new T.BoxGeometry(0.08, 0.07, l + 0.07), mat);
+          seg.position.copy(a).lerp(b, 0.5);
+          seg.lookAt(b);
+          seg.castShadow = true;
+          gootGroep.add(seg);
+        }
+      });
+      vuil = true;
+    }
+
     function past() {
       if (!renderer) return;
       var r = vlak.getBoundingClientRect();
-      var hint = vlak.querySelector(".zb-hint").getBoundingClientRect().height + 8;
+      var hh = hint.getBoundingClientRect().height + 8;
       var w = Math.max(100, Math.round(r.width)),
-        h = Math.max(100, Math.round(r.height - hint));
+        h = Math.max(100, Math.round(r.height - hh));
       renderer.setSize(w, h, false);
       renderer.domElement.style.width = w + "px";
       renderer.domElement.style.height = h + "px";
@@ -1036,10 +1592,10 @@
       vuil = true;
     }
     window.addEventListener("resize", function () {
-      if (actief && !box.hidden) past();
+      if (actief && box && !box.hidden) past();
     });
     function zetCamera() {
-      var doel = new T.Vector3(0, 2.3, HUIS.d / 2);
+      var doel = new T.Vector3(2.0, 2.2, 2.2);
       camera.position.set(
         doel.x + zicht.r * Math.sin(zicht.yaw) * Math.cos(zicht.pitch),
         doel.y + zicht.r * Math.sin(zicht.pitch),
@@ -1056,23 +1612,17 @@
       }
       requestAnimationFrame(lus);
     }
-    function beeld(cb) {
-      if (!renderer) return;
+    function beeld() {
+      if (!renderer) return null;
       zetCamera();
       renderer.render(scene, camera);
-      renderer.domElement.toBlob(
-        function (bl) {
-          if (bl) cb(bl);
-        },
-        "image/jpeg",
-        0.9
-      );
+      return renderer.domElement;
     }
 
-    // muis en vingers: op de unit = slepen, ernaast = draaien, twee vingers of scrollen = zoomen
+    // muis en vingers: op de unit of een schim = slepen, ernaast = draaien, twee vingers of scrollen = zoomen
     var ray = null,
       vingers = {},
-      sleep = false,
+      sleep = null, // "unit" of het nummer van de kamer (schim)
       vorigeAfstand = 0;
     function straal(e) {
       var r = renderer.domElement.getBoundingClientRect();
@@ -1081,40 +1631,93 @@
       ray.setFromCamera(m, camera);
       return ray;
     }
+    function sleepbaar(e) {
+      var rr = straal(e);
+      if (stap === 2 && rr.intersectObject(unit, true).length) return "unit";
+      if (stap === 1) {
+        var hits = rr.intersectObjects(schimmen, true);
+        if (hits.length) {
+          var g = hits[0].object;
+          while (g && g.userData.kamer == null) g = g.parent;
+          if (g) return g.userData.kamer;
+        }
+      }
+      return null;
+    }
     vlak.addEventListener("pointerdown", function (e) {
       if (!renderer || e.target !== renderer.domElement) return;
       vingers[e.pointerId] = { x: e.clientX, y: e.clientY };
       renderer.domElement.setPointerCapture(e.pointerId);
       e.preventDefault();
       if (Object.keys(vingers).length === 1) {
-        var raak = straal(e).intersectObject(unit, true);
-        sleep = raak.length > 0;
-        renderer.domElement.style.cursor = sleep ? "grabbing" : "move";
+        sleep = sleepbaar(e);
+        if (typeof sleep === "number" && sleep !== plan.actief) {
+          plan.actief = sleep;
+          toon();
+        }
+        renderer.domElement.style.cursor = sleep != null ? "grabbing" : "move";
       }
     });
     vlak.addEventListener("pointermove", function (e) {
       if (!renderer) return;
       if (!vingers[e.pointerId]) {
-        if (e.pointerType === "mouse") {
-          var over = straal(e).intersectObject(unit, true).length > 0;
-          renderer.domElement.style.cursor = over ? "grab" : "default";
-        }
+        if (e.pointerType === "mouse") renderer.domElement.style.cursor = sleepbaar(e) != null ? "grab" : "default";
         return;
       }
       var ids = Object.keys(vingers);
       if (ids.length === 1) {
         var v = vingers[e.pointerId];
-        if (sleep) {
-          var hit = straal(e).intersectObject(gevelVlak);
-          if (hit.length) {
-            unitPos.x = hit[0].point.x;
-            unitPos.y = hit[0].point.y;
+        if (sleep === "unit") {
+          var hits = straal(e).intersectObjects(vlakken);
+          if (hits.length) {
+            var h = hits[0],
+              p = h.point,
+              u = plan.buiten3d;
+            if (h.object.userData.type === "muur") {
+              var w = h.object.userData.wand;
+              u.type = "muur";
+              u.s = w.s0 + (p.x - w.p[0]) * w.d[0] + (p.z - w.p[1]) * w.d[1];
+              u.y = p.y;
+            } else if (h.object.userData.type === "dak") {
+              u.type = "dak";
+              u.x = Math.max(AANB.x0 + 0.6, Math.min(AANB.x1 - 0.6, p.x));
+              u.z = Math.max(AANB.z0 + 0.4, Math.min(AANB.z1 - 0.4, p.z));
+            } else {
+              // op de grond: bij de dichtstbijzijnde muur
+              var best = null;
+              WANDEN.forEach(function (w) {
+                var t = (p.x - w.p[0]) * w.d[0] + (p.z - w.p[1]) * w.d[1];
+                t = Math.max(0, Math.min(w.s1 - w.s0, t));
+                var q = punt(w.s0 + t, 0, 0);
+                var d = Math.hypot(q.x - p.x, q.z - p.z);
+                if (!best || d < best.d) best = { s: w.s0 + t, d: d };
+              });
+              u.type = "grond";
+              u.s = best.s;
+            }
             zetUnit();
+            zetGoten();
+            if (stap === 2) hint.textContent = "Nu: " + montage3dTekst() + ". Sleep de buitenunit tegen een muur, op de grond of op het platte dak.";
+          }
+        } else if (typeof sleep === "number") {
+          var hs = straal(e).intersectObjects(
+            vlakken.filter(function (x) {
+              return x.userData.type === "muur";
+            })
+          );
+          if (hs.length) {
+            var ww = hs[0].object.userData.wand,
+              pp = hs[0].point,
+              k = plan.kamers[sleep];
+            k.d3.s = ww.s0 + (pp.x - ww.p[0]) * ww.d[0] + (pp.z - ww.p[1]) * ww.d[1];
+            k.d3.y = pp.y;
+            zetSchimmen();
+            zetGoten();
           }
         } else {
           zicht.yaw -= (e.clientX - v.x) * 0.006;
           zicht.pitch += (e.clientY - v.y) * 0.004;
-          zicht.yaw = Math.max(-1.25, Math.min(1.25, zicht.yaw));
+          zicht.yaw = Math.max(-1.0, Math.min(1.6, zicht.yaw));
           zicht.pitch = Math.max(0.04, Math.min(0.95, zicht.pitch));
           vuil = true;
         }
@@ -1126,7 +1729,7 @@
           b = vingers[ids[1]];
         var af = Math.hypot(a.x - b.x, a.y - b.y);
         if (vorigeAfstand) {
-          zicht.r = Math.max(6, Math.min(28, zicht.r * (vorigeAfstand / af)));
+          zicht.r = Math.max(7, Math.min(30, zicht.r * (vorigeAfstand / af)));
           vuil = true;
         }
         vorigeAfstand = af;
@@ -1135,7 +1738,7 @@
     function los(e) {
       delete vingers[e.pointerId];
       vorigeAfstand = 0;
-      sleep = false;
+      sleep = null;
       if (renderer) renderer.domElement.style.cursor = "default";
     }
     vlak.addEventListener("pointerup", los);
@@ -1145,12 +1748,179 @@
       function (e) {
         if (!renderer) return;
         e.preventDefault();
-        zicht.r = Math.max(6, Math.min(28, zicht.r * (e.deltaY > 0 ? 1.08 : 0.92)));
+        zicht.r = Math.max(7, Math.min(30, zicht.r * (e.deltaY > 0 ? 1.08 : 0.92)));
         vuil = true;
       },
       { passive: false }
     );
-    return { start: start, stop: stop, laadModel: laadModel };
+    return {
+      start: start,
+      stop: stop,
+      beeld: beeld,
+      laadModel: laadModel,
+      wandNaam: function (s) {
+        return wandBij(s).naam;
+      },
+      montageTekst: montage3dTekst,
+      gootLengte: gootLengte3d,
+      klaar: function () {
+        return !!scene;
+      },
+    };
+  }
+
+  // ---------------------------------------------------------------------
+  // Stap 4: het overzicht, met de beelden en het lijstje; delen, bewaren of mee in de offerte
+  // ---------------------------------------------------------------------
+  function planTekst() {
+    var r = ["Mijn plaatsingsplan (" + (modus === "foto" ? "op eigen foto’s" : "in het 3D-voorbeeldhuis") + ")", "Toestel: " + o.model];
+    plan.kamers.forEach(function (k) {
+      var waar;
+      if (modus === "foto") waar = !o.binnenKan || o.type === "buiten" ? "plaats bespreken bij het plaatsbezoek" : k.foto ? "op de foto geplaatst" : "nog geen foto";
+      else waar = "aan " + drieDeel.wandNaam(k.d3.s) + ", ongeveer " + m2(k.d3.y) + " m hoog";
+      r.push("Binnenunit, " + k.naam.toLowerCase() + ": " + waar);
+    });
+    if (modus === "foto") r.push("Buitenunit: " + (plan.gevel.foto ? MONTAGE[plan.gevel.montage] + " (zie foto)" : "nog geen foto van de gevel"));
+    else r.push("Buitenunit: " + drieDeel.montageTekst());
+    plan.kamers.forEach(function (k) {
+      var l = modus === "foto" ? gootLengteFoto(k) : drieDeel.gootLengte(k);
+      var naam = plan.kamers.length > 1 ? " (" + k.naam.toLowerCase() + ")" : "";
+      if (!k.goot.zichtbaar) r.push("Leiding" + naam + ": binnenin, geen goot aan de gevel");
+      else if (l) r.push("Goot" + naam + ": " + plan.gootKleur + ", ongeveer " + m2(l) + " m");
+      else r.push("Goot" + naam + ": nog niet ingetekend");
+    });
+    r.push(INBEGREPEN);
+    return r;
+  }
+  // één beeld met alle foto's onder elkaar en het lijstje erbij, om te delen of te bewaren
+  function planBeeld(cb) {
+    var beelden = [];
+    if (modus === "foto") {
+      plan.kamers.forEach(function (k) {
+        var c = fotoDeel.beeldKamer(k);
+        if (c) beelden.push({ c: c, t: "Binnenunit, " + k.naam.toLowerCase() });
+      });
+      var g = fotoDeel.beeldGevel();
+      if (g) beelden.push({ c: g, t: "Buitenunit en goot" });
+    } else {
+      var d = drieDeel.beeld();
+      if (d) beelden.push({ c: d, t: "3D-voorbeeldhuis" });
+    }
+    var B = 1000,
+      regels = planTekst(),
+      lh = 34;
+    var hoogte = 90 + regels.length * lh + 20;
+    beelden.forEach(function (b) {
+      hoogte += Math.round((B * b.c.height) / b.c.width) + 48;
+    });
+    var c = document.createElement("canvas");
+    c.width = B;
+    c.height = hoogte;
+    var x = c.getContext("2d");
+    x.fillStyle = "#f8f5ee";
+    x.fillRect(0, 0, B, hoogte);
+    x.fillStyle = "#1b2f44";
+    x.font = "bold 40px serif";
+    x.fillText("Plaatsingsplan · Reijners Technics", 30, 56);
+    x.font = "26px sans-serif";
+    var y = 90;
+    regels.forEach(function (r, i) {
+      x.fillStyle = i === 0 ? "#7a5417" : "#1b2f44";
+      x.fillText(r, 30, y + 26);
+      y += lh;
+    });
+    y += 20;
+    beelden.forEach(function (b) {
+      var h = Math.round((B * b.c.height) / b.c.width);
+      x.fillStyle = "#1b2f44";
+      x.font = "bold 28px sans-serif";
+      x.fillText(b.t, 30, y + 28);
+      y += 40;
+      x.drawImage(b.c, 0, y, B, h);
+      y += h + 8;
+    });
+    c.toBlob(
+      function (bl) {
+        cb(bl, c);
+      },
+      "image/jpeg",
+      0.86
+    );
+  }
+  function maakOverDeel(root) {
+    function toon() {
+      root.innerHTML = "";
+      var kaart = el("div", "zb-overkaart");
+      kaart.appendChild(el("h3", null, "Uw plaatsingsplan"));
+      var ul = el("ul", "zb-lijst");
+      planTekst()
+        .slice(1)
+        .forEach(function (r) {
+          ul.appendChild(el("li", null, "")).textContent = r;
+        });
+      kaart.appendChild(ul);
+      var beelden = el("div", "zb-beelden");
+      kaart.appendChild(beelden);
+      var klaar = false,
+        blobKlaar = null;
+      planBeeld(function (bl, c) {
+        blobKlaar = bl;
+        klaar = true;
+        var im = el("img");
+        im.alt = "Het plaatsingsplan als beeld";
+        im.src = c.toDataURL("image/jpeg", 0.7);
+        beelden.appendChild(im);
+      });
+      var rij = el("div", "zb-overknoppen");
+      var tekst = function () {
+        return "Hallo Rim, hierbij mijn plaatsingsplan voor de " + o.model + ":\n" + planTekst().slice(2).join("\n") + "\nKunt u mij een offerte sturen?";
+      };
+      rij.appendChild(
+        knop("Stuur naar Rim (WhatsApp)", "gold", function () {
+          if (!klaar) return melding("Een ogenblik, het beeld wordt gemaakt…");
+          deel(blobKlaar, "reijners-technics-plan-" + slug(o.model) + ".jpg", tekst(), melding);
+        })
+      );
+      rij.appendChild(
+        knop("Neem op in mijn offerteaanvraag", "", function () {
+          window.rtPlan = planTekst().join("\n");
+          sluit();
+          if (window.rtGoToOffer) window.rtGoToOffer("nieuw", o.model);
+        })
+      );
+      rij.appendChild(
+        knop("Bewaar het plan", "", function () {
+          if (!klaar) return melding("Een ogenblik, het beeld wordt gemaakt…");
+          bewaar(blobKlaar, "reijners-technics-plan-" + slug(o.model) + ".jpg");
+          melding("Het plan is bewaard als foto (map Downloads).");
+        })
+      );
+      kaart.appendChild(rij);
+      kaart.appendChild(
+        el(
+          "p",
+          "zb-klein",
+          "Dit is uw eigen schets. Rim bekijkt alles tijdens het gratis plaatsbezoek en bevestigt de plaats en de prijs in de offerte. " +
+            'Liever dat Rim het tekent? <a class="zb-wa" href="#" target="_blank" rel="noopener">Stuur uw foto via WhatsApp</a>.'
+        )
+      );
+      kaart.querySelector(".zb-wa").href = WA + encodeURIComponent("Hallo Rim, ik wil graag zien hoe de " + o.model + " bij mij zou staan. Ik stuur u hierbij een foto.");
+      root.appendChild(kaart);
+      var balk = el("div", "zb-balk");
+      balk.appendChild(
+        knop("← Terug naar de goot", "", function () {
+          zetStap(3);
+        })
+      );
+      balk.appendChild(
+        knop("Opnieuw beginnen", "", function () {
+          plan = nieuwPlan();
+          zetStap(1);
+        })
+      );
+      root.appendChild(balk);
+    }
+    return { toon: toon };
   }
 
   // ---------------------------------------------------------------------
@@ -1158,7 +1928,12 @@
   // ---------------------------------------------------------------------
   function buitenFoto(model) {
     var m = typeof RT_MEDIA !== "undefined" ? RT_MEDIA[model] : null;
-    var f = m && m.fotos ? m.fotos.filter(function (x) { return x && x.src && /^buitenunit/i.test(x.label || ""); })[0] : null;
+    var f =
+      m && m.fotos
+        ? m.fotos.filter(function (x) {
+            return x && x.src && /^buitenunit/i.test(x.label || "");
+          })[0]
+        : null;
     return f ? f.src : null;
   }
   window.rtZicht = {

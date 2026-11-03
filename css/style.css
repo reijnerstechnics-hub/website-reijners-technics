@@ -12055,3 +12055,161 @@ button.td-kamer {
     font-size: 0.8rem;
   }
 }
+
+/* ---------- Plan uw plaatsing: de stappen, de kamers en het overzicht (3-11-2026) ---------- */
+.zb-stappen {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0 12px 8px;
+  list-style: none;
+}
+.zb-stappen li {
+  flex: 1;
+  min-width: 0;
+}
+.zb-stappen button {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: #c9d4de;
+  font-family: var(--font-tekst);
+  font-size: 0.88rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.zb-stappen button span {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 0.8rem;
+}
+.zb-stappen button[aria-current="step"] {
+  color: #fff;
+  border-bottom-color: var(--gold);
+}
+.zb-stappen button[aria-current="step"] span {
+  background: var(--gold);
+  color: #2b1c05;
+}
+.zb-kamers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 6px;
+}
+.zb-kamers button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font-family: var(--font-tekst);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.zb-kamers button[aria-pressed="true"] {
+  background: #fff;
+  color: var(--ink);
+  border-color: #fff;
+}
+.zb-kamers button.plus {
+  border-style: dashed;
+}
+.zb-kamers button.min {
+  border-color: transparent;
+  color: #c9d4de;
+  text-decoration: underline;
+}
+.zb-kamertip {
+  font-size: 0.8rem;
+  color: #c9d4de;
+}
+.zb-startknoppen {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.zb-over {
+  overflow: auto;
+}
+.zb-overkaart {
+  flex: 1;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 8px 16px 20px;
+  color: #e9eef3;
+}
+.zb-overkaart h3 {
+  margin: 4px 0 10px;
+  font-family: var(--font-kop);
+  font-size: 1.3rem;
+  color: #fff;
+}
+.zb-lijst {
+  margin: 0 0 14px;
+  padding: 0 0 0 20px;
+  line-height: 1.5;
+  font-size: 0.98rem;
+}
+.zb-lijst li {
+  margin: 0 0 4px;
+}
+.zb-beelden img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  background: #fff;
+  margin-bottom: 14px;
+}
+.zb-overknoppen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.calc-plan {
+  white-space: normal;
+}
+@media (max-width: 600px) {
+  .zb-stappen {
+    padding: 0 8px 6px;
+  }
+  .zb-stappen button {
+    font-size: 0.78rem;
+    padding: 0 2px;
+  }
+  .zb-stappen button span {
+    margin-right: 2px;
+  }
+  .zb-stappen .lang {
+    display: none;
+  }
+}
+.zb-stappen em {
+  font-style: normal;
+}
+.zb-stappen .kort {
+  display: none;
+}
+@media (max-width: 600px) {
+  .zb-stappen .kort {
+    display: inline;
+  }
+}
