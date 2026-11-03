@@ -1958,6 +1958,7 @@
   window.rtZicht = {
     open: open,
     sluit: sluit,
+    uitsnede: uitsnede, // ook voor js/woonkamer.js
     buitenFoto: buitenFoto,
     laadModel: function (url) {
       if (drieDeel) drieDeel.laadModel(url);

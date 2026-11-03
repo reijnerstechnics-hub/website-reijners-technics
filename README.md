@@ -137,7 +137,11 @@ Elke toestelfoto op de detailpagina opent een viewer (`zoomViewer` in `js/main.j
 
 Tikt de bezoeker een kleur aan, dan gaat die ook mee, bv. "Daikin Emura (zwart, 3,5 kW)". Op een toestelpagina vragen ook de knop *Offerte aanvragen* bovenaan en de balk onderaan op de gsm een offerte voor dat toestel. Elders beginnen die knoppen een gewone aanvraag, zonder toestel.
 
-### Plan uw plaatsing (js/zicht.js)
+### Zie dit toestel in een woonkamer (js/woonkamer.js)
+
+Op de toestelpagina van elk wandmodel opent de kaart "Zie dit toestel in een woonkamer" (`.td-kamer` in `js/main.js`) een venster met de binnenunit op ware grootte aan de muur van een woonkamer in drie stijlen: Licht, Donker en Warm (`assets/img/kamer-licht.webp`, `kamer-donker.webp`, `kamer-warm.webp`, 1168 × 880, op 3-11-2026 gemaakt met Higgsfield, gpt_image_2_5, 0,25 credit per beeld; de bronnen en drie reservekamers staan in `voorbeeld/woonkamer-2026-11-03/`, buiten git). De binnenunit wordt uit de kaartfoto geknipt (`uitsnede` in `js/zicht.js`, het bovenste stuk van de setfoto) en getekend op een canvas; per kamer staan in `KAMERS` de plek (x, y als deel van de foto) en de schaal (deel van de fotobreedte per meter, gemeten aan de zetel van ± 2,2 m), met 0,9 m als breedte van het toestel. Heeft het toestel kleurbolletjes, dan kan de klant in het venster van kleur wisselen. Knop "Offerte voor dit model" gaat naar het formulier met het toestel ingevuld.
+
+### Plan uw plaatsing (js/zicht.js, geparkeerd tot december 2026)
 
 Op elke toestelpagina opent de kaart "Plan uw plaatsing bij u thuis" (`.td-kamer`, gebouwd in `js/main.js`) een venster waarin de klant in vier stappen zijn eigen plaatsingsplan maakt (Rims keuzes van 3-11-2026), met twee tabbladen: **Met eigen foto's** en **In een 3D-huis**.
 

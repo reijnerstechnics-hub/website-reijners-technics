@@ -12219,3 +12219,24 @@ button.td-kamer {
     display: inline;
   }
 }
+
+/* ---------- Zie dit toestel in een woonkamer (js/woonkamer.js, 3-11-2026) ---------- */
+.wk-stijlen {
+  display: flex;
+  justify-content: center;
+  padding: 0 12px 8px;
+}
+.wk-stijlen .zb-seg button {
+  min-width: 90px;
+}
+.wk .zb-vlak {
+  flex: 1;
+}
+.wk .zb-balk .zb-seg {
+  margin-right: 6px;
+}
+@media (max-width: 600px) {
+  .wk .zb-vlak {
+    justify-content: flex-start; /* de kamer bovenaan, niet zwevend in het midden */
+  }
+}
