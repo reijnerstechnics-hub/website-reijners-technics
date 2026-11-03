@@ -63,152 +63,162 @@
       c.height = h;
       var ctx = c.getContext("2d");
       ctx.drawImage(im, 0, 0);
-      var id;
       try {
-        id = ctx.getImageData(0, 0, w, h);
+        ctx.getImageData(0, 0, 1, 1);
       } catch (e) {
         knipCache[sleutel] = c; // (zou enkel mislukken bij een foto van een ander adres)
         return cb(c);
       }
-      var d = id.data;
-      var n = w * h;
-      var weg = new Uint8Array(n); // 1 = wordt doorzichtig
-      var stapel = [];
-      function wit(i) {
-        var r = d[i * 4],
-          g = d[i * 4 + 1],
-          b = d[i * 4 + 2];
-        var mn = Math.min(r, g, b),
-          mx = Math.max(r, g, b);
-        return mn > 234 && mx - mn < 14;
-      }
-      function duw(i) {
-        if (!weg[i] && wit(i)) {
-          weg[i] = 1;
-          stapel.push(i);
+      // Witte toestellen staan op een nog wittere achtergrond: de drempel ligt hoog (250). Gaat de achtergrond
+      // daarmee niet weg (het stuk vult bijna de hele foto), dan nog eens met een lagere drempel.
+      function snij(drempel, sat) {
+        ctx.drawImage(im, 0, 0);
+        var id = ctx.getImageData(0, 0, w, h);
+        var d = id.data;
+        var n = w * h;
+        var weg = new Uint8Array(n); // 1 = wordt doorzichtig
+        var stapel = [];
+        function wit(i) {
+          var r = d[i * 4],
+            g = d[i * 4 + 1],
+            b = d[i * 4 + 2];
+          var mn = Math.min(r, g, b),
+            mx = Math.max(r, g, b);
+          return mn > drempel && mx - mn < sat;
         }
-      }
-      var x, y;
-      for (x = 0; x < w; x++) {
-        duw(x);
-        duw((h - 1) * w + x);
-      }
-      for (y = 0; y < h; y++) {
-        duw(y * w);
-        duw(y * w + w - 1);
-      }
-      while (stapel.length) {
-        var i = stapel.pop();
-        x = i % w;
-        y = (i - x) / w;
-        if (x > 0) duw(i - 1);
-        if (x < w - 1) duw(i + 1);
-        if (y > 0) duw(i - w);
-        if (y < h - 1) duw(i + w);
-      }
-      // doorzichtig maken en de rand verzachten (een pixel die aan "weg" grenst, wordt half doorzichtig
-      // naarmate hij lichter is: zo verdwijnt ook de lichte zweem rond het toestel)
-      var mnX = w,
-        mnY = h,
-        mxX = 0,
-        mxY = 0;
-      for (y = 0; y < h; y++) {
+        function duw(i) {
+          if (!weg[i] && wit(i)) {
+            weg[i] = 1;
+            stapel.push(i);
+          }
+        }
+        var x, y;
         for (x = 0; x < w; x++) {
-          var k = y * w + x;
-          if (weg[k]) {
-            d[k * 4 + 3] = 0;
-            continue;
+          duw(x);
+          duw((h - 1) * w + x);
+        }
+        for (y = 0; y < h; y++) {
+          duw(y * w);
+          duw(y * w + w - 1);
+        }
+        while (stapel.length) {
+          var i = stapel.pop();
+          x = i % w;
+          y = (i - x) / w;
+          if (x > 0) duw(i - 1);
+          if (x < w - 1) duw(i + 1);
+          if (y > 0) duw(i - w);
+          if (y < h - 1) duw(i + w);
+        }
+        // doorzichtig maken en de rand verzachten (een pixel die aan "weg" grenst, wordt half doorzichtig
+        // naarmate hij lichter is: zo verdwijnt ook de lichte zweem rond het toestel)
+        var mnX = w,
+          mnY = h,
+          mxX = 0,
+          mxY = 0;
+        for (y = 0; y < h; y++) {
+          for (x = 0; x < w; x++) {
+            var k = y * w + x;
+            if (weg[k]) {
+              d[k * 4 + 3] = 0;
+              continue;
+            }
+            var rand = (x > 0 && weg[k - 1]) || (x < w - 1 && weg[k + 1]) || (y > 0 && weg[k - w]) || (y < h - 1 && weg[k + w]);
+            if (rand) {
+              var lum = Math.min(d[k * 4], d[k * 4 + 1], d[k * 4 + 2]);
+              d[k * 4 + 3] = Math.max(60, Math.min(255, Math.round((drempel + 2 - lum) * 9)));
+            }
+            if (x < mnX) mnX = x;
+            if (x > mxX) mxX = x;
+            if (y < mnY) mnY = y;
+            if (y > mxY) mxY = y;
           }
-          var rand = (x > 0 && weg[k - 1]) || (x < w - 1 && weg[k + 1]) || (y > 0 && weg[k - w]) || (y < h - 1 && weg[k + w]);
-          if (rand) {
-            var lum = Math.min(d[k * 4], d[k * 4 + 1], d[k * 4 + 2]);
-            d[k * 4 + 3] = Math.max(60, Math.min(255, Math.round((236 - lum) * 9)));
+        }
+        // welk stuk? de aaneengesloten stukken zoeken en het bovenste of onderste grote stuk kiezen
+        if (deel !== "alles") {
+          var lab = new Int32Array(n),
+            stukken = [],
+            st = [];
+          for (var s = 0; s < n; s++) {
+            if (weg[s] || lab[s]) continue;
+            var nr = stukken.length + 1;
+            var cp = { id: nr, a: 0, x0: w, x1: 0, y0: h, y1: 0 };
+            lab[s] = nr;
+            st.push(s);
+            while (st.length) {
+              var q = st.pop();
+              cp.a++;
+              var qx = q % w,
+                qy = (q - qx) / w;
+              if (qx < cp.x0) cp.x0 = qx;
+              if (qx > cp.x1) cp.x1 = qx;
+              if (qy < cp.y0) cp.y0 = qy;
+              if (qy > cp.y1) cp.y1 = qy;
+              if (qx > 0 && !weg[q - 1] && !lab[q - 1]) {
+                lab[q - 1] = nr;
+                st.push(q - 1);
+              }
+              if (qx < w - 1 && !weg[q + 1] && !lab[q + 1]) {
+                lab[q + 1] = nr;
+                st.push(q + 1);
+              }
+              if (qy > 0 && !weg[q - w] && !lab[q - w]) {
+                lab[q - w] = nr;
+                st.push(q - w);
+              }
+              if (qy < h - 1 && !weg[q + w] && !lab[q + w]) {
+                lab[q + w] = nr;
+                st.push(q + w);
+              }
+            }
+            stukken.push(cp);
           }
-          if (x < mnX) mnX = x;
-          if (x > mxX) mxX = x;
-          if (y < mnY) mnY = y;
-          if (y > mxY) mxY = y;
-        }
-      }
-      // welk stuk? de aaneengesloten stukken zoeken en het bovenste of onderste grote stuk kiezen
-      if (deel !== "alles") {
-        var lab = new Int32Array(n),
-          stukken = [],
-          st = [];
-        for (var s = 0; s < n; s++) {
-          if (weg[s] || lab[s]) continue;
-          var nr = stukken.length + 1;
-          var cp = { id: nr, a: 0, x0: w, x1: 0, y0: h, y1: 0 };
-          lab[s] = nr;
-          st.push(s);
-          while (st.length) {
-            var q = st.pop();
-            cp.a++;
-            var qx = q % w,
-              qy = (q - qx) / w;
-            if (qx < cp.x0) cp.x0 = qx;
-            if (qx > cp.x1) cp.x1 = qx;
-            if (qy < cp.y0) cp.y0 = qy;
-            if (qy > cp.y1) cp.y1 = qy;
-            if (qx > 0 && !weg[q - 1] && !lab[q - 1]) {
-              lab[q - 1] = nr;
-              st.push(q - 1);
-            }
-            if (qx < w - 1 && !weg[q + 1] && !lab[q + 1]) {
-              lab[q + 1] = nr;
-              st.push(q + 1);
-            }
-            if (qy > 0 && !weg[q - w] && !lab[q - w]) {
-              lab[q - w] = nr;
-              st.push(q - w);
-            }
-            if (qy < h - 1 && !weg[q + w] && !lab[q + w]) {
-              lab[q + w] = nr;
-              st.push(q + w);
-            }
+          var grootste = 0;
+          stukken.forEach(function (k) {
+            if (k.a > grootste) grootste = k.a;
+          });
+          // enkel de grote stukken tellen mee (geen stofjes, geen kleine afstandsbediening)
+          var kand = stukken.filter(function (k) {
+            return k.a >= grootste * 0.25;
+          });
+          if (deel === "onder" && kand.length < 2) return { out: null, bb: 0 };
+          // bovenste (of onderste) eerst; staan twee stukken even hoog, dan het grootste
+          kand.sort(function (p, q) {
+            var v = deel === "boven" ? p.y0 - q.y0 : q.y1 - p.y1;
+            return Math.abs(v) < h * 0.15 ? q.a - p.a : v;
+          });
+          var keuze = kand[0];
+          if (keuze) {
+            mnX = keuze.x0;
+            mxX = keuze.x1;
+            mnY = keuze.y0;
+            mxY = keuze.y1;
+            for (y = mnY; y <= mxY; y++) for (x = mnX; x <= mxX; x++) if (lab[y * w + x] !== keuze.id) d[(y * w + x) * 4 + 3] = 0;
           }
-          stukken.push(cp);
         }
-        var grootste = 0;
-        stukken.forEach(function (k) {
-          if (k.a > grootste) grootste = k.a;
-        });
-        // enkel de grote stukken tellen mee (geen stofjes, geen kleine afstandsbediening)
-        var kand = stukken.filter(function (k) {
-          return k.a >= grootste * 0.25;
-        });
-        if (deel === "onder" && kand.length < 2) {
-          knipCache[sleutel] = null;
-          return cb(null);
+        ctx.putImageData(id, 0, 0);
+        // bijsnijden tot het toestel zelf (met een kleine marge)
+        var out = c;
+        if (mxX > mnX && mxY > mnY) {
+          var p = 2;
+          mnX = Math.max(0, mnX - p);
+          mnY = Math.max(0, mnY - p);
+          mxX = Math.min(w - 1, mxX + p);
+          mxY = Math.min(h - 1, mxY + p);
+          out = document.createElement("canvas");
+          out.width = mxX - mnX + 1;
+          out.height = mxY - mnY + 1;
+          out.getContext("2d").drawImage(c, mnX, mnY, out.width, out.height, 0, 0, out.width, out.height);
         }
-        // bovenste (of onderste) eerst; staan twee stukken even hoog, dan het grootste
-        kand.sort(function (p, q) {
-          var v = deel === "boven" ? p.y0 - q.y0 : q.y1 - p.y1;
-          return Math.abs(v) < h * 0.15 ? q.a - p.a : v;
-        });
-        var keuze = kand[0];
-        if (keuze) {
-          mnX = keuze.x0;
-          mxX = keuze.x1;
-          mnY = keuze.y0;
-          mxY = keuze.y1;
-          for (y = mnY; y <= mxY; y++) for (x = mnX; x <= mxX; x++) if (lab[y * w + x] !== keuze.id) d[(y * w + x) * 4 + 3] = 0;
-        }
+
+        return { out: out, bb: ((mxX - mnX + 1) * (mxY - mnY + 1)) / (w * h) };
       }
-      ctx.putImageData(id, 0, 0);
-      // bijsnijden tot het toestel zelf (met een kleine marge)
-      var out = c;
-      if (mxX > mnX && mxY > mnY) {
-        var p = 2;
-        mnX = Math.max(0, mnX - p);
-        mnY = Math.max(0, mnY - p);
-        mxX = Math.min(w - 1, mxX + p);
-        mxY = Math.min(h - 1, mxY + p);
-        out = document.createElement("canvas");
-        out.width = mxX - mnX + 1;
-        out.height = mxY - mnY + 1;
-        out.getContext("2d").drawImage(c, mnX, mnY, out.width, out.height, 0, 0, out.width, out.height);
-      }
+      var r = { out: null, bb: 0 };
+      [[250, 8], [240, 12], [232, 16]].some(function (dr) {
+        r = snij(dr[0], dr[1]);
+        return !r.out || r.bb < 0.92;
+      });
+      var out = r.out;
       knipCache[sleutel] = out;
       cb(out);
     };
@@ -283,8 +293,8 @@
         kiesDeel(t.dataset.deel);
       });
     });
-    box.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") sluit();
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && box && !box.hidden) sluit();
     });
     window.addEventListener("hashchange", function () {
       if (box && !box.hidden) sluit();
@@ -313,7 +323,9 @@
     maakBox();
     huidig = o;
     opener = document.activeElement;
-    box.querySelector(".zb-titel").textContent = o.type === "buiten" ? "Deze buitenunit aan uw gevel" : "De " + o.model + " bij u thuis";
+    var enkelBuiten = o.type === "buiten" || o.binnenKan === false;
+    box.querySelector(".zb-titel").textContent =
+      o.type === "buiten" ? "Deze buitenunit aan uw gevel" : enkelBuiten ? "De buitenunit van de " + o.model + " aan uw gevel" : "De " + o.model + " bij u thuis";
     melding("");
     fotoDeel.reset(o);
     kiesDeel("foto");
