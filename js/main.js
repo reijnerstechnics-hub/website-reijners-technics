@@ -2954,17 +2954,41 @@ function rtKwVoorKeuze(maten, k) {
     acts.appendChild(wa);
     acts.appendChild(mail);
     info.appendChild(acts);
-    // "Zie dit toestel in uw kamer" (Rims keuze van 2-11-2026): de klant stuurt via WhatsApp een foto van zijn muur,
-    // Rim stuurt een beeld terug met het toestel erin gemonteerd (gemaakt met Higgsfield), samen met de offerte.
-    var kamer = el("a", "td-kamer", "");
-    kamer.href =
+    // "Zie dit toestel bij u thuis" (Rims keuzes van 3-11-2026): opent js/zicht.js. De klant zet het toestel
+    // zelf op een foto van zijn muur of gevel, of op een 3D-voorbeeldhuis, en stuurt het beeld naar Rim.
+    // Zonder zicht.js (of zonder JavaScript-ondersteuning) blijft het de WhatsApp-link van 2-11-2026:
+    // de klant stuurt een foto van zijn muur en Rim stuurt een beeld terug (Higgsfield).
+    var isBuiten = card.dataset.type === "buiten";
+    // een cassette, kanaal- of plafondunit hangt niet aan een muur: daar enkel de buitenunit
+    var binnenKan = !isBuiten && ["cassette", "kanaal", "plafond"].indexOf(card.dataset.type) < 0;
+    var waKamer =
       "https://wa.me/32491113313?text=" +
-      encodeURIComponent("Hallo Rim, ik wil graag zien hoe de " + model + " in mijn kamer zou staan. Ik stuur u hierbij een foto van de muur.");
-    kamer.target = "_blank";
-    kamer.rel = "noopener";
+      encodeURIComponent("Hallo Rim, ik wil graag zien hoe de " + model + " bij mij zou staan. Ik stuur u hierbij een foto van de muur.");
+    var kamer = el("button", "td-kamer", "");
+    kamer.type = "button";
+    kamer.addEventListener("click", function () {
+      // (zicht.js laadt na main.js; is het er niet, dan blijft de WhatsApp-weg van 2-11-2026)
+      if (!window.rtZicht) return window.open(waKamer, "_blank", "noopener");
+      var kleur = media.querySelector(".color-swatch.active");
+      var kaartFoto = card.querySelector(".device-photo img");
+      window.rtZicht.open({
+        model: model,
+        merk: card.dataset.brand,
+        type: card.dataset.type,
+        // binnen: de kaartfoto (of de gekozen kleur); zicht.js knipt er de binnenunit uit (het bovenste stuk)
+        // en haalt er zo nodig ook de buitenunit uit (het onderste stuk) als het model geen eigen foto heeft
+        binnen: (kleur && kleur.dataset.src) || (kaartFoto && kaartFoto.getAttribute("src")),
+        binnenKan: binnenKan,
+        buiten: isBuiten ? kaartFoto && kaartFoto.getAttribute("src") : window.rtZicht.buitenFoto(model),
+      });
+    });
     kamer.innerHTML =
       '<span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/></svg></span>' +
-      '<span><b>Zie dit toestel in uw kamer</b><small>Stuur een foto van uw muur via WhatsApp. Rim stuurt u een beeld terug met dit toestel erin, gratis, samen met de offerte.</small></span>';
+      "<span><b>" +
+      (isBuiten ? "Zie deze buitenunit aan uw gevel" : binnenKan ? "Zie dit toestel bij u thuis" : "Zie de buitenunit aan uw gevel") +
+      "</b><small>Op een foto van uw " +
+      (binnenKan ? "muur of gevel" : "gevel") +
+      ", of op een 3D-voorbeeldhuis. Gratis, en uw foto blijft op uw gsm.</small></span>";
     info.appendChild(kamer);
     info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Op werkdagen binnen 24\u00a0uur teruggebeld · U beslist pas na de offerte"));
     top.appendChild(info);

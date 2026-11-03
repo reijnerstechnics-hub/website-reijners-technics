@@ -137,6 +137,15 @@ Elke toestelfoto op de detailpagina opent een viewer (`zoomViewer` in `js/main.j
 
 Tikt de bezoeker een kleur aan, dan gaat die ook mee, bv. "Daikin Emura (zwart, 3,5 kW)". Op een toestelpagina vragen ook de knop *Offerte aanvragen* bovenaan en de balk onderaan op de gsm een offerte voor dat toestel. Elders beginnen die knoppen een gewone aanvraag, zonder toestel.
 
+### Zie dit toestel bij u thuis (js/zicht.js)
+
+Op elke toestelpagina opent de kaart "Zie dit toestel bij u thuis" (`.td-kamer`, gebouwd in `js/main.js`) een venster met twee delen (Rims keuzes van 3-11-2026):
+
+- **Op uw eigen foto.** De klant kiest of neemt een foto van zijn muur of gevel. De site knipt het toestel uit de productfoto (alles wat wit is en aan de rand vastzit, wordt doorzichtig). De meeste kaartfoto's tonen een set: het bovenste grote stuk is de binnenunit, het onderste de buitenunit. Voor de buitenunit gebruikt de site eerst de foto met label "Buitenunit" uit `js/toestel-media.js`, anders het onderste stuk van de kaartfoto, anders de losse buitenunit van het merk (`MERK_BUITEN`). Een cassette, kanaal- of plafondunit krijgt enkel de buitenunit. Slepen, knijpen of scrollen (grootte), spiegelen. De foto blijft in de browser: niets gaat naar een server. "Stuur naar Rim" opent op een gsm het deelmenu (WhatsApp) met het beeld; op een computer wordt het beeld bewaard en opent WhatsApp met een tekst.
+- **3D-voorbeeldhuis.** three.js (r128, cdnjs) laadt pas als de klant dit deel opent. Het huis, de texturen (baksteen, pleister, dak, gras) en de buitenunit zijn in code getekend. Slepen op de unit verplaatst ze over de gevel (of over de grond, met voetjes); slepen ernaast draait het huis; knijpen of scrollen zoomt. Zodra het 3D-model van de buitenunit uit Higgsfield klaar is: het GLB-bestand in `assets/3d/` zetten en de naam in `MODEL_3D` bovenaan `js/zicht.js` invullen (`laadModel` vervangt dan de getekende unit).
+
+Zonder `js/zicht.js` opent de kaart de WhatsApp-weg van 2-11-2026 (foto sturen, Rim stuurt een beeld terug).
+
 ## Voor Google
 
 - `robots.txt` en `sitemap.xml` (enkel het echte adres: de #-adressen zijn voor Google geen pagina's), `site.webmanifest` en de iconen in `assets/img/` (`favicon-32.png`, `icoon-192.png`, `icoon-512.png`, `apple-touch-icon.png`) plus `favicon.ico`.
