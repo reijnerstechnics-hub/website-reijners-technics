@@ -92,6 +92,7 @@
       // Witte toestellen staan op een nog wittere achtergrond: de drempel ligt hoog (250). Gaat de achtergrond
       // daarmee niet weg (het stuk vult bijna de hele foto), dan nog eens met een lagere drempel.
       function snij(drempel, sat) {
+        var keuze = null;
         ctx.drawImage(im, 0, 0);
         var id = ctx.getImageData(0, 0, w, h);
         var d = id.data;
@@ -207,12 +208,73 @@
             var v = deel === "boven" ? p.y0 - q.y0 : q.y1 - p.y1;
             return Math.abs(v) < h * 0.15 ? q.a - p.a : v;
           });
-          var keuze = kand[0];
+          keuze = kand[0];
           if (keuze) {
             mnX = keuze.x0;
             mxX = keuze.x1;
             mnY = keuze.y0;
             mxY = keuze.y1;
+            // Een binnenunit is altijd een (afgeronde) rechthoek. Loopt de vulling toch het toestel in (een
+            // wit toestel met een glanzende, bijna witte hoek), dan vullen we de omhullende vorm van het stuk:
+            // alles binnen de buitenste omtrek hoort bij het toestel.
+            if (deel === "boven") {
+              var pts = [];
+              for (y = mnY; y <= mxY; y++) {
+                var li = -1,
+                  re = -1;
+                for (x = mnX; x <= mxX; x++)
+                  if (lab[y * w + x] === keuze.id) {
+                    if (li < 0) li = x;
+                    re = x;
+                  }
+                if (li >= 0) {
+                  pts.push([li, y]);
+                  pts.push([re, y]);
+                }
+              }
+              pts.sort(function (p1, p2) {
+                return p1[0] - p2[0] || p1[1] - p2[1];
+              });
+              var kruis = function (o1, a1, b1) {
+                return (a1[0] - o1[0]) * (b1[1] - o1[1]) - (a1[1] - o1[1]) * (b1[0] - o1[0]);
+              };
+              var onder = [],
+                boven = [],
+                q;
+              for (q = 0; q < pts.length; q++) {
+                while (onder.length >= 2 && kruis(onder[onder.length - 2], onder[onder.length - 1], pts[q]) <= 0) onder.pop();
+                onder.push(pts[q]);
+              }
+              for (q = pts.length - 1; q >= 0; q--) {
+                while (boven.length >= 2 && kruis(boven[boven.length - 2], boven[boven.length - 1], pts[q]) <= 0) boven.pop();
+                boven.push(pts[q]);
+              }
+              var hull = onder.slice(0, -1).concat(boven.slice(0, -1));
+              // per rij: de linker- en rechtergrens van de omhullende, en alles ertussen hoort erbij
+              for (y = mnY; y <= mxY; y++) {
+                var xl = Infinity,
+                  xr = -Infinity;
+                for (q = 0; q < hull.length; q++) {
+                  var p1 = hull[q],
+                    p2 = hull[(q + 1) % hull.length];
+                  if ((p1[1] <= y && p2[1] >= y) || (p2[1] <= y && p1[1] >= y)) {
+                    var xx = p1[1] === p2[1] ? Math.min(p1[0], p2[0]) : p1[0] + ((y - p1[1]) * (p2[0] - p1[0])) / (p2[1] - p1[1]);
+                    var xx2 = p1[1] === p2[1] ? Math.max(p1[0], p2[0]) : xx;
+                    if (xx < xl) xl = xx;
+                    if (xx2 > xr) xr = xx2;
+                  }
+                }
+                if (xl === Infinity) continue;
+                for (x = Math.ceil(xl); x <= Math.floor(xr); x++) {
+                  var kk = y * w + x;
+                  if (lab[kk] !== keuze.id) {
+                    lab[kk] = keuze.id;
+                    weg[kk] = 0;
+                    d[kk * 4 + 3] = 255;
+                  } else if (x > xl + 1 && x < xr - 1 && y > mnY + 1 && y < mxY - 1) d[kk * 4 + 3] = 255; // binnenin: geen oude, zachte rand
+                }
+              }
+            }
             for (y = mnY; y <= mxY; y++) for (x = mnX; x <= mxX; x++) if (lab[y * w + x] !== keuze.id) d[(y * w + x) * 4 + 3] = 0;
           }
         }
@@ -231,14 +293,25 @@
           out.getContext("2d").drawImage(c, mnX, mnY, out.width, out.height, 0, 0, out.width, out.height);
         }
 
-        return { out: out, bb: ((mxX - mnX + 1) * (mxY - mnY + 1)) / (w * h) };
+        var opp = (mxX - mnX + 1) * (mxY - mnY + 1);
+        return { out: out, bb: opp / (w * h), vul: keuze ? keuze.a / opp : 1 };
       }
-      var r = { out: null, bb: 0 };
+      var r = { out: null, bb: 0, vul: 1 };
       [[250, 8], [240, 12], [232, 16]].some(function (dr) {
         r = snij(dr[0], dr[1]);
         return !r.out || r.bb < 0.92;
       });
+      // Loopt de vulling toch het toestel in (een wit toestel met een vage rand), dan is het stuk "hol":
+      // nog eens met een strengere drempel, en de beste houden.
+      if (r.out && r.vul < 0.72) {
+        [[253, 5], [254, 4]].some(function (dr) {
+          var r2 = snij(dr[0], dr[1]);
+          if (r2.out && r2.bb < 0.92 && r2.vul > r.vul) r = r2;
+          return r.vul >= 0.72;
+        });
+      }
       var out = r.out;
+      if (out) verscherp(out);
       knipCache[sleutel] = out;
       cb(out);
     };
@@ -247,6 +320,39 @@
       cb(null);
     };
     im.src = src;
+  }
+
+  // De uitsnede een tikje verscherpen (onscherp-masker), enkel binnen het toestel zelf.
+  function verscherp(c) {
+    var w = c.width,
+      h = c.height;
+    if (w < 3 || h < 3) return;
+    var x2 = c.getContext("2d", { willReadFrequently: true });
+    var id = x2.getImageData(0, 0, w, h),
+      d = id.data,
+      bron = new Uint8ClampedArray(d);
+    var sterkte = 0.55;
+    for (var y = 1; y < h - 1; y++) {
+      for (var x = 1; x < w - 1; x++) {
+        var k = (y * w + x) * 4;
+        if (bron[k + 3] < 200) continue;
+        for (var c3 = 0; c3 < 3; c3++) {
+          var som = 0,
+            n = 0;
+          for (var dy = -1; dy <= 1; dy++)
+            for (var dx = -1; dx <= 1; dx++) {
+              var q = ((y + dy) * w + (x + dx)) * 4;
+              if (bron[q + 3] >= 200) {
+                som += bron[q + c3];
+                n++;
+              }
+            }
+          var v = bron[k + c3];
+          d[k + c3] = v + sterkte * (v - som / n);
+        }
+      }
+    }
+    x2.putImageData(id, 0, 0);
   }
 
   // ---------------------------------------------------------------------

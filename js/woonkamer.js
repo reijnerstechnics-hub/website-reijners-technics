@@ -12,10 +12,13 @@
 (function () {
   "use strict";
   var KAMERS = [
-    { id: "licht", naam: "Licht", src: "assets/img/kamer-licht.webp", x: 0.55, y: 0.21, m: 0.304, uitleg: "Lichte woonkamer, witte muur" },
-    { id: "donker", naam: "Donker", src: "assets/img/kamer-donker.webp", x: 0.56, y: 0.22, m: 0.345, uitleg: "Donkere muur, avondlicht" },
-    { id: "warm", naam: "Warm", src: "assets/img/kamer-warm.webp", x: 0.5, y: 0.21, m: 0.309, uitleg: "Warme, landelijke woonkamer" },
+    { id: "licht", naam: "Licht", src: "assets/img/kamer-licht.webp", uitleg: "Lichte woonkamer, witte muur" },
+    { id: "donker", naam: "Donker", src: "assets/img/kamer-donker.webp", uitleg: "Donkere muur, avondlicht" },
+    { id: "warm", naam: "Warm", src: "assets/img/kamer-warm.webp", uitleg: "Warme, landelijke woonkamer" },
   ];
+  // Het toestel hangt in elke kamer op precies dezelfde plek en grootte (Rim, 3-11-2026: "geen unit die
+  // verspringt"): de drie kamers zijn even groot (1168 x 880) en de zetel staat er telkens even breed op.
+  var PLEK = { x: 0.53, y: 0.215, m: 0.315 }; // midden (deel van de foto) en deel van de fotobreedte per meter
   var BREEDTE_M = 0.9; // de meeste wandmodellen zijn 0,8 tot 1,1 m breed
 
   function el(tag, cls, html) {
@@ -84,6 +87,18 @@
     o = opts;
     opener = document.activeElement;
     box.querySelector(".zb-titel").textContent = "De " + o.model + " in een woonkamer";
+    // de gekozen kleur (of de eerste, de standaard) bepaalt welke foto gezocht wordt
+    if (o.kleuren && o.kleuren.length) {
+      var idx = 0;
+      o.kleuren.forEach(function (k, i) {
+        if (k.src === o.binnen) idx = i;
+      });
+      o.kleurNaam = o.kleuren[idx].naam;
+      o.kleurStandaard = idx === 0;
+    } else {
+      o.kleurNaam = "";
+      o.kleurStandaard = true;
+    }
     // de kleuren van het toestel (de bolletjes op de toestelpagina)
     var kl = box.querySelector(".wk-kleuren");
     kl.innerHTML = "";
@@ -97,6 +112,8 @@
           x.setAttribute("aria-pressed", x === b ? "true" : "false");
         });
         o.binnen = k.src;
+        o.kleurNaam = k.naam;
+        o.kleurStandaard = i === 0;
         laadKnip();
       });
       kl.appendChild(b);
@@ -127,11 +144,28 @@
     };
     im.src = k.src;
   }
+  // De foto die het toestel het best recht van voren toont (Rim, 3-11-2026: "alle modellen met een mooi
+  // vooraanzicht"): uit de fotoreeks in js/toestel-media.js eerst "In <kleur>" (de gekozen kleur), dan
+  // "Vooraanzicht", "Klep dicht", "Binnenunit wit" of "Binnenunit"; anders de kaartfoto of de kleurfoto.
+  function besteFoto() {
+    var m = typeof RT_MEDIA !== "undefined" ? RT_MEDIA[o.model] : null;
+    var fotos = m && m.fotos ? m.fotos : [];
+    function met(re) {
+      var f = fotos.filter(function (x) {
+        return x && x.src && re.test(x.label || "");
+      })[0];
+      return f ? f.src : null;
+    }
+    var kleur = (o.kleurNaam || "").replace(/\s*\(.*$/, "").trim().toLowerCase();
+    var s = kleur ? met(new RegExp("^in " + kleur.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i")) : null;
+    if (!s && (!kleur || o.kleurStandaard)) s = met(/^vooraanzicht/i) || met(/^klep dicht/i) || met(/^binnenunit wit/i) || met(/^binnenunit$/i);
+    return s || o.binnen;
+  }
   function laadKnip() {
     knip = null;
     var mijn = ++knipNr;
     if (!window.rtZicht || !window.rtZicht.uitsnede) return;
-    window.rtZicht.uitsnede(o.binnen, "boven", function (c) {
+    window.rtZicht.uitsnede(besteFoto(), "boven", function (c) {
       if (mijn !== knipNr) return;
       knip = c;
       teken();
@@ -160,10 +194,12 @@
     ctx.clearRect(0, 0, W, H);
     ctx.drawImage(im, 0, 0, W, H);
     if (!knip) return;
-    var b = BREEDTE_M * kamer.m * W;
+    var b = BREEDTE_M * PLEK.m * W;
     var h = (b * knip.height) / knip.width;
     ctx.save();
-    ctx.translate(kamer.x * W, kamer.y * H);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.translate(PLEK.x * W, PLEK.y * H);
     ctx.shadowColor = "rgba(0,0,0,0.35)";
     ctx.shadowBlur = b * 0.07;
     ctx.shadowOffsetY = b * 0.04;
