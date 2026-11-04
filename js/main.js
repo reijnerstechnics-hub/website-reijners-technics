@@ -3005,7 +3005,7 @@ function rtKwVoorKeuze(maten, k) {
         '<span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/></svg></span>' +
         "<span><b>Zie dit toestel in een woonkamer</b><small>Bekijk hoe de " +
         naam +
-        " aan de muur hangt in een lichte, donkere of warme woonkamer.</small></span>";
+        " aan de muur hangt in zes woonkamers, en schuif hem naar de plek die u wilt.</small></span>";
       info.appendChild(kamer);
     }
     info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Op werkdagen binnen 24\u00a0uur teruggebeld · U beslist pas na de offerte"));

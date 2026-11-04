@@ -12245,3 +12245,61 @@ button.td-kamer {
 section.v3-hero .v3-kicker {
   color: var(--gold-text);
 }
+
+/* Woonkamer, 4-11-2026: zes kamers, slepen van het toestel */
+.wk-stijlen .zb-seg {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.wk-stijlen .zb-seg button {
+  min-width: 0;
+  padding: 0 12px;
+}
+.wk .zb-canvas {
+  cursor: default;
+}
+.wk .zb-canvas.kan-slepen {
+  cursor: grab;
+}
+.wk .zb-canvas.is-sleep {
+  cursor: grabbing;
+}
+.wk .zb-canvas:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+.wk-terug {
+  margin-left: 6px;
+  padding: 4px 10px;
+  min-height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.wk-terug:hover {
+  border-color: #fff;
+}
+.wk-terug[hidden] {
+  display: inline-block;
+  visibility: hidden; /* houdt zijn plaats, zodat de kamer niet verspringt */
+}
+@media (max-width: 600px) {
+  .wk-stijlen {
+    padding: 0 8px 6px;
+  }
+  .wk-stijlen .zb-seg {
+    border-radius: 14px;
+  }
+  .wk-stijlen .zb-seg button {
+    min-height: 40px;
+    padding: 0 10px;
+    font-size: 0.86rem;
+  }
+  .wk-sleep {
+    display: block;
+  }
+}
