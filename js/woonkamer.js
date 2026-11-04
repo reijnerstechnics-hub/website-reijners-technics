@@ -104,6 +104,8 @@
     fotos = {},
     knip = null,
     knipNr = 0,
+    foto = null, // de fotorealistische opname van dit toestel in deze kamer (Higgsfield, 4-11-2026), als die er is
+    fotoCache = {},
     plek = null, // door de klant gekozen plek {x, y} (deel van de foto); null = de vaste plek
     sleep = null; // tijdens het slepen: {dx, dy} afstand van de vinger tot het midden van het toestel
 
@@ -118,7 +120,7 @@
       '<div class="zb-top"><b class="zb-titel"></b><button type="button" class="zb-x" aria-label="Sluiten">&times;</button></div>' +
       '<div class="wk-stijlen"><div class="zb-seg" role="group" aria-label="Stijl van de woonkamer"></div></div>' +
       '<div class="zb-vlak"><canvas class="zb-canvas" tabindex="0" aria-label="Het toestel aan de muur van een woonkamer. Sleep het naar de plek die u wilt, of verplaats het met de pijltjestoetsen."></canvas>' +
-      '<p class="zb-hint"><span class="wk-uitleg"></span> <span class="wk-sleep">Sleep het toestel naar de plek die u wilt; het hangt op ware grootte.</span> ' +
+      '<p class="zb-hint"><span class="wk-uitleg"></span> <span class="wk-sleep">Sleep het toestel naar de plek die u wilt; het hangt op ware grootte.</span><span class="wk-echt" hidden>Zo hangt hij in deze kamer, op ware grootte.</span> ' +
       '<button type="button" class="wk-terug" hidden>Zet terug in het midden</button></p></div>' +
       '<div class="zb-balk"><div class="zb-seg wk-kleuren" role="group" aria-label="Kleur van het toestel" hidden></div>' +
       '<button type="button" class="zb-btn gold wk-offerte">Offerte voor dit model →</button>' +
@@ -162,7 +164,7 @@
     // Slepen met de vinger of de muis (Rim, 4-11-2026). De canvas heeft touch-action: none, dus de pagina
     // scrolt niet mee.
     canvas.addEventListener("pointerdown", function (e) {
-      if (!knip) return;
+      if (!knip || foto) return;
       var p = punt(e),
         r = rechthoek();
       if (p.x < r.x || p.x > r.x + r.b || p.y < r.y || p.y > r.y + r.h) return;
@@ -172,6 +174,7 @@
       e.preventDefault();
     });
     canvas.addEventListener("pointermove", function (e) {
+      if (foto) return;
       if (!sleep) {
         // handje als de muis op het toestel staat
         if (knip && e.pointerType === "mouse") {
@@ -197,7 +200,7 @@
     canvas.addEventListener("pointercancel", los);
     // ook met de pijltjestoetsen (toetsenbord), 2 cm per tik, 10 cm met Shift
     canvas.addEventListener("keydown", function (e) {
-      if (!knip) return;
+      if (!knip || foto) return;
       var stap = (e.shiftKey ? 0.1 : 0.02) * PLEK.m * canvas.width;
       var r = rechthoek(),
         cx = r.x + r.b / 2,
@@ -292,6 +295,7 @@
       b.setAttribute("aria-pressed", b.dataset.kamer === k.id ? "true" : "false");
     });
     box.querySelector(".wk-uitleg").textContent = k.uitleg + " ·";
+    if (o) laadFoto();
     if (fotos[k.id]) return teken();
     var im = new Image();
     im.onload = function () {
@@ -318,10 +322,39 @@
     if (!s && (!kleur || o.kleurStandaard)) s = met(/^vooraanzicht/i) || met(/^klep dicht/i) || met(/^binnenunit wit/i) || met(/^binnenunit$/i);
     return s || o.binnen;
   }
+  function knipNaam() {
+    return KNIP[o.model + "|" + (o.kleurNaam || "")];
+  }
+  // De echte foto van dit toestel in deze kamer (assets/img/wkf-<slug>-<kamer>.webp, gemaakt met Higgsfield).
+  // Bestaat ze niet (nieuw toestel), dan tekent de site de uitsnede op de kamerfoto zoals vroeger.
+  function laadFoto() {
+    var naam = knipNaam();
+    var sleutel = naam ? naam + "|" + kamer.id : "";
+    foto = null;
+    if (!naam) return teken();
+    if (sleutel in fotoCache) {
+      foto = fotoCache[sleutel] || null;
+      return teken();
+    }
+    var im = new Image();
+    im.onload = function () {
+      fotoCache[sleutel] = im;
+      if (box && !box.hidden && knipNaam() + "|" + kamer.id === sleutel) {
+        foto = im;
+        teken();
+      }
+    };
+    im.onerror = function () {
+      fotoCache[sleutel] = false;
+      if (knipNaam() + "|" + kamer.id === sleutel) teken();
+    };
+    im.src = "assets/img/wkf-" + naam + "-" + kamer.id + ".webp";
+  }
   function laadKnip() {
     knip = null;
     var mijn = ++knipNr;
-    var naam = KNIP[o.model + "|" + (o.kleurNaam || "")];
+    laadFoto();
+    var naam = knipNaam();
     if (naam) {
       var im = new Image();
       im.onload = function () {
@@ -396,6 +429,14 @@
     ctx.clearRect(0, 0, W, H);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
+    box.querySelector(".wk-sleep").hidden = !!foto;
+    box.querySelector(".wk-echt").hidden = !foto;
+    canvas.classList.toggle("is-foto", !!foto);
+    if (foto) {
+      ctx.drawImage(foto, 0, 0, W, H);
+      box.querySelector(".wk-terug").hidden = true;
+      return;
+    }
     ctx.drawImage(im, 0, 0, W, H);
     box.querySelector(".wk-terug").hidden = !plek;
     if (!knip) return;

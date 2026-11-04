@@ -12303,3 +12303,16 @@ section.v3-hero .v3-kicker {
     display: block;
   }
 }
+
+/* Woonkamer, echte foto per toestel en kamer (4-11-2026): geen sleepcursor, geen sleep-uitleg */
+.wk .zb-canvas.is-foto,
+.wk .zb-canvas.is-foto.kan-slepen {
+  cursor: default;
+}
+.wk-echt {
+  display: inline;
+}
+.wk-sleep[hidden],
+.wk-echt[hidden] {
+  display: none;
+}
