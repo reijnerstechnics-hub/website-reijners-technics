@@ -330,6 +330,11 @@ var RT_MEDIA ={
   "Toshiba Yukai": {
     "fotos": [
       {
+        "src": "assets/img/t-toshiba-yukai-4.webp",
+        "label": "Vooraanzicht",
+        "alt": "Toshiba Yukai binnenunit (RAS-B..E2KVG-E), recht van voren"
+      },
+      {
         "src": "assets/img/t-toshiba-yukai-2.webp",
         "label": "Binnenunit",
         "alt": "Toshiba Yukai binnenunit, schuin van opzij"
@@ -1016,6 +1021,11 @@ var RT_MEDIA ={
   "Daikin Sensira": {
     "fotos": [
       {
+        "src": "assets/img/t-daikin-sensira-6.webp",
+        "label": "Vooraanzicht",
+        "alt": "Daikin Sensira FTXC-E binnenunit, recht van voren"
+      },
+      {
         "src": "assets/img/t-daikin-sensira-3.webp",
         "label": "Zijkant",
         "alt": "Daikin Sensira FTXC-E binnenunit, schuin van links"
@@ -1060,6 +1070,11 @@ var RT_MEDIA ={
   },
   "Daikin Comfora": {
     "fotos": [
+      {
+        "src": "assets/img/t-daikin-comfora-5.webp",
+        "label": "Vooraanzicht",
+        "alt": "Daikin Comfora FTXP-N binnenunit, recht van voren"
+      },
       {
         "src": "assets/img/t-daikin-comfora-2.webp",
         "label": "Zijkant",
@@ -1113,6 +1128,11 @@ var RT_MEDIA ={
   },
   "Daikin Stylish": {
     "fotos": [
+      {
+        "src": "assets/img/t-daikin-stylish-6.webp",
+        "label": "In blackwood",
+        "alt": "Daikin Stylish FTXA-BT binnenunit in blackwood, recht van voren"
+      },
       {
         "src": "assets/img/t-daikin-stylish-2.webp",
         "label": "Zijkant",
@@ -1197,5 +1217,15 @@ var RT_MEDIA ={
       "titel": "Daikin FVXM-A",
       "kanaal": "Daikin Belux"
     }
+  },
+  "Daikin Sensira CTXF-C multi-split binnenunit": {
+    "fotos": [
+      {
+        "src": "assets/img/t-daikin-sensira-ctxf-c-multi-split-binnenunit-2.webp",
+        "label": "Vooraanzicht",
+        "alt": "Daikin Sensira CTXF-C multi-split binnenunit, recht van voren"
+      }
+    ],
+    "video": null
   }
 };
