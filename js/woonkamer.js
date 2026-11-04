@@ -20,6 +20,8 @@
   // verspringt"): de drie kamers zijn even groot (1168 x 880) en de zetel staat er telkens even breed op.
   var PLEK = { x: 0.53, y: 0.215, m: 0.315 }; // midden (deel van de foto) en deel van de fotobreedte per meter
   var BREEDTE_M = 0.9; // de meeste wandmodellen zijn 0,8 tot 1,1 m breed
+  // vierkante "schilderij"-modellen zijn smaller
+  var BREEDTE_PER_MODEL = { "LG Artcool Gallery Special": 0.6, "LG Artcool LCD Gallery Premium": 0.6 };
 
   function el(tag, cls, html) {
     var e = document.createElement(tag);
@@ -67,7 +69,9 @@
     box.querySelector(".zb-x").addEventListener("click", sluit);
     box.querySelector(".wk-sluit").addEventListener("click", sluit);
     box.querySelector(".wk-offerte").addEventListener("click", function () {
-      var m = o.model;
+      // met de kleur die hier gekozen is en het vermogen van de pagina (grote controle 4-11-2026)
+      var hier = o.kleurNaam && !o.kleurStandaard ? o.kleurNaam.replace(/\s*\(.*$/, "").toLowerCase() : null;
+      var m = o.offerte ? o.offerte(hier) : o.model;
       sluit();
       if (window.rtGoToOffer) window.rtGoToOffer("nieuw", m);
     });
@@ -194,7 +198,7 @@
     ctx.clearRect(0, 0, W, H);
     ctx.drawImage(im, 0, 0, W, H);
     if (!knip) return;
-    var b = BREEDTE_M * PLEK.m * W;
+    var b = (BREEDTE_PER_MODEL[o.model] || BREEDTE_M) * PLEK.m * W;
     var h = (b * knip.height) / knip.width;
     ctx.save();
     ctx.imageSmoothingEnabled = true;

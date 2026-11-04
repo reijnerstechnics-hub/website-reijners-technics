@@ -12240,3 +12240,8 @@ button.td-kamer {
     justify-content: flex-start; /* de kamer bovenaan, niet zwevend in het midden */
   }
 }
+
+/* grote controle 4-11-2026: de gouden regel bovenaan Home staat op creme, niet op donker: donker goud */
+section.v3-hero .v3-kicker {
+  color: var(--gold-text);
+}

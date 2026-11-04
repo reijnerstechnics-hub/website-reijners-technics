@@ -2984,7 +2984,7 @@ function rtKwVoorKeuze(maten, k) {
       kamer.type = "button";
       kamer.addEventListener("click", function () {
         if (!window.rtWoonkamer) return;
-        var kleur = media.querySelector(".color-swatch.active");
+        var sw = media.querySelector(".color-swatch.active");
         var kaartFoto = card.querySelector(".device-photo img");
         var kleuren = [];
         media.querySelectorAll(".color-swatch").forEach(function (s) {
@@ -2992,8 +2992,13 @@ function rtKwVoorKeuze(maten, k) {
         });
         window.rtWoonkamer.open({
           model: model,
-          binnen: (kleur && kleur.dataset.src) || (kaartFoto && kaartFoto.getAttribute("src")),
+          binnen: (sw && sw.dataset.src) || (kaartFoto && kaartFoto.getAttribute("src")),
           kleuren: kleuren,
+          // de offerte met kleur en vermogen, zoals de knop op de pagina zelf (grote controle 4-11-2026)
+          offerte: function (kleurNaam) {
+            var k = [kleurNaam || kleur, gekozen ? rtKwTekst(gekozen) + " kW" : ""].filter(Boolean);
+            return k.length ? model + " (" + k.join(", ") + ")" : model;
+          },
         });
       });
       kamer.innerHTML =
@@ -3675,6 +3680,13 @@ function rtKwVoorKeuze(maten, k) {
     fb.addEventListener("click", function () {
       var open = side.classList.toggle("v4-open");
       fb.setAttribute("aria-expanded", open ? "true" : "false");
+      // het paneel stond soms buiten beeld (grote controle 4-11-2026): erheen scrollen
+      if (open)
+        setTimeout(function () {
+          var r = side.getBoundingClientRect();
+          if (r.top < 0 || r.top > window.innerHeight * 0.6)
+            window.scrollTo({ top: r.top + window.scrollY - 90, behavior: "smooth" });
+        }, 60);
     });
   }
 
