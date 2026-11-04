@@ -157,7 +157,7 @@
       if (box && !box.hidden) sluit();
     });
     window.addEventListener("resize", function () {
-      if (box && !box.hidden) past();
+      if (box && !box.hidden) teken();
     });
     // Slepen met de vinger of de muis (Rim, 4-11-2026). De canvas heeft touch-action: none, dus de pagina
     // scrolt niet mee.
@@ -343,38 +343,69 @@
       teken();
     });
   }
+  // De canvas krijgt precies zoveel pixels als ze op het scherm inneemt (maal de pixeldichtheid van het
+  // toestel): zo tekent de browser de kamer en het toestel scherp, zonder nog eens te verkleinen via CSS.
   function past() {
+    var im = fotos[kamer.id];
+    if (!im) return false;
     var vlak = box.querySelector(".zb-vlak");
     var r = vlak.getBoundingClientRect();
     var hh = box.querySelector(".zb-hint").getBoundingClientRect().height + 8;
     var bw = Math.max(100, r.width - 16),
       bh = Math.max(100, r.height - hh - 16);
-    var s = Math.min(bw / canvas.width, bh / canvas.height);
-    canvas.style.width = Math.round(canvas.width * s) + "px";
-    canvas.style.height = Math.round(canvas.height * s) + "px";
+    var s = Math.min(bw / im.naturalWidth, bh / im.naturalHeight);
+    var cw = Math.round(im.naturalWidth * s),
+      ch = Math.round(im.naturalHeight * s);
+    canvas.style.width = cw + "px";
+    canvas.style.height = ch + "px";
+    var dpr = Math.min(3, window.devicePixelRatio || 1);
+    var W = Math.min(im.naturalWidth, Math.round(cw * dpr)),
+      H = Math.min(im.naturalHeight, Math.round(ch * dpr));
+    if (canvas.width !== W || canvas.height !== H) {
+      canvas.width = W;
+      canvas.height = H;
+      return true;
+    }
+    return false;
+  }
+  // De uitsnede (1600 px breed) in stappen halveren tot ze hoogstens dubbel zo groot is als nodig:
+  // zo blijft ze scherp en rustig, zonder korrel.
+  var kleinCache = { bron: null, b: 0, c: null };
+  function knipVoor(b) {
+    if (kleinCache.bron === knip && kleinCache.b === b) return kleinCache.c;
+    var c = knip;
+    while (c.width > 2 * b && c.width > 64) {
+      var k = document.createElement("canvas");
+      k.width = Math.round(c.width / 2);
+      k.height = Math.round(c.height / 2);
+      var kx = k.getContext("2d");
+      kx.imageSmoothingEnabled = true;
+      kx.imageSmoothingQuality = "high";
+      kx.drawImage(c, 0, 0, k.width, k.height);
+      c = k;
+    }
+    kleinCache = { bron: knip, b: b, c: c };
+    return c;
   }
   function teken() {
     var im = fotos[kamer.id];
     if (!im) return;
-    var W = im.naturalWidth,
-      H = im.naturalHeight;
-    if (canvas.width !== W || canvas.height !== H) {
-      canvas.width = W;
-      canvas.height = H;
-    }
     past();
+    var W = canvas.width,
+      H = canvas.height;
     ctx.clearRect(0, 0, W, H);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     ctx.drawImage(im, 0, 0, W, H);
     box.querySelector(".wk-terug").hidden = !plek;
     if (!knip) return;
     var r = rechthoek();
+    var bron = knipVoor(Math.ceil(r.b));
     ctx.save();
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
     ctx.shadowColor = "rgba(0,0,0,0.35)";
     ctx.shadowBlur = r.b * 0.07;
     ctx.shadowOffsetY = r.b * 0.04;
-    ctx.drawImage(knip, r.x, r.y, r.b, r.h);
+    ctx.drawImage(bron, r.x, r.y, r.b, r.h);
     ctx.restore();
   }
   window.rtWoonkamer = { open: open, sluit: sluit };
