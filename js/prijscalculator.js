@@ -439,7 +439,7 @@
           P.btw.standaard +
           "% btw (woning ouder dan 10 jaar; jonger: " +
           P.btw.nieuw +
-          "% btw). De echte prijs krijgt u in de offerte, nadat Rim bij u langs is geweest. Dat plaatsbezoek is gratis.") +
+          "% btw). De echte prijs krijgt u na het gratis plaatsbezoek.") +
       "</p>";
     if (P.voorlopig) h += '<div class="pc-demo">Let op: dit prijsadvies gebruikt nog voorbeeldprijzen.</div>';
 
