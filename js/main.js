@@ -2414,7 +2414,7 @@ function rtKwVoorKeuze(maten, k) {
     box.appendChild(bedrag);
     box.appendChild(uitleg);
     var btw = "een standaardplaatsing (5 m leiding inbegrepen) en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar).";
-    var echt = " Stroom vanuit de zekeringkast of een langere leiding komt erbij; de echte prijs krijgt u in de offerte, na het gratis plaatsbezoek.";
+    var echt = " De echte prijs krijgt u in de offerte, na het gratis plaatsbezoek.";
     function toon(kw) {
       var p = kw && richtprijs(model, kw);
       lbl.textContent = kw ? "Richtprijs voor " + rtKwTekst(kw) + " kW" : "Richtprijs";
