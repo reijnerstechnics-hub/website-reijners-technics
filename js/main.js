@@ -2492,6 +2492,18 @@ function rtKwVoorKeuze(maten, k) {
       zimg.style.transform = "translate(" + tx + "px, " + ty + "px) scale(" + schaal + ")";
       vlak.classList.toggle("ingezoomd", schaal > 1.01);
     }
+    // de foto zo groot mogelijk in het vak, maar altijd volledig en in het midden (Rim, 5-11-2026)
+    function pas() {
+      var nw = zimg.naturalWidth,
+        nh = zimg.naturalHeight;
+      if (!nw || !nh || box.hidden) return;
+      var r = vlak.getBoundingClientRect();
+      var f = Math.min(r.width / nw, r.height / nh);
+      zimg.style.width = Math.floor(nw * f) + "px";
+      zimg.style.height = Math.floor(nh * f) + "px";
+    }
+    zimg.addEventListener("load", pas);
+    window.addEventListener("resize", pas);
     function zet(s, cx, cy) {
       // zoomen rond het punt (cx, cy) in het vlak, zodat wat onder de vinger zit blijft staan
       var r = vlak.getBoundingClientRect();
@@ -2509,6 +2521,7 @@ function rtKwVoorKeuze(maten, k) {
       i = (k + lijst.length) % lijst.length;
       schaal = 1;
       tx = ty = 0;
+      zimg.style.width = zimg.style.height = "";
       zimg.src = lijst[i].src;
       zimg.alt = lijst[i].alt || "";
       box.querySelector(".td-zoom-cap").textContent = lijst[i].label || "";
@@ -2528,6 +2541,7 @@ function rtKwVoorKeuze(maten, k) {
           new Image().src = lijst[(k + lijst.length) % lijst.length].src;
         });
       teken();
+      if (zimg.complete) pas();
     }
     function sluit() {
       box.hidden = true;
@@ -2649,6 +2663,7 @@ function rtKwVoorKeuze(maten, k) {
         toon(k);
         box.hidden = false;
         document.documentElement.style.overflow = "hidden";
+        pas();
         box.querySelector(".x").focus();
       },
     };

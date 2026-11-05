@@ -9210,9 +9210,11 @@ img.td-zoomable:focus-visible {
 }
 .td-zoom-vlak {
   flex: 1;
+  /* min-height 0 en een vaste plaats voor de foto: zo past de foto altijd volledig in het vak,
+     ook op een breed scherm (Rim, 5-11-2026: de foto viel onderaan weg en hing niet in het midden) */
+  min-height: 0;
+  position: relative;
   overflow: hidden;
-  display: grid;
-  place-items: center;
   touch-action: none;
   cursor: grab;
 }
@@ -9220,6 +9222,11 @@ img.td-zoomable:focus-visible {
   cursor: move;
 }
 .td-zoom-vlak img {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: auto;
+  height: auto;
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
