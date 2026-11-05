@@ -3859,7 +3859,9 @@ function rtKwVoorKeuze(maten, k) {
     el.alt = img.alt;
     el.width = 1200;
     el.height = 900;
-    el.dataset.src = b.dataset.groot || img.getAttribute("src");
+    // de kijker toont de uitsnede met het toestel in het midden (rm-....webp, Rim 5-11-2026); de grote weergave de volledige foto
+    var groot = b.dataset.groot || img.getAttribute("src");
+    el.dataset.src = /\/rm-/.test(img.getAttribute("src")) ? img.getAttribute("src") : groot;
     if (!i) {
       el.src = el.dataset.src;
       el.className = "on";
@@ -3871,7 +3873,7 @@ function rtKwVoorKeuze(maten, k) {
       merk: NAMEN[t.dataset.merk] || "",
       // de kop: het eerste stuk van de uitleg ("LG-wandmodel in roze uitvoering")
       titel: uitleg.split(". ")[0].split(", ")[0].replace(/\.$/, ""),
-      foto: { src: el.dataset.src, alt: img.alt, label: NAMEN[t.dataset.merk] || "", uitleg: uitleg, link: b.dataset.toestel || "", offerte: true },
+      foto: { src: groot, alt: img.alt, label: NAMEN[t.dataset.merk] || "", uitleg: uitleg, link: b.dataset.toestel || "", offerte: true },
     };
   });
   var nu = 0;
