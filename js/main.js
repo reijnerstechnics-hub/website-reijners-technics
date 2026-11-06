@@ -3544,7 +3544,7 @@ function rtKwVoorKeuze(maten, k) {
   var month = new Date().getMonth();
   var mode = month >= 4 && month <= 8 ? "cool" : "warm";
   var SUB = {
-    cool: "Koel en stil, ook op de warmste zomerdag. Op werkdagen belt Rim u binnen 24\u00a0uur zelf terug en bespreekt hij wat bij uw woning past.",
+    cool: "Een airco die koelt in de zomer en verwarmt in de winter. Op werkdagen belt Rim u binnen 24\u00a0uur zelf terug en bespreekt hij wat bij uw woning past.",
     warm: "Behaaglijk warm deze winter, met een warmtepomp: een airco die ook verwarmt. Op werkdagen belt Rim u binnen 24\u00a0uur zelf terug en bespreekt hij wat bij uw woning past.",
   };
   var tempEl = document.getElementById("v4-temp");
@@ -3754,6 +3754,10 @@ function rtKwVoorKeuze(maten, k) {
     Energielabel: "Van A+++ (zuinigst) naar lager, apart voor koelen en verwarmen.",
     "Geluidsniveau binnen": "In dB(A). Fluisteren is ongeveer 30 dB(A); de stilste binnenunits op deze site draaien vanaf ongeveer 18 dB(A).",
     "Geluidsniveau buiten": "In dB(A), gemeten aan de buitenunit.",
+    // overal dezelfde volgorde (controle 5-11-2026, punt 22)
+    Afmetingen: "Breedte × hoogte × diepte, in millimeter.",
+    "Afmetingen binnenunit": "Breedte × hoogte × diepte, in millimeter.",
+    "Afmetingen buitenunit": "Breedte × hoogte × diepte, in millimeter.",
     Koudemiddel: "Het middel in het toestel dat de warmte verplaatst. R32 is het gangbare koudemiddel in nieuwe toestellen.",
   };
   // ook de tabel op een toestelpagina die al openstond bij het laden (die is opgebouwd vóór deze uitleg bestond)

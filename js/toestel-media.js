@@ -152,7 +152,7 @@ var RT_MEDIA ={
       {
         "src": "assets/img/t-lg-artcool-ai-matt-black-2.webp",
         "label": "Binnenunit",
-        "alt": "LG Artcool AI Matt Black binnenunit met afstandsbediening"
+        "alt": "LG Artcool AI binnenunit in mat zwart, met afstandsbediening"
       }
     ],
     "video": {
@@ -557,7 +557,7 @@ var RT_MEDIA ={
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ef-premium-design-2.webp",
         "label": "Binnenunit wit",
-        "alt": "Mitsubishi Electric MSZ-EF Premium Design binnenunit in natural white"
+        "alt": "Mitsubishi Electric MSZ-EF Premium Design binnenunit in wit"
       },
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ef-premium-design-3.webp",
@@ -567,7 +567,7 @@ var RT_MEDIA ={
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ef-premium-design-4.webp",
         "label": "In zwart",
-        "alt": "Mitsubishi Electric MSZ-EF Premium Design binnenunit in onyx black"
+        "alt": "Mitsubishi Electric MSZ-EF Premium Design binnenunit in zwart"
       },
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ef-premium-design-5.webp",
@@ -586,7 +586,7 @@ var RT_MEDIA ={
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ln-diamond-2.webp",
         "label": "Binnenunit",
-        "alt": "Mitsubishi Electric MSZ-LN Diamond binnenunit in natural white met afstandsbediening"
+        "alt": "Mitsubishi Electric MSZ-LN Diamond binnenunit in wit met afstandsbediening"
       },
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ln-diamond-3.webp",
@@ -596,12 +596,12 @@ var RT_MEDIA ={
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ln-diamond-4.webp",
         "label": "In robijnrood",
-        "alt": "Mitsubishi Electric MSZ-LN Diamond binnenunit in ruby red"
+        "alt": "Mitsubishi Electric MSZ-LN Diamond binnenunit in robijnrood"
       },
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ln-diamond-5.webp",
         "label": "In zwart",
-        "alt": "Mitsubishi Electric MSZ-LN Diamond binnenunit in onyx black"
+        "alt": "Mitsubishi Electric MSZ-LN Diamond binnenunit in zwart"
       }
     ],
     "video": {
@@ -615,12 +615,12 @@ var RT_MEDIA ={
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ln-diamond-zubadan-2.webp",
         "label": "Binnenunit zwart",
-        "alt": "Mitsubishi Electric MSZ-LN Diamond Zubadan binnenunit in onyx black"
+        "alt": "Mitsubishi Electric MSZ-LN Diamond Zubadan binnenunit in zwart"
       },
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ln-diamond-zubadan-3.webp",
         "label": "In wit",
-        "alt": "Mitsubishi Electric MSZ-LN Diamond Zubadan binnenunit in natural white met afstandsbediening"
+        "alt": "Mitsubishi Electric MSZ-LN Diamond Zubadan binnenunit in wit met afstandsbediening"
       },
       {
         "src": "assets/img/t-mitsubishi-electric-msz-ln-diamond-zubadan-4.webp",
@@ -982,8 +982,8 @@ var RT_MEDIA ={
       },
       {
         "src": "assets/img/t-nuova-stellar-inverter-5.webp",
-        "label": "In zwart mirror",
-        "alt": "Nuova Stellar Inverter binnenunit in zwart mirror, vooraanzicht"
+        "label": "In spiegelzwart",
+        "alt": "Nuova Stellar Inverter binnenunit in spiegelzwart, vooraanzicht"
       }
     ],
     "video": null

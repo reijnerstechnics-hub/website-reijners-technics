@@ -11395,7 +11395,10 @@ body.rt-warm .up-adem-lbl::before {
     transform: scale(1.08) translateY(-2%);
   }
 }
-.up-live .up-adem-laag i {
+/* bij de open klep altijd een zachte witte luchtstroom, ook in de winter: de warme gloed leek op een vlek (controle 5-11-2026, punt 31) */
+.up-live .up-adem-laag i,
+body.rt-warm .up-live .up-adem-laag i,
+body.rt-cool .up-live .up-adem-laag i {
   background: radial-gradient(closest-side, rgba(255, 255, 255, 0.95), rgba(214, 232, 247, 0.55) 55%, rgba(214, 232, 247, 0) 100%);
   animation: up-koel 3.6s ease-out infinite;
   animation-delay: var(--d);
