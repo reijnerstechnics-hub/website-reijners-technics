@@ -214,7 +214,7 @@
       <img class="rot" data-src="assets/img/s-06545912d880.webp" alt="Wit LG Deluxe-wandmodel (H-serie) boven twee houten wandplanken">
       <img class="rot" data-src="assets/img/g-s-eee01264090f.webp" alt="Roze LG-wandmodel tegen een bakstenen muur">
     </div>
-      <div class="v4-thermo"><span class="dot" aria-hidden="true"></span><div><small id="v4-thlbl">Verwarmen naar</small><span class="t" id="v4-temp">30,0&deg;</span></div></div>
+      <div class="v4-thermo"><span class="dot" aria-hidden="true"></span><div><small id="v4-thlbl">Verwarmen tot</small><span class="t" id="v4-temp">30&deg;</span><small class="v4-bereik">instelbaar van 16 tot 30&nbsp;&deg;C</small></div></div>
       <div class="v3-sub-ph" id="v3-sub-rot">
         <!-- buitenunit van hetzelfde merk als de grote foto; wisselt mee via data-rotate-koppel.
              Altijd evenveel foto's als het grote vak, in dezelfde volgorde (paar 1 bij paar 1 enz.).
@@ -349,6 +349,11 @@
                     <label for="calc-gemeente">Gemeente</label>
                     <input id="calc-gemeente" type="text" autocomplete="address-level2" placeholder="bv. Bree" enterkeyhint="send" list="rt-gemeenten"><datalist id="rt-gemeenten"><option value="Dilsen-Stokkem"></option><option value="Maaseik"></option><option value="Bree"></option><option value="Genk"></option><option value="Lanaken"></option><option value="Bilzen"></option><option value="Tongeren"></option><option value="Hasselt"></option><option value="Peer"></option></datalist>
                   </div>
+                </div>
+                <!-- enkel bij een herstelling: het probleem al vóór het versturen (controle 5-11-2026) -->
+                <div class="field calc-probleem" id="calc-probleem-veld" hidden>
+                  <label for="calc-probleem">Wat scheelt er? <span class="calc-extra-sub">mag leeg blijven</span></label>
+                  <textarea id="calc-probleem" maxlength="800" placeholder="bv. koelt niet meer, lekt water of toont foutcode E5"></textarea>
                 </div>
                 <div class="calc-status" id="calc-contact-status" role="alert"></div>
                 <div class="calc-result-actions">
@@ -536,6 +541,7 @@
           <div class="v3-kicker">Onderhoud</div>
           <h2>Uw toestel laten onderhouden</h2>
           <p>Een jaarlijks nazicht en een grondige reiniging houden uw airco of warmtepomp zuinig en verlengen de levensduur.</p>
+          <p class="dn-prijs"><strong>Richtprijs: &euro;&nbsp;150 tot &euro;&nbsp;200</strong>, exclusief btw.</p>
           <a class="btn btn-gold" href="#calculator" data-start-dienst="onderhoud">Onderhoud aanvragen <span class="ar">&rarr;</span></a>
         </div>
       </article>
@@ -546,6 +552,8 @@
           <div class="v3-kicker">Herstelling</div>
           <h2>Een storing laten herstellen</h2>
           <p>Werkt uw airco of warmtepomp niet zoals het hoort? We zoeken ter plaatse uit wat er scheelt en lossen het meteen op als dat kan.</p>
+          <p class="dn-prijs"><strong>Richtprijs: &euro;&nbsp;100 tot &euro;&nbsp;150</strong>, exclusief btw, voor de verplaatsing en het eerste uur.</p>
+          <p class="dn-prijs"><strong>Wanneer:</strong> Rim probeert binnen de week langs te komen, afhankelijk van hoe druk het is.</p>
           <a class="btn btn-gold" href="#calculator" data-start-dienst="herstelling">Herstelling aanvragen <span class="ar">&rarr;</span></a>
           <p class="dn-dringend">Liever bellen? Bel Rim: <a href="tel:+32491113313">+32 491 11 33 13</a></p>
         </div>
@@ -632,7 +640,7 @@
               </ul>
             </div>
             <div class="svc-facts">
-              <div><span>Wanneer</span><p>Op afspraak. Nadat u de aanvraag hebt verstuurd, kunt u kort beschrijven wat er scheelt. Rim belt u op werkdagen binnen 24&nbsp;uur terug en spreekt met u een dag af.</p></div>
+              <div><span>Wanneer</span><p>Op afspraak. Rim belt u op werkdagen binnen 24&nbsp;uur terug en spreekt met u een dag af. Hij probeert binnen de week langs te komen, afhankelijk van hoe druk het is.</p></div>
               <div><span>Prijs</span><p><strong>Richtprijs: &euro;&nbsp;100 tot &euro;&nbsp;150, exclusief btw.</strong> Voor de verplaatsing en het eerste uur. Onderdelen en extra werk komen erbij: die prijs hoort u vooraf, nadat Rim het probleem heeft bekeken.</p></div>
             </div>
           </div>

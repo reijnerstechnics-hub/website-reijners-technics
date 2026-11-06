@@ -427,7 +427,7 @@ function sendLead(data) {
   var GERUST = {
     nieuw: "Gratis plaatsbezoek · U beslist pas na de offerte",
     onderhoud: "Aanvragen kost niets · Rim spreekt met u een dag af",
-    herstelling: "Aanvragen kost niets · Na het versturen kunt u het probleem beschrijven · U hoort de prijs vooraf",
+    herstelling: "Aanvragen kost niets · U hoort de prijs vooraf",
   };
   function toonDienst() {
     var el = document.getElementById("calc-dienst");
@@ -435,6 +435,8 @@ function sendLead(data) {
     el.hidden = !zin;
     if (zin) el.querySelector("strong").textContent = zin;
     document.getElementById("calc-gerust").textContent = GERUST[state.dienst] || GERUST.nieuw;
+    var pv = document.getElementById("calc-probleem-veld");
+    if (pv) pv.hidden = state.dienst !== "herstelling";
     // een toestel gekozen op Toestellen hoort enkel bij een nieuwe airco, niet bij onderhoud of herstelling
     var mEl = document.getElementById("calc-model");
     if (mEl) mEl.hidden = !(window.rtModel && state.dienst === "nieuw");
@@ -559,6 +561,14 @@ function sendLead(data) {
     state.naam = naam;
     state.telefoon = telefoon;
     state.gemeente = gemeente;
+    var probEl = document.getElementById("calc-probleem");
+    var probleem = probEl && state.dienst === "herstelling" ? probEl.value.trim() : "";
+    if (probleem) {
+      state.omschrijving = probleem;
+      // staat ook al klaar in de aanvulling na het versturen
+      var omEl = document.getElementById("calc-omschrijving-herstelling");
+      if (omEl && !omEl.value.trim()) omEl.value = probleem;
+    }
     statusEl.textContent = "Bezig met versturen...";
     statusEl.className = "calc-status";
     sendBtn.disabled = true;
@@ -570,6 +580,7 @@ function sendLead(data) {
       gemeente: gemeente,
       model: state.dienst === "nieuw" ? window.rtModel || "" : "",
       plaatsingsplan: state.dienst === "nieuw" ? window.rtPlan || "" : "",
+      probleem: probleem,
       source: "aanvraagformulier",
       submittedAt: new Date().toISOString(),
     };
@@ -584,6 +595,13 @@ function sendLead(data) {
       a.rel = "noopener";
       a.textContent = "Stuur uw aanvraag via WhatsApp";
       statusEl.appendChild(a);
+      // wie geen WhatsApp heeft, kan Rim ook bellen (controle 5-11-2026)
+      statusEl.appendChild(document.createTextNode(" of bel Rim op "));
+      var tel = document.createElement("a");
+      tel.href = "tel:+32491113313";
+      tel.textContent = "0491 11 33 13";
+      statusEl.appendChild(tel);
+      statusEl.appendChild(document.createTextNode("."));
     }
     sendLead(data)
       .then(function () {
@@ -3478,7 +3496,9 @@ function rtKwVoorKeuze(maten, k) {
   var tVal = 21,
     tAnim = 0;
   function showTemp(v) {
-    if (tempEl) tempEl.textContent = v.toFixed(1).replace(".", ",") + "°";
+    // tijdens het lopen met een cijfer na de komma, op het einde een rond getal (16° of 30°)
+    var r = Math.round(v * 10) / 10;
+    if (tempEl) tempEl.textContent = (r % 1 ? r.toFixed(1).replace(".", ",") : String(r)) + "°";
   }
   function animTemp(from, to) {
     cancelAnimationFrame(tAnim);
@@ -3506,8 +3526,8 @@ function rtKwVoorKeuze(maten, k) {
     document.querySelectorAll(".v4-mode button").forEach(function (b) {
       b.setAttribute("aria-pressed", b.getAttribute("data-m") === mode ? "true" : "false");
     });
-    if (lblEl) lblEl.textContent = mode === "warm" ? "Verwarmen naar" : "Koelen naar";
-    // koelen loopt naar 16 graden, verwarmen naar 30 graden
+    if (lblEl) lblEl.textContent = mode === "warm" ? "Verwarmen tot" : "Koelen vanaf";
+    // de toestellen zijn instelbaar van 16 tot 30 graden (Rim, 6-11-2026): koelen loopt naar 16, verwarmen naar 30
     var target = mode === "warm" ? 30 : 16;
     animTemp(first ? (mode === "warm" ? 21 : 24) : tVal, target);
     if (subEl) {
