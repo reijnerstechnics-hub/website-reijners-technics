@@ -2763,7 +2763,7 @@ function rtKwVoorKeuze(maten, k) {
         b.setAttribute("aria-pressed", k === actief ? "true" : "false");
         var ti = el("img");
         ti.src = f.src;
-        ti.alt = "";
+        ti.alt = f.alt || naamVol;
         ti.loading = "lazy";
         b.appendChild(ti);
         b.appendChild(el("span", null, f.label || "Foto " + (k + 1)));
