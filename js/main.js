@@ -86,6 +86,20 @@
     if (doScrollTop) window.scrollTo(0, 0);
   };
 
+  // Voert fn uit zodra el echt op het scherm staat: de pagina is gewisseld en de overgang uit
+  // js/beweging.js (260 ms) is voorbij. Vroeger scrolde de site te vroeg, terwijl het onderdeel nog
+  // verborgen was, en kwam de klant bovenaan Home uit in plaats van bij het formulier (controle 5-11-2026).
+  window.rtZodraZichtbaar = function (el, fn) {
+    var start = Date.now();
+    (function kijk() {
+      var pg = el && el.closest("[data-page]");
+      var klaar =
+        !document.documentElement.classList.contains("up-weg") && (!pg || pg.classList.contains("page-active"));
+      if (klaar || Date.now() - start > 1500) setTimeout(fn, 40);
+      else setTimeout(kijk, 30);
+    })();
+  };
+
   // Klik op een #link binnen dezelfde pagina: vloeiend naar dat onderdeel scrollen.
   document.addEventListener("click", function (e) {
     var a = e.target.closest('a[href^="#"]');
@@ -97,10 +111,8 @@
     e.preventDefault();
     if (info.scrollTo) {
       goToPage(info.page, false);
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          info.scrollTo.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
+      window.rtZodraZichtbaar(info.scrollTo, function () {
+        info.scrollTo.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     } else {
       goToPage(info.page, true, info.hash);
@@ -779,11 +791,11 @@ window.rtGoToOffer = function (d, model) {
   }
   if (window.goToPage) window.goToPage("home", false);
   if (window.rtStartOffer) window.rtStartOffer(d);
-  setTimeout(function () {
-    var card = document.querySelector("#calculator .calc-card");
-    if (card)
+  var card = document.querySelector("#calculator .calc-card");
+  if (card && window.rtZodraZichtbaar)
+    window.rtZodraZichtbaar(card, function () {
       window.scrollTo({ top: card.getBoundingClientRect().top + window.scrollY - 84, behavior: "smooth" });
-  }, 260);
+    });
 };
 (function () {
   var m = /[?&]dienst=([a-z]+)/.exec(location.search);
@@ -2201,7 +2213,7 @@ function rtKwVoorKeuze(maten, k) {
   }
   var UITLEG = {
     wand:
-      "Een wandmodel hangt hoog aan de muur. Via een kleine doorvoer in de muur is het met leidingen verbonden met de buitenunit. Het is de meest gekozen oplossing: snel geplaatst en met een goede luchtverdeling.",
+      "Een wandmodel hangt hoog aan de muur. Via een kleine doorvoer in de muur is het met leidingen verbonden met de buitenunit. Het wordt snel geplaatst en verdeelt de lucht goed over de kamer.",
     vloer:
       "Een vloermodel staat laag tegen de muur, bijvoorbeeld onder een raam. Handig als er boven geen plaats is, of in een slaapkamer onder een schuin dak. Bij verwarmen komt de warme lucht dicht bij de vloer, waar u ze het meest voelt.",
     cassette:
@@ -3020,7 +3032,7 @@ function rtKwVoorKeuze(maten, k) {
         '<span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/></svg></span>' +
         "<span><b>Zie dit toestel in een woonkamer</b><small>Bekijk hoe de " +
         naam +
-        " aan de muur hangt in zes woonkamers, en schuif hem naar de plek die u wilt.</small></span>";
+        " aan de muur hangt, in zes woonkamers, op ware grootte.</small></span>";
       info.appendChild(kamer);
     }
     info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Op werkdagen binnen 24\u00a0uur teruggebeld · U beslist pas na de offerte"));
