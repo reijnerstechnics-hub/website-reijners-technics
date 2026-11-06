@@ -177,7 +177,7 @@ var SOURCE_SUBJECTS = {
   aanvraagformulier: "Nieuwe aanvraag via de website",
   "aanvraagformulier-aanvulling": "Aanvulling op een aanvraag",
   "contact-form": "Nieuw bericht via het contactformulier",
-  prijscalculator: "Offerteaanvraag via de prijscalculator",
+  prijscalculator: "Offerteaanvraag via de keuzehulp",
 };
 
 function sendLead(data) {
@@ -999,7 +999,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.360 euro, standaardplaatsing met 5 meter leiding en 6% btw inbegrepen voor een woning ouder dan 10 jaar; onderhoud 100 tot 150 euro, exclusief btw, afhankelijk van de situatie en het aantal toestellen; herstelling: geen vaste prijs, die hangt af van wat er moet gebeuren en Rim zegt vooraf wat het kost); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Rim belt zelf op werkdagen binnen 24\u00a0uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Noem nooit een prijs voor een toestel of een plaatsing: die bespreekt Rim na het gratis plaatsbezoek, in de offerte. Onderhoud kost 100 tot 150 euro, exclusief btw, afhankelijk van de situatie en het aantal toestellen. Herstelling heeft geen vaste prijs: die hangt af van wat er moet gebeuren en Rim zegt vooraf wat het kost. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Rim belt zelf op werkdagen binnen 24\u00a0uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -1994,18 +1994,13 @@ function rtKwVoorKeuze(maten, k) {
     cards.forEach(function (c) {
       c.hidden = !(vanMerk(c) && past(c) && test(c) && pastKw(c));
       if (!c.hidden) zichtbaar++;
-      // de maat die bij de filter Vermogen past, staat donker (zo opent ook de detailpagina),
-      // en de richtprijs op de kaart is die van die maat
+      // de maat die bij de filter Vermogen past, staat donker (zo opent ook de detailpagina)
       var kw = rtKw(c);
       var donker = kw && rtKwVoorKeuze(kw.maten, kwNu);
       c.querySelectorAll(".kw-maten [data-kw]").forEach(function (m) {
         m.classList.toggle("on", parseFloat(m.dataset.kw) === donker);
       });
-      if (window.rtKaartPrijs) window.rtKaartPrijs(c, donker);
     });
-    // uitleg bij de richtprijzen, enkel als er een kaart met een prijs te zien is
-    var noot = lijst.querySelector(".lijst-noot");
-    if (noot) noot.hidden = !lijst.querySelector(".device-card:not([hidden]) .device-prijs");
     section.querySelectorAll(".brand-sub").forEach(function (sub) {
       var devices = sub.nextElementSibling;
       if (devices && devices.classList.contains("devices")) {
@@ -2441,95 +2436,8 @@ function rtKwVoorKeuze(maten, k) {
     if (a) a.click();
   });
 
-  // ---------- richtprijs per toestel (Rim, 24-10-2026; rekenregel van 27-10-2026) ----------
-  // Dezelfde berekening als het prijsadvies (calculate in js/prijscalculator.js) voor één kamer
-  // met een eigen buitenunit: set (inkoop x 1,15) + Rims werk voor één binnenunit, plus btw,
-  // afgerond op 10 euro. Enkel voor toestellen met een setprijs in js/prijzen.js.
-  var euro = new Intl.NumberFormat("nl-BE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
-  var getal = new Intl.NumberFormat("nl-BE", { maximumFractionDigits: 0 });
-  function prijsToestel(model) {
-    if (typeof RT_PRIJZEN === "undefined" || RT_PRIJZEN.voorlopig) return null;
-    for (var i = 0; i < RT_PRIJZEN.toestellen.length; i++) if (RT_PRIJZEN.toestellen[i].model === model) return RT_PRIJZEN.toestellen[i];
-    return null;
-  }
-  function richtprijs(model, kw) {
-    var t = prijsToestel(model);
-    var rij = t && t.prijzen[kw.toFixed(1)];
-    if (!rij || rij[0] == null) return null;
-    var P = RT_PRIJZEN;
-    var incl = (rij[0] + P.werk[1]) * (1 + P.btw.standaard / 100);
-    var bedrag = Math.round(incl / 10) * 10;
-    return { lo: bedrag, hi: bedrag };
-  }
-  // het kleinste vermogen met een setprijs
-  function vanafPrijs(model) {
-    var t = prijsToestel(model);
-    if (!t) return null;
-    var maten = Object.keys(t.prijzen)
-      .map(parseFloat)
-      .sort(function (a, b) {
-        return a - b;
-      });
-    for (var i = 0; i < maten.length; i++) {
-      var p = richtprijs(model, maten[i]);
-      if (p) return { kw: maten[i], prijs: p, meer: maten.length - i > 1 };
-    }
-    return null;
-  }
-  // Het blok met de richtprijs. toon(kw) zet er de prijs voor het gekozen vermogen in,
-  // toon(null) de laagste prijs ("vanaf").
-  function prijsBlok(model) {
-    var v = vanafPrijs(model);
-    if (!v) return null;
-    var box = el("div", "td-prijs");
-    var lbl = el("span", "td-prijs-lbl");
-    var bedrag = el("b", "td-prijs-bedrag");
-    var uitleg = el("p");
-    box.appendChild(lbl);
-    box.appendChild(bedrag);
-    box.appendChild(uitleg);
-    var btw = "een standaardplaatsing (5 m leiding inbegrepen) en " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar).";
-    var echt = " De echte prijs krijgt u na het gratis plaatsbezoek.";
-    function toon(kw) {
-      var p = kw && richtprijs(model, kw);
-      lbl.textContent = kw ? "Richtprijs voor " + rtKwTekst(kw) + " kW" : "Richtprijs";
-      if (!kw) {
-        bedrag.textContent = "vanaf " + euro.format(v.prijs.lo);
-        uitleg.textContent = "Voor " + rtKwTekst(v.kw) + " kW, met " + btw + echt;
-      } else if (p) {
-        bedrag.textContent = euro.format(p.lo);
-        uitleg.textContent = "Met " + btw + echt;
-      } else {
-        bedrag.textContent = "Op aanvraag";
-        uitleg.textContent = "Voor dit vermogen krijgt u de prijs in de offerte, na het gratis plaatsbezoek.";
-      }
-    }
-    toon(null);
-    return { box: box, toon: toon };
-  }
-
-  // ---------- richtprijs op de kaarten in de lijst (Rim, 24-10-2026) ----------
-  // "vanaf € ..." zoals op de detailpagina. Staat de filter Vermogen aan, dan de prijs voor de
-  // donkere maat (de lijst roept daarvoor window.rtKaartPrijs aan).
-  function kaartPrijs(card, kw) {
-    var box = card.querySelector(".device-prijs");
-    if (!box) return;
-    var model = card.querySelector(".device-cta").dataset.model;
-    var p = kw && richtprijs(model, kw);
-    box.firstChild.textContent = kw ? "Richtprijs voor " + rtKwTekst(kw) + " kW" : "Richtprijs";
-    box.lastChild.textContent = !kw ? "vanaf " + euro.format(vanafPrijs(model).prijs.lo) : p ? euro.format(p.lo) : "Op aanvraag";
-  }
-  cards.forEach(function (card) {
-    var cta = card.querySelector(".device-cta");
-    if (!cta || !vanafPrijs(cta.dataset.model)) return;
-    var box = el("div", "device-prijs");
-    box.appendChild(el("span"));
-    box.appendChild(el("b"));
-    var kw = card.querySelector(".device-kw");
-    card.insertBefore(box, kw ? kw.nextSibling : card.querySelector(".device-keys, .device-more"));
-    kaartPrijs(card, null);
-  });
-  window.rtKaartPrijs = kaartPrijs;
+  // Geen richtprijzen meer bij de toestellen (Rim, 6-11-2026): "de prijs wordt besproken na het plaatsbezoek".
+  // De toestelpagina, de kaarten en de tabel "Welk vermogen heb ik nodig?" tonen geen bedrag meer.
 
   // ---------- toestel bekijken: fotoreeks, inzoomen, video (Rim, 27-10-2026) ----------
   // De klant moet het toestel in elke stand kunnen zien. De extra foto's en de merkvideo
@@ -2897,43 +2805,19 @@ function rtKwVoorKeuze(maten, k) {
       );
       return box;
     }
-    // met een kolom richtprijs als er voor dit toestel prijzen zijn
-    var metPrijs = nums.some(function (n) {
-      return richtprijs(model, n);
-    });
-    var t = el("table", "td-kw" + (metPrijs ? " td-kw-prijs" : ""));
+    var t = el("table", "td-kw");
     var head = el("tr");
     head.appendChild(el("th", null, "Vermogen"));
-    head.appendChild(el("th", null, metPrijs ? "Ruimte" : "Richtwaarde ruimte"));
-    if (metPrijs) head.appendChild(el("th", null, "Richtprijs"));
+    head.appendChild(el("th", null, "Richtwaarde ruimte"));
     t.appendChild(head);
     nums.forEach(function (n) {
       var tr = el("tr");
       tr.dataset.kw = n; // de rij van het gekozen vermogen licht op (kiesKw in bouw)
       tr.appendChild(el("td", null, n.toFixed(1).replace(".", ",") + " kW"));
-      if (metPrijs) {
-        // compacter, zodat de drie kolommen ook op een smalle gsm op één regel passen
-        var ruimte = el("td");
-        if (n !== nums[0]) ruimte.appendChild(el("span", "td-kw-ca", "ca. "));
-        ruimte.appendChild(el("span", "td-kw-m2", (n === nums[0] ? "tot " : Math.round(n / 0.12) + "-") + Math.round(n / 0.09) + " m²"));
-        tr.appendChild(ruimte);
-        var p = richtprijs(model, n);
-        tr.appendChild(el("td", p ? null : "td-kw-geen", p ? euro.format(p.lo) : "op aanvraag"));
-      } else {
-        tr.appendChild(el("td", null, "ca. " + (n === nums[0] ? "tot " : Math.round(n / 0.12) + "-") + Math.round(n / 0.09) + " m²"));
-      }
+      tr.appendChild(el("td", null, "ca. " + (n === nums[0] ? "tot " : Math.round(n / 0.12) + "-") + Math.round(n / 0.09) + " m²"));
       t.appendChild(tr);
     });
     box.appendChild(t);
-    if (metPrijs)
-      box.appendChild(
-        el(
-          "p",
-          "td-kw-noot",
-          "Richtprijs voor een standaardplaatsing (5 m leiding inbegrepen), met " + RT_PRIJZEN.btw.standaard + "% btw (woning ouder dan 10 jaar; jonger: " + RT_PRIJZEN.btw.nieuw +
-            "% btw). De echte prijs krijgt u na het gratis plaatsbezoek."
-        )
-      );
     return box;
   }
 
@@ -2949,12 +2833,12 @@ function rtKwVoorKeuze(maten, k) {
     return kw && kw.maten.length ? Math.min.apply(null, kw.maten) : null;
   }
   // de zin onder de kW-knoppen: hoe u kiest, of voor welke kamer het gekozen vermogen past
-  function kwZin(card, n, metPrijs) {
+  function kwZin(card, n) {
     var t = card.dataset.type;
     if (t === "buiten") return "Welk vermogen past, hangt af van de binnenunits. Dat rekenen we voor u uit.";
     if (n) return ruimteTekst(n, n === kleinsteMaat(card)) + ".";
     if (t === "mobiel") return "Twijfelt u? Rim helpt u graag kiezen.";
-    return (metPrijs ? "Kies een vermogen voor de richtprijs. " : "") + "Twijfelt u? Het juiste vermogen bepalen we samen bij het gratis plaatsbezoek.";
+    return "Twijfelt u? Het juiste vermogen bepalen we samen bij het gratis plaatsbezoek.";
   }
   // Is er bij het openen al een vermogen gekozen? Eerst wat de bezoeker voor dit toestel koos
   // (op de kaart of op de detailpagina), anders de maat die past bij de filter Vermogen.
@@ -3033,14 +2917,12 @@ function rtKwVoorKeuze(maten, k) {
       keys.appendChild(el("span", null, t));
     });
     if (keys.children.length) info.appendChild(keys);
-    // Het vermogen kiezen, met de richtprijs eronder en daarna de knoppen: kiezen, prijs zien,
-    // offerte vragen (Rim, 24-10-2026: de maten waren geen knoppen).
-    var prijs = prijsBlok(model);
+    // Het vermogen kiezen en daarna de knoppen: kiezen, offerte vragen (Rim, 24-10-2026: de maten
+    // waren geen knoppen). Geen richtprijs meer (Rim, 6-11-2026).
     var kwKnoppen = kwGroot ? kwGroot.querySelectorAll(".kw-maten button") : [];
     var kwUitleg = el("p", "kw-uitleg");
     if (kwKnoppen.length) kwGroot.appendChild(kwUitleg);
     if (kwGroot) info.appendChild(kwGroot);
-    if (prijs) info.appendChild(prijs.box);
     var acts = el("div", "td-acts");
     var offerte = el("button", "btn btn-gold", "Offerte voor dit model ");
     offerte.type = "button";
@@ -3149,7 +3031,7 @@ function rtKwVoorKeuze(maten, k) {
     body.appendChild(side);
     detail.appendChild(body);
 
-    // Een vermogen kiezen: de knop wordt donker, de richtprijs en de rij in de tabel passen
+    // Een vermogen kiezen: de knop wordt donker, de rij in de tabel past
     // zich aan, en het vermogen gaat mee in de offerte, WhatsApp en e-mail. Een kleur die de
     // bezoeker koos, gaat ook mee. Nog eens op hetzelfde vermogen tikken zet de keuze af.
     var gekozen = null;
@@ -3168,8 +3050,7 @@ function rtKwVoorKeuze(maten, k) {
       Array.prototype.forEach.call(kwKnoppen, function (b) {
         b.setAttribute("aria-pressed", parseFloat(b.dataset.kw) === n ? "true" : "false");
       });
-      kwUitleg.textContent = kwZin(card, n, !!prijs);
-      if (prijs) prijs.toon(n);
+      kwUitleg.textContent = kwZin(card, n);
       detail.querySelectorAll(".td-kw tr[data-kw]").forEach(function (tr) {
         tr.classList.toggle("on", parseFloat(tr.dataset.kw) === n);
       });
