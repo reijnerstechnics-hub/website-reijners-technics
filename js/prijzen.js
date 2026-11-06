@@ -39,7 +39,7 @@ var RT_PRIJZEN = {
     // altijd een mooie binnenunit, de voordeligste die de volgorde laat kloppen (Sensira, Perfera, Stylish).
     { id: "prijs", vraag: "Zo voordelig mogelijk", uitleg: "Een eenvoudig toestel tegen een scherpe prijs", markeer: "voordelig",
       voorstellen: { voordelig: "Nuova Infinity AI Smart", kwaliteit: "LG Standard Plus DualCool Special P · PZ-serie", premium: "LG Artcool AI Air Mirror" } },
-    { id: "kwaliteit", vraag: "Goede prijs-kwaliteit", uitleg: "Een gekend merk, goede verhouding prijs en kwaliteit", markeer: "kwaliteit",
+    { id: "kwaliteit", vraag: "Beste prijs-kwaliteit", uitleg: "Een gekend merk, goede verhouding prijs en kwaliteit", markeer: "kwaliteit",
       voorstellen: { voordelig: "Daikin Sensira", kwaliteit: "Daikin Perfera", premium: "Daikin Stylish" } },
     { id: "stil", vraag: "Extra stil en zuinig", uitleg: "Stil en zuinig in gebruik", markeer: "premium",
       voorstellen: { voordelig: "Daikin Sensira", kwaliteit: "Mitsubishi Electric MSZ-AY Compact", premium: "Mitsubishi Electric MSZ-LN Diamond" } },

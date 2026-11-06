@@ -197,6 +197,14 @@ function sendLead(data) {
   });
 }
 
+// De foutmelding noemt enkel wat ontbreekt (controle 5-11-2026), bv. ["gemeente"] -> "Vul ook uw gemeente in.",
+// ["naam", "telefoonnummer", "gemeente"] -> "Vul uw naam, telefoonnummer en gemeente in."
+// Ook gebruikt in js/prijscalculator.js.
+function rtOntbreektZin(leeg, totaal) {
+  var lijst = leeg.length === 1 ? leeg[0] : leeg.slice(0, -1).join(", ") + " en " + leeg[leeg.length - 1];
+  return "Vul " + (leeg.length < (totaal || 3) ? "ook " : "") + "uw " + lijst + " in.";
+}
+
 (function () {
   document.addEventListener("click", function (e) {
     var btn = e.target.closest(".color-btn");
@@ -345,12 +353,13 @@ function sendLead(data) {
   var WA_NUMBER = "32491113313";
 
   var LABELS = {
-    dienst: { nieuw: "Nieuwe airco of warmtepomp", onderhoud: "Onderhoud", herstelling: "Herstelling" },
+    dienst: { nieuw: "Nieuwe airco", onderhoud: "Onderhoud", herstelling: "Herstelling" },
     grootte: {
-      "<20": "kleiner dan 20 m²",
-      "20-35": "20-35 m²",
-      "35-50": "35-50 m²",
-      ">50": "groter dan 50 m²",
+      // dezelfde indeling als het prijsadvies (js/prijscalculator.js, SIZES)
+      "<15": "tot 15 m²",
+      "15-25": "15 tot 25 m²",
+      "25-40": "25 tot 40 m²",
+      ">40": "meer dan 40 m²",
     },
     laatsteOnderhoud: {
       "<1j": "minder dan 1 jaar geleden",
@@ -421,7 +430,7 @@ function sendLead(data) {
   document.getElementById("calc-wijzig").addEventListener("click", vorigeStap);
 
   // In stap 2 tonen welke dienst gekozen is, zodat de klant niet twijfelt.
-  var DIENST_ZIN = { nieuw: "een nieuwe airco of warmtepomp", onderhoud: "een onderhoud", herstelling: "een herstelling" };
+  var DIENST_ZIN = { nieuw: "een nieuwe airco", onderhoud: "een onderhoud", herstelling: "een herstelling" };
   // Geruststelling onder de knop. "Gratis plaatsbezoek" klopt enkel bij een nieuw toestel:
   // onderhoud en herstelling zijn betalend.
   var GERUST = {
@@ -537,7 +546,9 @@ function sendLead(data) {
     var statusEl = document.getElementById("calc-contact-status");
     var digits = telefoon.replace(/\D/g, "");
     if (!naam || !telefoon || !gemeente) {
-      statusEl.textContent = "Vul uw naam, telefoonnummer en gemeente in.";
+      statusEl.textContent = rtOntbreektZin(
+        [!naam && "naam", !telefoon && "telefoonnummer", !gemeente && "gemeente"].filter(Boolean)
+      );
       statusEl.className = "calc-status err";
       // de lege velden krijgen een rode rand; het eerste krijgt de focus
       var eerste = null;
@@ -664,7 +675,8 @@ function sendLead(data) {
     });
   });
 
-  var KW_AREA_MIDPOINT = { "<20": 15, "20-35": 27, "35-50": 42, ">50": 55 };
+  // zelfde m² per maat als het prijsadvies (js/prijscalculator.js, SIZES: 12 / 20 / 32 / 48)
+  var KW_AREA_MIDPOINT = { "<15": 12, "15-25": 20, "25-40": 32, ">40": 48 };
   var KW_STANDARD_SIZES = [2.0, 2.5, 3.5, 5.0, 6.0, 7.1, 8.0];
   function snapKw(v) {
     for (var i = 0; i < KW_STANDARD_SIZES.length; i++) {
@@ -675,6 +687,7 @@ function sendLead(data) {
   function estimateKw(s) {
     var area = KW_AREA_MIDPOINT[s.grootte];
     if (!area) return null;
+    // een vork rond de vuistregel van ongeveer 1 kW per 10 m² (die de klant overal leest)
     var low = snapKw(area * 0.09),
       high = snapKw(area * 0.12);
     // met een komma, zoals overal op de site (2,5 kW)
@@ -727,8 +740,25 @@ function sendLead(data) {
     st.className = "calc-status";
     function ok() {
       extraBtn.disabled = false;
-      st.textContent = "Dank u, dat helpt ons om goed voorbereid te bellen.";
-      st.className = "calc-status ok";
+      st.textContent = "";
+      st.className = "calc-status";
+      // een duidelijke bevestiging in de stijl van de bevestiging bovenaan; de vragen verdwijnen, zodat de
+      // klant niet denkt dat hij nog iets moet invullen (controle 5-11-2026, klantenreis 7)
+      var ex = document.getElementById("calc-extra");
+      var klaar = ex.querySelector(".calc-extra-klaar");
+      if (!klaar) {
+        klaar = document.createElement("div");
+        klaar.className = "calc-extra-klaar";
+        klaar.setAttribute("role", "status");
+        klaar.innerHTML =
+          '<span class="calc-extra-vink v4-check" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="44"/><path d="M30 50l12 12 24-26"/></svg></span>' +
+          "<div><strong>Aanvulling verstuurd. Bedankt!</strong><span>Dat helpt Rim om goed voorbereid te bellen.</span></div>";
+        ex.insertBefore(klaar, ex.firstChild);
+      }
+      ex.classList.add("is-verstuurd");
+      var exTop = ex.getBoundingClientRect().top;
+      if (exTop < 80 || exTop > window.innerHeight - 120)
+        window.scrollTo({ top: window.scrollY + exTop - 90, behavior: "smooth" });
       if (kw) {
         document.getElementById("calc-kw-value").textContent = kw;
         document.getElementById("calc-kw-box").hidden = false;
@@ -771,6 +801,7 @@ function sendLead(data) {
     var st = document.getElementById("calc-extra-status");
     st.textContent = "";
     st.className = "calc-status";
+    document.getElementById("calc-extra").classList.remove("is-verstuurd");
     document.getElementById("calc-kw-box").hidden = true;
     document.getElementById("calc-again").hidden = false;
   }
@@ -968,7 +999,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.360 euro, standaardplaatsing met 5 meter leiding en 6% btw inbegrepen voor een woning ouder dan 10 jaar; onderhoud 100 tot 150 euro, exclusief btw, afhankelijk van de situatie en het aantal toestellen; herstelling: geen vaste prijs, die hangt af van wat er moet gebeuren en Rim zegt vooraf wat het kost); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Reijners Technics belt op werkdagen binnen 24\u00a0uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Op de website staan richtprijzen (bv. een airco voor één kamer vanaf ongeveer 1.360 euro, standaardplaatsing met 5 meter leiding en 6% btw inbegrepen voor een woning ouder dan 10 jaar; onderhoud 100 tot 150 euro, exclusief btw, afhankelijk van de situatie en het aantal toestellen; herstelling: geen vaste prijs, die hangt af van wat er moet gebeuren en Rim zegt vooraf wat het kost); de echte prijs komt pas in de offerte, na het gratis plaatsbezoek. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Rim belt zelf op werkdagen binnen 24\u00a0uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -1814,7 +1845,7 @@ function rtKwVoorKeuze(maten, k) {
   }
 
   // Filter op vermogen: welk vermogen hebt u ongeveer nodig? De oppervlakte volgt dezelfde
-  // vuistregel als op de detailpagina (90 tot 120 W per m²), aaneensluitend zodat elke kamer
+  // vuistregel als op de detailpagina (ongeveer 1 kW per 10 m²; gerekend als vork van 90 tot 120 W per m²), aaneensluitend zodat elke kamer
   // ergens past: ook een kleine slaapkamer valt onder "tot 2,5 kW".
   var KW_KEUZES = [
     { id: "2", label: "tot 2,5 kW", sub: "tot 28 m²", zin: "tot 2,5 kW", van: 0, tot: 2.95 },
@@ -1879,7 +1910,7 @@ function rtKwVoorKeuze(maten, k) {
     var kwKop = document.createElement("h4");
     kwKop.textContent = "Vermogen";
     var kwUitleg = document.createElement("small");
-    kwUitleg.textContent = "vuistregel: ± 1 kW per 10 m²";
+    kwUitleg.textContent = "vuistregel: ongeveer 1 kW per 10 m²";
     kwKop.appendChild(kwUitleg);
     catBox.appendChild(kwKop);
     var voorKw = cards.filter(function (c) {
@@ -2182,6 +2213,20 @@ function rtKwVoorKeuze(maten, k) {
     });
   });
 
+  // Rechtstreeks geopend op #toestellen-lijst (een gedeelde link, of terug met de knop van de browser):
+  // zonder gekozen merk bleef de lijst verborgen. Dan alle toestellen tonen (controle 5-11-2026).
+  function lijstUitAdres() {
+    if (location.hash !== "#toestellen-lijst" || state.merk) return false;
+    state.merk = "alle";
+    return true;
+  }
+  lijstUitAdres();
+  window.addEventListener("popstate", function () {
+    if (!lijstUitAdres()) return;
+    render();
+    requestAnimationFrame(naarLijst);
+  });
+
   render();
 })();
 
@@ -2224,8 +2269,8 @@ function rtKwVoorKeuze(maten, k) {
     if (t === "buiten") return "Wordt gecombineerd met meerdere binnenunits";
     if (t === "monoblock") return "Alles in één toestel, geen buitenunit aan de gevel";
     if (t === "mobiel") return "Verplaatsbaar, met een afvoerslang naar buiten";
-    if (s && m) return "Voor 1 kamer, of meerdere kamers op 1 buitenunit";
-    if (s) return "Voor 1 kamer, met een eigen buitenunit";
+    if (s && m) return "Voor één kamer, of meerdere kamers op één buitenunit";
+    if (s) return "Voor één kamer, met een eigen buitenunit";
     if (m) return "Binnenunit voor multi-split (meerdere kamers)";
     return "";
   }
@@ -2507,7 +2552,7 @@ function rtKwVoorKeuze(maten, k) {
       // uitleg onder de foto (Realisaties) en eventueel een link naar het toestel
       '<div class="td-zoom-onder" hidden><p class="td-zoom-uitleg"></p><a class="td-zoom-link" href="#" hidden>Bekijk dit toestel <span aria-hidden="true">&rarr;</span></a>' +
       // Realisaties (Rims keuze van 29-10-2026): wie een foto mooi vindt, vraagt meteen een offerte aan
-      '<p class="td-zoom-offerte" hidden><span>Zo&rsquo;n toestel bij mij?</span> <a class="btn btn-gold btn-sm" href="#calculator">Offerte aanvragen <span class="ar" aria-hidden="true">&rarr;</span></a></p></div>' +
+      '<p class="td-zoom-offerte" hidden><span>Zo\'n toestel bij mij?</span> <a class="btn btn-gold btn-sm" href="#calculator">Offerte aanvragen <span class="ar" aria-hidden="true">&rarr;</span></a></p></div>' +
       '<p class="td-zoom-hint">Knijp of scrol om in te zoomen, sleep om te verschuiven</p>';
     document.body.appendChild(box);
     var vlak = box.querySelector(".td-zoom-vlak");
@@ -2838,7 +2883,7 @@ function rtKwVoorKeuze(maten, k) {
       el(
         "p",
         null,
-        "Als vuistregel rekenen we 90 tot 120 watt per m², afhankelijk van de isolatie, de hoogte van het plafond en de ramen. Het exacte vermogen bepalen we samen tijdens het gratis plaatsbezoek."
+        "Als vuistregel rekenen we ongeveer 1 kW per 10 m². De isolatie, de hoogte van het plafond en de ramen tellen mee. Het exacte vermogen bepalen we samen tijdens het gratis plaatsbezoek."
       )
     );
     if (bereik) {
@@ -2892,7 +2937,7 @@ function rtKwVoorKeuze(maten, k) {
     return box;
   }
 
-  // Voor welke kamer een vermogen past (90 tot 120 W per m²). De kleinste maat van een toestel
+  // Voor welke kamer een vermogen past: een vork rond "ongeveer 1 kW per 10 m²" (90 tot 120 W per m²). De kleinste maat van een toestel
   // past ook in een kleinere kamer, dus daar staat "tot": een slaapkamer van 12 m² hoort er ook bij.
   function ruimteTekst(n, kleinste) {
     return kleinste
@@ -3044,6 +3089,14 @@ function rtKwVoorKeuze(maten, k) {
             var k = [kleurNaam || kleur, gekozen ? rtKwTekst(gekozen) + " kW" : ""].filter(Boolean);
             return k.length ? model + " (" + k.join(", ") + ")" : model;
           },
+          // een kleur gekozen in het venster: ook op de pagina dat bolletje aanzetten (controle 5-11-2026)
+          kiesKleur: function (src) {
+            var doel = null;
+            media.querySelectorAll(".color-swatch").forEach(function (s) {
+              if (s.dataset.src === src) doel = s;
+            });
+            if (doel) doel.click();
+          },
         });
       });
       kamer.innerHTML =
@@ -3051,6 +3104,10 @@ function rtKwVoorKeuze(maten, k) {
         "<span><b>Zie dit toestel in een woonkamer</b><small>Bekijk hoe de " +
         naam +
         " aan de muur hangt, in zes woonkamers, op ware grootte.</small></span>";
+      // een pijl, zodat de kaart er ook uitziet als iets om op te tikken (controle 5-11-2026)
+      var kamerGo = el("span", "td-kamer-go", "→");
+      kamerGo.setAttribute("aria-hidden", "true");
+      kamer.appendChild(kamerGo);
       info.appendChild(kamer);
     }
     info.appendChild(el("p", "td-note", "Gratis plaatsbezoek · Op werkdagen binnen 24\u00a0uur teruggebeld · U beslist pas na de offerte"));
@@ -3823,12 +3880,17 @@ function rtKwVoorKeuze(maten, k) {
       if (eerste) eerste.querySelector(".rl-open").focus({ preventScroll: true });
     });
 
-  // aantal foto's per knop; een merk zonder foto's krijgt geen knop
-  knoppen.forEach(function (k) {
-    var m = k.dataset.merk;
-    var n = tegels.filter(function (t) {
+  // aantal foto's per knop; een merk zonder foto's krijgt geen knop. De 6 foto's van de kijker tellen mee:
+  // ze staan op dezelfde pagina, en zo zegt "Alle" hetzelfde aantal als Home (controle 5-11-2026: "78" op Home,
+  // "Alle 72" hier).
+  function aantal(m) {
+    return tegels.concat(kijkerTegels).filter(function (t) {
       return !m || t.dataset.merk === m;
     }).length;
+  }
+  knoppen.forEach(function (k) {
+    var m = k.dataset.merk;
+    var n = aantal(m);
     var tel = k.querySelector(".rl-n");
     if (tel) tel.textContent = n;
     k.hidden = !n;
@@ -3849,6 +3911,7 @@ function rtKwVoorKeuze(maten, k) {
     toonTot();
     // met een merk gekozen is het merklabel op elke tegel overbodig: rustiger zonder
     raster.classList.toggle("rl-een-merk", !!merk);
+    n = aantal(merk); // zelfde telling als de knop (met de kijker)
     if (status) status.textContent = n + (n === 1 ? " foto" : " foto's") + (merk ? " van " + NAMEN[merk] : "");
   }
   knoppen.forEach(function (k) {

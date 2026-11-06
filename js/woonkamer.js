@@ -147,7 +147,10 @@
     });
     box.querySelector(".wk-offerte").addEventListener("click", function () {
       // met de kleur die hier gekozen is en het vermogen van de pagina (grote controle 4-11-2026)
-      var hier = o.kleurNaam && !o.kleurStandaard ? o.kleurNaam.replace(/\s*\(.*$/, "").toLowerCase() : null;
+      // ook de eerste kleur (bv. wit) als de klant die hier zelf koos; anders bleef de kleur van de pagina staan
+      // (controle 5-11-2026, klantenreis 8)
+      var hier =
+        o.kleurNaam && (o.kleurGekozen || !o.kleurStandaard) ? o.kleurNaam.replace(/\s*\(.*$/, "").toLowerCase() : null;
       var m = o.offerte ? o.offerte(hier) : o.model;
       sluit();
       if (window.rtGoToOffer) window.rtGoToOffer("nieuw", m);
@@ -245,6 +248,7 @@
     opener = document.activeElement;
     plek = null;
     sleep = null;
+    o.kleurGekozen = false;
     box.querySelector(".zb-titel").textContent = "De " + o.model + " in een woonkamer";
     // de gekozen kleur (of de eerste, de standaard) bepaalt welke foto gezocht wordt
     if (o.kleuren && o.kleuren.length) {
@@ -273,6 +277,9 @@
         o.binnen = k.src;
         o.kleurNaam = k.naam;
         o.kleurStandaard = i === 0;
+        o.kleurGekozen = true;
+        // dezelfde kleur ook op de toestelpagina (foto, bolletje, WhatsApp en e-mail)
+        if (o.kiesKleur) o.kiesKleur(k.src);
         laadKnip();
       });
       kl.appendChild(b);
@@ -368,12 +375,36 @@
       im.src = "assets/img/wk-" + naam + ".webp";
     } else zelfKnippen(mijn);
   }
+  // De uitknipfunctie zit in js/zicht.js. Dat bestand laadt niet meer bij elke bezoeker (geparkeerd tot
+  // december 2026, controle 5-11-2026): enkel als het hier nodig is (een toestel zonder vooraf uitgeknipte
+  // versie), één keer, en daarna wordt het meteen gebruikt.
+  var zichtLaden = null;
+  function metZicht(cb) {
+    if (window.rtZicht && window.rtZicht.uitsnede) return cb();
+    if (!zichtLaden) {
+      zichtLaden = [];
+      var s = document.createElement("script");
+      s.src = "js/zicht.js";
+      s.onload = s.onerror = function () {
+        var l = zichtLaden;
+        zichtLaden = null;
+        if (window.rtZicht && window.rtZicht.uitsnede)
+          l.forEach(function (f) {
+            f();
+          });
+      };
+      document.body.appendChild(s);
+    }
+    zichtLaden.push(cb);
+  }
   function zelfKnippen(mijn) {
-    if (!window.rtZicht || !window.rtZicht.uitsnede) return;
-    window.rtZicht.uitsnede(besteFoto(), "boven", function (c) {
+    metZicht(function () {
       if (mijn !== knipNr) return;
-      knip = c;
-      teken();
+      window.rtZicht.uitsnede(besteFoto(), "boven", function (c) {
+        if (mijn !== knipNr) return;
+        knip = c;
+        teken();
+      });
     });
   }
   // De canvas krijgt precies zoveel pixels als ze op het scherm inneemt (maal de pixeldichtheid van het
@@ -386,6 +417,16 @@
     var hh = box.querySelector(".zb-hint").getBoundingClientRect().height + 8;
     var bw = Math.max(100, r.width - 16),
       bh = Math.max(100, r.height - hh - 16);
+    // Op gsm groeit het vlak niet mee (CSS: flex none), zodat de kleuren en de offerteknop meteen onder de
+    // foto staan in plaats van onder een groot leeg vlak (controle 5-11-2026). De ruimte die er dan is: het
+    // venster min de kopbalk, de kamerknoppen en de balk onderaan.
+    if (getComputedStyle(vlak).flexGrow === "0") {
+      var hoog = function (sel) {
+        var e = box.querySelector(sel);
+        return e ? e.getBoundingClientRect().height : 0;
+      };
+      bh = Math.max(100, box.clientHeight - hoog(".zb-top") - hoog(".wk-stijlen") - hoog(".zb-balk") - hh - 16);
+    }
     var s = Math.min(bw / im.naturalWidth, bh / im.naturalHeight);
     var cw = Math.round(im.naturalWidth * s),
       ch = Math.round(im.naturalHeight * s);

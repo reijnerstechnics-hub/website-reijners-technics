@@ -22,6 +22,8 @@
   .v2-phead .v2-btn-ghost { color: var(--ink); border-color: var(--ink); }
   .v2-phead .v2-btn-ghost:hover { background: var(--ink); color: #fff; }
   @media (max-width: 600px) { .btn { white-space: normal; height: auto; min-height: 44px; } }
+  /* de telefoonlink in donker goud (licht goud op creme was 2,2:1, nu 5,6:1) en een tikvlak van 44 px */
+  .v2-phead .nf-tel a { color: var(--gold-text) !important; font-weight: 700; padding: 12px 0; } /* !important: style.css zet .v2-phead p a met !important in licht goud */
 </style>
 </head>
 <body>
@@ -43,7 +45,7 @@
         <a class="btn v2-btn-ghost" href="/#diensten">Onze diensten</a>
         <a class="btn v2-btn-ghost" href="/#contact">Contact</a>
       </div>
-      <p style="margin-top:28px;">Liever meteen iemand aan de lijn? Bel Rim op <a href="tel:+32491113313">+32 491 11 33 13</a>.</p>
+      <p class="nf-tel" style="margin-top:28px;">Liever meteen iemand aan de lijn? Bel Rim op <a href="tel:+32491113313">+32 491 11 33 13</a>.</p>
     </div>
   </section>
 </main>

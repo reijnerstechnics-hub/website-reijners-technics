@@ -23,7 +23,7 @@
   // Rims rekenregel (27-10-2026): het werk hangt af van het aantal binnenunits (P.werk);
   // meer dan P.maxBinnenunits, dan is het op maat en toont de site geen bedrag.
   var WERK = P.werk;
-  var KW_PER_M2 = 0.1; // vuistregel: 100 W per m² (goed geïsoleerde woning)
+  var KW_PER_M2 = 0.1; // vuistregel: ongeveer 1 kW per 10 m² (zoals in de FAQ en op de toestelpagina)
   var STORE_KEY = "rt-prijsadvies-v2";
   var NIVEAUS = ["voordelig", "kwaliteit", "premium"];
 
@@ -305,7 +305,6 @@
       h += '<div class="pc-opts pc-opts-n">';
       for (var n = 1; n <= 6; n++) h += opt('data-n="' + n + '"', state.n === n, n === 6 ? "6+" : String(n), n === 1 ? "kamer" : "kamers");
       h += "</div>";
-      if (state.n === 6) h += '<p class="pc-hint">Bij meer dan 6 kamers rekenen we met 6. De rest bespreken we graag samen.</p>';
       return h;
     },
     grootte: function () {
@@ -434,7 +433,7 @@
     h +=
       '<p class="pc-fine">' +
       (opMaat
-        ? "Vanaf vier binnenunits komt er meestal meer materiaal en werk bij kijken. Daarom maakt Rim die prijs op maat, na het gratis plaatsbezoek."
+        ? "Vanaf vier binnenunits maakt Rim de prijs op maat, na het gratis plaatsbezoek."
         : "Richtprijzen voor een standaardplaatsing (5 m leiding per binnenunit inbegrepen), incl. " +
           P.btw.standaard +
           "% btw (woning ouder dan 10 jaar; jonger: " +
@@ -447,7 +446,10 @@
     var gk = results[state.gekozen];
     h += '<div class="pc-lead pc-vs-lead">';
     if (state.sent) {
-      h += '<b>Bedankt. Rim belt u op werkdagen binnen 24\u00a0uur terug.</b><span class="pc-muted">Dan plannen we samen het gratis plaatsbezoek.</span>';
+      // met het vinkje van de bevestiging op Home (controle 5-11-2026)
+      h +=
+        '<div class="pc-bevestigd" role="status"><span class="pc-vink v4-check" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="44"/><path d="M30 50l12 12 24-26"/></svg></span>' +
+        '<div><b>Bedankt. Rim belt u op werkdagen binnen 24\u00a0uur terug.</b><span class="pc-muted">Dan plannen we samen het gratis plaatsbezoek.</span></div></div>';
     } else {
       h +=
         "<div><b>" +
@@ -538,7 +540,10 @@
       gem = document.getElementById("pc-gem").value.trim();
     // zoals in het formulier op Home: ook de gemeente, zodat Rim weet of het in zijn regio is
     if (!naam || !tel || !gem) {
-      st.textContent = "Vul uw naam, telefoonnummer en gemeente in.";
+      // enkel wat ontbreekt (rtOntbreektZin staat in js/main.js)
+      var ontbreekt = [!naam && "naam", !tel && "telefoonnummer", !gem && "gemeente"].filter(Boolean);
+      st.textContent =
+        typeof rtOntbreektZin === "function" ? rtOntbreektZin(ontbreekt) : "Vul uw naam, telefoonnummer en gemeente in.";
       st.className = "calc-status err";
       // zoals in het formulier op Home: rode rand rond de lege velden, focus op het eerste
       var eerste = null;
@@ -607,6 +612,15 @@
         // het prijsadvies toont zijn eigen bedankt-tekst; het contactformulier blijft vrij
         state.sent = true;
         render();
+        // de bevestiging volledig in beeld, onder de vaste menubalk (controle 5-11-2026: ze viel er half achter)
+        var bev = root.querySelector(".pc-vs-lead");
+        if (bev) {
+          var kop = document.querySelector("header.site");
+          var onder = kop ? Math.max(0, kop.getBoundingClientRect().bottom) : 0;
+          var r = bev.getBoundingClientRect();
+          if (r.top < onder + 12 || r.bottom > window.innerHeight)
+            window.scrollTo({ top: window.scrollY + r.top - onder - 16, behavior: "smooth" });
+        }
       })
       .catch(function () {
         btn.disabled = false;

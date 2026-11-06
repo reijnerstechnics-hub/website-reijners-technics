@@ -11485,10 +11485,12 @@ body.rt-warm .up-adem-lbl::before {
 .up-par-kader > [data-up-par] {
   transform: scale(1.12) translate3d(0, var(--up-y, 0px), 0);
 }
-/* de fotostrook op Home schuift mee met het scrollen (bovenop het trage drijven) */
-.v4-strip {
-  transform: translate3d(var(--up-strip, 0px), 0, 0);
-  will-change: transform;
+/* de fotostrook op Home schuift mee met het scrollen (bovenop het trage drijven). Enkel de foto's
+   binnen de strook schuiven (naar links, in de richting van het drijven): de strook zelf blijft binnen het
+   scherm, anders kwam er op computer een horizontale schuifbalk (controle 5-11-2026, punt 10). */
+.v4-strip-track {
+  translate: calc(-1 * var(--up-strip, 0px)) 0;
+  will-change: transform, translate;
 }
 .up-tel {
   font-variant-numeric: tabular-nums;
@@ -11642,8 +11644,8 @@ html.up-komt .up-balk {
   .up-par-kader > [data-up-par] {
     transform: none;
   }
-  .v4-strip {
-    transform: none;
+  .v4-strip-track {
+    translate: none;
   }
   .td-media .device-photo.up-tilt,
   .device-card.up-3d {
@@ -11689,9 +11691,11 @@ html.up-komt .up-balk {
     transform: none;
   }
   .up-par-kader > img,
-  .up-par-kader > [data-up-par],
-  .v4-strip {
+  .up-par-kader > [data-up-par] {
     transform: none;
+  }
+  .v4-strip-track {
+    translate: none;
   }
 }
 
@@ -12345,4 +12349,229 @@ section.v3-hero .v3-kicker {
 .wk-sleep[hidden],
 .wk-echt[hidden] {
   display: none;
+}
+
+/* ---------- herstelwerk na de grote controle van 5-11-2026 (6-11-2026, branch rest-06-11) ---------- */
+
+/* toestelpagina: het label "Klep open, lucht stroomt" bovenaan de foto, en de kleurbolletjes altijd
+   boven de bewegende laag, zodat ze meteen te zien en te tikken zijn (klantenreis 9) */
+.up-live-lbl {
+  top: 14px;
+  bottom: auto;
+  left: 14px;
+}
+.td-media .color-swatches {
+  z-index: 5;
+}
+
+/* toestelpagina: de woonkamerkaart ziet eruit als iets om op te tikken (pijl, zelfde vorm als de keuzes op Home) */
+button.td-kamer {
+  position: relative;
+  padding-right: 64px;
+}
+button.td-kamer .ic {
+  background: var(--gold-tint);
+  color: var(--gold-text);
+}
+.td-kamer-go {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 36px;
+  height: 36px;
+  margin-top: -18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--gold);
+  background: var(--gold-tint);
+  color: var(--gold-text);
+  font-weight: 700;
+  transition: transform 0.25s var(--ease);
+}
+button.td-kamer:hover,
+button.td-kamer:focus-visible {
+  background: var(--gold-tint);
+  border-color: var(--gold);
+}
+button.td-kamer:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+button.td-kamer:hover .td-kamer-go,
+button.td-kamer:focus-visible .td-kamer-go {
+  transform: translateX(3px);
+}
+button.td-kamer:active {
+  transform: none;
+}
+
+/* woonkamer op gsm: kleuren en "Offerte voor dit model" meteen onder de foto, geen groot leeg vlak
+   ertussen (de grootte van de foto rekent js/woonkamer.js uit, zie past()); kamerknoppen 44 px */
+@media (max-width: 600px) {
+  .wk .zb-vlak {
+    flex: none;
+  }
+  .wk-stijlen .zb-seg button {
+    min-height: 44px;
+  }
+}
+.wk-terug {
+  min-height: 44px;
+}
+
+/* formulier op Home: na het doorsturen van de aanvulling een duidelijke bevestiging, de vragen verdwijnen
+   (klantenreis 7). Het vinkje is hetzelfde als bovenaan de bevestiging. */
+.calc-extra-klaar {
+  display: none;
+}
+.calc-extra.is-verstuurd > :not(.calc-extra-klaar):not(.calc-kw-box) {
+  display: none;
+}
+.calc-extra.is-verstuurd .calc-extra-klaar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.calc-extra-vink,
+.pc-vink {
+  flex: none;
+  width: 48px;
+  height: 48px;
+}
+.calc-extra-klaar strong {
+  display: block;
+  font-family: var(--font-kop);
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+.calc-extra-klaar span {
+  display: block;
+  color: var(--body);
+}
+.calc-extra.is-verstuurd .calc-kw-box {
+  margin-top: 14px;
+}
+/* prijsadvies: dezelfde bevestiging met vinkje (op de donkere kaart) */
+.pc-bevestigd {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.pc-bevestigd b {
+  display: block;
+  color: #fff;
+  font-family: var(--font-kop);
+}
+.pc-vink path {
+  animation: v4-draw 0.8s 0.25s var(--ease) forwards;
+}
+.pc-vink circle {
+  animation: v4-pop 0.5s var(--ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .v4-check path {
+    animation: none !important;
+    stroke-dashoffset: 0;
+  }
+  .v4-check circle {
+    animation: none !important;
+  }
+}
+
+/* gsm: de vaste knop "Filter" ligt niet meer over de kop "Vermogen" als het paneel open is */
+.v4-filterbtn[aria-expanded="true"] {
+  position: relative;
+  top: auto;
+}
+
+/* bovenste strook en "Klaar in 2 minuten": rustige lijn-iconen in plaats van emoji (beeld 27) */
+.v2-topstrip .ts-ic {
+  width: 14px;
+  height: 14px;
+  margin-right: 3px;
+  vertical-align: -2px;
+  color: var(--gold);
+  flex: none;
+}
+.v2-fine .fine-ic {
+  width: 14px;
+  height: 14px;
+  margin-right: 3px;
+  vertical-align: -2px;
+  color: var(--gold-text);
+}
+
+/* lichte kleine teksten donkerder (minstens 4,5:1, gemeten op de echte achtergrond) */
+.hz-lbl {
+  color: var(--body); /* was #9fb2c4 op creme: 1,8:1, nu 7,5:1 */
+}
+.v4-thermo small,
+.v4-thermo small.v4-bereik {
+  color: #dfe8ef; /* was #9fb2c4: 3,4:1; nu minstens 5,4:1, ook als de foto erachter een witte muur is */
+}
+.v3-tile.gold .seal,
+.v2-ar {
+  color: var(--gold-text); /* was --gold-dark op lichtgoud: 2,8:1, nu 6,0:1 */
+}
+
+/* tikdoelen van minstens 44 px op gsm en tablet (techniek 12): het tikvlak wordt groter, de tekst
+   verschuift niet (padding met een even grote negatieve marge, zoals in de voettekst) */
+@media (max-width: 760px), (pointer: coarse) and (max-width: 1100px) {
+  section[data-page] p a:not([class]),
+  section[data-page] p a.js-wa,
+  .v4-faq-go a,
+  .v3-richtprijs a,
+  .calc-done-wa a,
+  .dn-dringend a {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .v2-crumb a {
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+  .v2-footer li a {
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-left: -3px;
+    margin-right: -3px;
+  }
+  .calc-back {
+    min-height: 44px;
+    margin: -7px 0;
+  }
+  .calc-wijzig {
+    padding: 12px 4px;
+    margin: -12px -4px;
+  }
+  .chip,
+  .hz-item,
+  .hz-alle,
+  .hz-bar button,
+  header.site .brand {
+    min-height: 44px;
+  }
+  .hz-alle {
+    display: flex;
+    align-items: center;
+  }
+  /* prijsadvies: "Meer over dit toestel", "Antwoorden aanpassen", "Opnieuw beginnen" */
+  .pc-vs-meer {
+    padding-top: 11px;
+    padding-bottom: 11px;
+    margin-top: -11px;
+    margin-bottom: -11px;
+  }
+  .pc-back {
+    min-height: 44px;
+  }
+}
+
+/* menubalk volledig dekkend: bij 97 % dekking schemerden donkere stukken van de pagina (de knop "Filter",
+   koppen, labels) door de balk heen, over het logo (controle 3 en 5-11-2026). Zelfde wit, geen doorkijk meer. */
+header.site {
+  background: var(--surface);
 }
