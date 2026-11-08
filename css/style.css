@@ -4085,275 +4085,6 @@ section.v3-sec.v3-white {
   font-size: 1.02rem;
 }
 
-/* ---------- 3. bento ---------- */
-.v3-bento {
-  display: grid;
-  grid-template-columns: 1.35fr 1fr 1fr;
-  grid-template-rows: 240px 240px;
-  gap: 16px;
-}
-.v3-tile {
-  border-radius: 24px;
-  overflow: hidden;
-  position: relative;
-  background: #fff;
-  border: 1px solid var(--line);
-  box-shadow: var(--sh-1);
-  padding: 26px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  text-decoration: none;
-  color: var(--body);
-  transition:
-    transform 0.35s var(--ease),
-    box-shadow 0.35s var(--ease),
-    opacity 0.7s ease;
-}
-.v3-tile:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--sh-2);
-}
-.v3-tile img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s var(--ease);
-}
-.v3-tile:hover img {
-  transform: scale(1.04);
-}
-.v3-tile.big {
-  grid-row: span 2;
-  padding: 0;
-  border: 0;
-}
-/* tekst in een wit kader onderaan, zoals bij "Ook achter de kap netjes":
-   goed leesbaar, en het toestel op de foto blijft helemaal zichtbaar (geen donkere laag erover) */
-.v3-tile.big .tx {
-  position: relative;
-  z-index: 1;
-  margin: 16px;
-  padding: 16px 18px;
-  background: rgba(255, 255, 255, 0.94);
-  border-radius: 14px;
-}
-.v3-tile.big h3 {
-  font-size: 1.35rem;
-  line-height: 1.15;
-  margin: 0 0 6px;
-}
-.v3-tile.big p {
-  color: var(--body);
-}
-.v3-tile .num {
-  font-family: var(--font-kop);
-  font-weight: 800;
-  font-size: 3.6rem;
-  line-height: 1;
-  color: var(--ink);
-  letter-spacing: -0.04em;
-}
-.v3-tile .num em {
-  font-style: normal;
-  color: var(--gold-dark);
-  font-size: 1.6rem;
-  margin-left: 4px;
-}
-.v3-tile h3 {
-  font-size: 1.15rem;
-  margin: 8px 0 4px;
-}
-.v3-tile p {
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-.v3-tile.dark {
-  background: var(--ink);
-  border: 0;
-}
-.v3-tile.dark h3 {
-  color: #fff;
-}
-.v3-tile.dark p {
-  color: #b9c7d4;
-}
-.v3-tile.dark .brands {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-.v3-tile.dark .brands span {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 999px;
-  padding: 5px 12px;
-  font-size: 0.82rem;
-  color: #fff;
-}
-.v3-tile.ph {
-  padding: 0;
-}
-.v3-tile.ph .cap {
-  position: relative;
-  z-index: 1;
-  margin: 16px;
-  background: rgba(255, 255, 255, 0.94);
-  border-radius: 14px;
-  padding: 12px 14px;
-}
-.v3-tile.ph .cap h3 {
-  margin: 0 0 2px;
-  font-size: 1rem;
-}
-.v3-tile.ph .cap p {
-  color: var(--sky);
-  font-weight: 600;
-}
-.v3-tile.gold {
-  background: linear-gradient(160deg, var(--gold-tint), #fff 70%);
-  border-color: #f0dcb6;
-}
-/* het gouden blok is een knop naar de aanvraag */
-.v3-tile-cta {
-  display: inline-block;
-  margin-top: 12px;
-  color: var(--gold-text);
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-.v3-tile.gold:hover .v3-tile-cta {
-  text-decoration: underline;
-}
-a.v3-tile:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-}
-.v3-tile.gold .seal {
-  position: absolute;
-  top: 22px;
-  right: 22px;
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  border: 2px dashed var(--gold);
-  display: grid;
-  place-items: center;
-  color: var(--gold-dark);
-  font-weight: 800;
-  font-family: var(--font-kop);
-  font-size: 0.66rem;
-  text-align: center;
-  line-height: 1.15;
-  animation: v3-spin 24s linear infinite;
-}
-@keyframes v3-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ---------- 4. zo werkt het ---------- */
-.v3-story {
-  display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
-  gap: 72px;
-  align-items: start;
-}
-.v3-story-l {
-  position: sticky;
-  top: 110px;
-}
-.v3-story-l h2 {
-  font-size: clamp(2rem, 3.4vw, 2.7rem);
-  line-height: 1.12;
-  margin: 14px 0 18px;
-}
-.v3-prog {
-  margin: 30px 0;
-  display: grid;
-  gap: 14px;
-}
-.v3-prog div {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: var(--muted);
-  font-weight: 600;
-  transition: color 0.3s;
-}
-.v3-prog div i {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid var(--line);
-  display: grid;
-  place-items: center;
-  font-style: normal;
-  font-size: 0.8rem;
-  transition:
-    background 0.3s,
-    border-color 0.3s;
-}
-.v3-prog div.on {
-  color: var(--ink);
-}
-.v3-prog div.on i {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: var(--ink);
-}
-.v3-prog div::after {
-  content: "";
-  height: 2px;
-  width: 0;
-  background: var(--gold);
-  transition: width 0.4s var(--ease);
-}
-.v3-prog div.on::after {
-  width: 40px;
-}
-.v3-story-r {
-  display: grid;
-  gap: 22px;
-}
-.v3-scard {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  border-radius: 22px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  background: var(--paper);
-  transition:
-    transform 0.45s var(--ease),
-    box-shadow 0.45s var(--ease),
-    background 0.3s,
-    opacity 0.7s ease;
-}
-.v3-scard img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  min-height: 190px;
-}
-.v3-scard .t {
-  padding: 26px 28px;
-}
-.v3-scard .n {
-  font-family: var(--font-kop);
-  font-weight: 800;
-  font-size: 2.4rem;
-  color: var(--gold);
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-.v3-scard h3 {
-  font-size: 1.25rem;
-  margin: 10px 0 6px;
-}
-
 /* ---------- 5. offerteblok ---------- */
 section.v3-offer {
   background:
@@ -4669,32 +4400,21 @@ footer.v2-footer {
   opacity: 1;
   transform: none;
 }
-.v3-anim .v3-bento .rv:nth-child(2),
 .v3-anim .v3-mosaic .rv:nth-child(2) {
   transition-delay: 0.08s;
 }
-.v3-anim .v3-bento .rv:nth-child(3),
 .v3-anim .v3-mosaic .rv:nth-child(3) {
   transition-delay: 0.16s;
 }
-.v3-anim .v3-bento .rv:nth-child(4),
 .v3-anim .v3-mosaic .rv:nth-child(4) {
   transition-delay: 0.24s;
 }
-.v3-anim .v3-bento .rv:nth-child(5) {
-  transition-delay: 0.32s;
-}
-.v3-anim .v3-tile.rv.in:hover,
+
 .v3-anim .v3-mosaic .rv.in:hover {
   transform: translateY(-4px);
   transition-delay: 0s;
 }
-.v3-story-r .v3-scard.on {
-  background: #fff;
-  box-shadow: var(--sh-2);
-  border-color: transparent;
-  transform: translateX(-10px);
-}
+
 @media print {
   .v3-anim .rv {
     opacity: 1;
@@ -4704,7 +4424,6 @@ footer.v2-footer {
 @media (prefers-reduced-motion: reduce) {
   .v3-mq-track,
   .v3-glass,
-  .v3-tile.gold .seal,
   .v3-hero h1 .u::after {
     animation: none;
   }
@@ -4804,57 +4523,7 @@ footer.v2-footer {
     gap: 12px;
     margin-bottom: 28px;
   }
-  .v3-bento {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 380px auto auto;
-    gap: 10px;
-  }
-  .v3-tile {
-    min-height: 190px;
-    padding: 18px;
-    border-radius: 20px;
-  }
-  .v3-tile.big {
-    grid-column: span 2;
-    grid-row: auto;
-  }
-  .v3-tile.big .tx {
-    margin: 10px;
-    padding: 12px 14px;
-  }
-  .v3-tile.big h3 {
-    font-size: 1.15rem;
-  }
-  .v3-tile .num {
-    font-size: 2.6rem;
-  }
-  .v3-tile.gold .seal {
-    display: none;
-  }
-  .v3-tile.ph .cap {
-    margin: 10px;
-    padding: 10px 12px;
-  }
-  .v3-story {
-    grid-template-columns: 1fr;
-    gap: 22px;
-  }
-  .v3-story-l {
-    position: static;
-  }
-  .v3-prog {
-    display: none;
-  }
-  .v3-scard {
-    grid-template-columns: 1fr;
-  }
-  .v3-scard img {
-    height: 170px;
-    min-height: 0;
-  }
-  .v3-story-r .v3-scard.on {
-    transform: none;
-  }
+
   section.v3-offer {
     margin: 0;
     border-radius: 0;
@@ -5070,162 +4739,6 @@ section.v2-phead::before {
   }
 }
 
-/* ---------- reislijn ---------- */
-.v4-journey {
-  display: grid;
-  grid-template-columns: 0.82fr 1.18fr;
-  gap: 64px;
-  align-items: start;
-}
-.v4-journey-l {
-  position: sticky;
-  top: 110px;
-}
-.v4-journey-l h2 {
-  font-size: clamp(2rem, 3.4vw, 2.7rem);
-  line-height: 1.12;
-  margin: 14px 0 16px;
-}
-.v4-journey-l p {
-  margin-bottom: 24px;
-}
-.v4-journey-sm {
-  margin-top: 64px;
-}
-.v4-journey-sm .v4-journey-l h2 {
-  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
-}
-.v4-track {
-  position: relative;
-  padding-left: 58px;
-  display: grid;
-  gap: 22px;
-}
-.v4-rail,
-.v4-fill {
-  position: absolute;
-  left: 19px;
-  top: 10px;
-  width: 3px;
-  border-radius: 3px;
-}
-.v4-rail {
-  bottom: 10px;
-  background: var(--line);
-}
-.v4-fill {
-  height: 0;
-  background: linear-gradient(var(--gold), var(--gold-dark));
-}
-.v4-fill::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -7px;
-  width: 15px;
-  height: 15px;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: var(--gold);
-  box-shadow: 0 0 0 6px rgba(227, 166, 62, 0.2);
-}
-.v4-stop {
-  position: relative;
-  display: grid;
-  grid-template-columns: 170px minmax(0, 1fr);
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  overflow: visible;
-  transition:
-    box-shadow 0.5s var(--ease),
-    translate 0.5s var(--ease),
-    border-color 0.5s,
-    opacity 0.7s ease,
-    transform 0.7s var(--ease);
-}
-.v4-stop.noimg {
-  grid-template-columns: minmax(0, 1fr);
-}
-.v4-stop > img {
-  width: 100%;
-  height: 100%;
-  min-height: 150px;
-  object-fit: cover;
-  border-radius: 20px 0 0 20px;
-}
-.v4-stop::before {
-  content: attr(data-n);
-  position: absolute;
-  left: -58px;
-  top: 50%;
-  translate: 0 -50%;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #fff;
-  border: 2px solid var(--line);
-  display: grid;
-  place-items: center;
-  font-family: var(--font-kop);
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--muted);
-  transition: all 0.5s var(--ease);
-}
-.v4-stop.on {
-  box-shadow: var(--sh-2);
-  border-color: transparent;
-  translate: 6px 0;
-}
-.v4-stop.on::before,
-.v4-stop.past::before {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: var(--ink);
-}
-.v4-stop .t {
-  padding: 20px 24px;
-  min-width: 0;
-  position: relative;
-  z-index: 1;
-}
-.v4-stop .when {
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--gold-text);
-}
-.v4-stop h3 {
-  font-size: 1.15rem;
-  margin: 6px 0 4px;
-}
-.v4-stop p {
-  font-size: 0.93rem;
-}
-.v4-stop.end {
-  background: linear-gradient(135deg, var(--ink), #1d3a57);
-  border: 0;
-}
-.v4-stop.end h3 {
-  color: #fff;
-}
-.v4-stop.end p {
-  color: #c7d4e0;
-}
-.v4-stop.end .big {
-  font-family: var(--font-kop);
-  font-weight: 800;
-  font-size: 3rem;
-  color: #fff;
-  letter-spacing: -0.04em;
-  display: grid;
-  place-items: center;
-  min-height: 150px;
-  background: radial-gradient(circle at 50% 50%, rgba(227, 166, 62, 0.35), transparent 70%);
-}
-
 /* ---------- filmstrook ---------- */
 .v4-strip {
   overflow: hidden;
@@ -5303,12 +4816,8 @@ section.v2-phead::before {
 .v4-glow:hover::after {
   opacity: 1;
 }
-.v3-tile.dark.v4-glow::after,
-.v4-stop.end.v4-glow::after {
-  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(62, 127, 176, 0.45), transparent 60%);
-}
+
 @media (hover: none) {
-  .v3-tile:active,
   .service:active,
   .device-card:active,
   .v4-ctile:active,
@@ -5878,42 +5387,7 @@ img.v4-zoom:focus-visible {
   .v4-thermo .t {
     font-size: 1.3rem;
   }
-  .v4-journey {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-  .v4-journey-l {
-    position: static;
-  }
-  .v4-journey-sm {
-    margin-top: 40px;
-  }
-  .v4-track {
-    padding-left: 46px;
-    gap: 16px;
-  }
-  .v4-rail,
-  .v4-fill {
-    left: 15px;
-  }
-  .v4-stop {
-    grid-template-columns: 1fr;
-  }
-  .v4-stop > img {
-    height: 140px;
-    min-height: 0;
-    border-radius: 20px 20px 0 0;
-  }
-  .v4-stop::before {
-    left: -46px;
-    top: 26px;
-    translate: none;
-    width: 34px;
-    height: 34px;
-  }
-  .v4-stop.on {
-    translate: none;
-  }
+
   .v4-strip figure {
     width: 220px;
     height: 165px;
@@ -7815,31 +7289,6 @@ section.pc-catalog {
     font-size: 0.9rem;
   }
 }
-/* ---------- home: tegel met de merken (6 merken passen zonder af te knippen) ---------- */
-.v3-bento {
-  grid-template-rows: minmax(240px, auto) minmax(240px, auto);
-}
-.v3-tile.dark .brands {
-  gap: 6px;
-}
-.v3-tile.dark .brands span {
-  padding: 4px 10px;
-  font-size: 0.78rem;
-}
-@media (max-width: 860px) {
-  /* 380 px: het toestel op de foto staat dan boven het witte tekstkader */
-  .v3-bento {
-    grid-template-rows: 380px auto auto;
-  }
-}
-@media (max-width: 560px) {
-  /* smalle gsm: het tekstkader wordt hoger, dus de foto iets groter en hoger zetten
-     (bovenaan valt wat plafond weg), zodat het toestel er vrij boven blijft */
-  .v3-tile.big img {
-    top: auto;
-    height: 130%;
-  }
-}
 
 /* ---------- home: zoekbalk bovenaan (met suggesties terwijl u typt) ---------- */
 .hz {
@@ -8056,10 +7505,7 @@ h3,
 .brand-heading {
   letter-spacing: -0.01em;
 }
-.v3-tile .num,
-.v3-scard .n,
 .v3-count b,
-.v4-stop.end .big,
 .v4-thermo .t,
 .v3-mq-track .nm {
   letter-spacing: -0.015em;
@@ -8484,12 +7930,6 @@ section[data-page="privacy"] a {
   .v2-topstrip .wrap > span {
     display: none;
   }
-  .v3-bento {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .v3-tile.big {
-    grid-column: auto;
-  }
 }
 
 /* kW-blok: "tot 14,0 kW" mag onder "VERMOGEN" komen in plaats van uit het blok te steken (W-07, O-10) */
@@ -8521,18 +7961,6 @@ section[data-page="privacy"] a {
     left: auto;
     bottom: 14px;
     right: 14px;
-  }
-}
-
-/* Home "Zo werkt het" op tablet: foto links in plaats van een dunne strook (O-14) */
-@media (min-width: 561px) and (max-width: 860px) {
-  .v4-stop {
-    grid-template-columns: 200px minmax(0, 1fr);
-  }
-  .v4-stop > img {
-    height: 100%;
-    min-height: 150px;
-    border-radius: 20px 0 0 20px;
   }
 }
 
@@ -8903,26 +8331,6 @@ input.is-leeg {
   color: var(--muted);
 }
 
-/* Home, tegel "6 merken": de merken zijn links naar de lijst per merk */
-.v3-tile.dark .brands a {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 999px;
-  padding: 5px 12px;
-  font-size: 0.82rem;
-  color: #fff;
-  text-decoration: none;
-}
-.v3-tile.dark .brands a:hover,
-.v3-tile.dark .brands a:focus-visible {
-  border-color: var(--gold);
-  color: var(--gold);
-}
-@media (max-width: 860px) {
-  .v3-tile.dark .brands a {
-    padding: 4px 10px;
-    font-size: 0.78rem;
-  }
-}
 /* Over ons, werkgebied: de gemeenten als gewone zin */
 .v4-towns-tekst {
   margin: 0;
@@ -10211,35 +9619,12 @@ img.td-zoomable:focus-visible {
   -webkit-hyphens: auto;
   overflow-wrap: anywhere;
 }
-/* Home, "Zo werkt het": het woordje boven de donkere kaart leesbaar */
-.v4-stop.end .when {
-  color: var(--gold);
-}
-/* Home, tegel "24 uur": voldoende contrast */
-.v3-tile .num em {
-  color: var(--gold-text);
-}
-/* Home: merkpillen en zoekknop als volwaardige tikdoelen */
-@media (max-width: 860px) {
-  .v3-tile.dark .brands a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    padding: 0 14px;
-    white-space: nowrap;
-  }
-}
+
+/* Home: de zoekknop als volwaardig tikdoel */
 @media (max-width: 480px) {
   .hz-klein .hz-btn {
     min-height: 44px;
     min-width: 44px;
-  }
-  /* de tegels van Home in één kolom: in twee kolommen braken titels en pilletjes op 3 regels */
-  .v3-bento {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .v3-tile.big {
-    grid-column: auto;
   }
 }
 /* Contact op tablet: de knoppen twee op twee, de foto naast het verhaal en niet uitvergroot */
@@ -10633,7 +10018,6 @@ h1 {
 .eyebrow,
 .device-brand,
 .kw-kop span,
-.v4-stop .when,
 .td-prijs-lbl,
 .wb-from {
   color: var(--gold-text);
@@ -10865,48 +10249,10 @@ section.v2-phead::before,
   color: #6f7678;
   font-weight: 700;
 }
-.v3-tile {
-  border-radius: var(--r);
-  border: 1px solid var(--line);
-  box-shadow: none;
-}
-.v3-tile:hover {
-  box-shadow: var(--sh-2);
-}
-.v3-tile.big .tx,
-.v3-tile.ph .cap {
-  border-radius: 10px;
-}
-.v3-tile.dark {
-  background: var(--ink);
-}
-.v3-tile.gold {
-  background: var(--gold-tint);
-  border-color: #ecd9b4;
-}
-.v3-tile .num em {
-  color: var(--gold-dark);
-}
 
 /* ---------- home: zo werkt het ---------- */
 section.v3-sec.v3-white {
   background: #fff;
-}
-.v4-stop {
-  border-radius: var(--r);
-}
-.v4-stop > img {
-  border-radius: var(--r) 0 0 var(--r);
-}
-.v4-stop.on::before,
-.v4-stop.past::before {
-  color: var(--ink);
-}
-.v4-stop.end {
-  background: var(--ink);
-}
-.v4-stop.end .big {
-  background: radial-gradient(circle at 50% 50%, rgba(220, 154, 44, 0.3), transparent 70%);
 }
 
 /* ---------- home: offerteblok en formulier ---------- */
@@ -11110,7 +10456,6 @@ footer.v2-footer .wrap {
     font-size: 1.05rem;
   }
   .v3-shead h2,
-  .v4-journey-l h2,
   .v3-offer h2 {
     font-size: 1.7rem;
     line-height: 1.2;
@@ -11134,7 +10479,6 @@ footer.v2-footer .wrap {
     box-shadow: none;
   }
 }
-
 
 /* =====================================================================
    BEWEGING (Rims keuze van 2-11-2026): de sfeer bovenaan Home wisselt mee met Koelen/Verwarmen, de foto's
@@ -11506,7 +10850,6 @@ body.rt-cool .up-live .up-adem-laag i {
 .device-card,
 .dn-tegel,
 .rl-open,
-.v3-tile,
 .pc-vs {
   transition:
     transform 0.35s var(--up-ease),
@@ -11577,12 +10920,10 @@ body.rt-cool .up-live .up-adem-laag i {
 }
 .device-card .device-photo img,
 .dn-foto img,
-.v3-tile img,
 .ct-rim img {
   transition: transform 0.9s var(--up-ease);
 }
-.dn-tegel:hover .dn-foto img,
-.v3-tile:hover img {
+.dn-tegel:hover .dn-foto img {
   transform: scale(1.04);
 }
 .rl-open:hover img {
@@ -12513,7 +11854,6 @@ button.td-kamer:active {
 .v4-thermo small.v4-bereik {
   color: #dfe8ef; /* was #9fb2c4: 3,4:1; nu minstens 5,4:1, ook als de foto erachter een witte muur is */
 }
-.v3-tile.gold .seal,
 .v2-ar {
   color: var(--gold-text); /* was --gold-dark op lichtgoud: 2,8:1, nu 6,0:1 */
 }
@@ -12577,4 +11917,263 @@ button.td-kamer:active {
    koppen, labels) door de balk heen, over het logo (controle 3 en 5-11-2026). Zelfde wit, geen doorkijk meer. */
 header.site {
   background: var(--surface);
+}
+
+/* =====================================================================
+   HOME STERKER (Rim, 8-11-2026, vragen 104-107). Voorbeeld: voorbeeld/home-2026-11-08/.
+   104: de kop "Vraag in 2 minuten uw offerte aan" (enkel tekst, zie index.html en SUB in js/main.js).
+   105: "Waarom Reijners" als drie eigen werkfoto's met de uitleg eronder (niets over de foto),
+        daaronder de vier beloftes op een witte strook en een gouden knop (voorstel B).
+   106: "Zo werkt het" als vier genummerde stappen zonder foto's (voorstel A).
+   107: de zwevende balk onderaan (#v4-mini) is weg op computer en tablet; de knop "Offerte aanvragen"
+        staat daar altijd in de menubalk. De balk onderaan op gsm en de bel- en WhatsApp-knoppen blijven.
+   Het oude bento-blok (stempel "GRATIS BEZOEK", tegel "24 uur") en de reislijn met foto's zijn weg,
+   samen met hun opmaak.
+   ===================================================================== */
+
+/* ---------- 107: geen zwevende balk meer ---------- */
+.v4-mini {
+  display: none !important;
+}
+
+/* ---------- 105: waarom, drie werkfoto's ---------- */
+.wb-fotos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0 0 44px;
+}
+.wb-fotos figure {
+  margin: 0;
+}
+.wb-fotos img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--r);
+}
+.wb-fotos figcaption {
+  margin-top: 12px;
+  font-size: 0.98rem;
+}
+.wb-fotos figcaption b {
+  display: block;
+  font-family: var(--font-kop);
+  color: var(--ink);
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+.wb-fotos figcaption a,
+.wb-beloftes a {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+  text-underline-offset: 4px;
+  display: inline-block;
+  padding: 8px 0;
+}
+.wb-beloftes a {
+  padding: 4px 0;
+}
+.wb-fotos figcaption a:hover,
+.wb-beloftes a:hover {
+  color: var(--gold-text);
+}
+.wb-beloftes {
+  list-style: none;
+  margin: 0;
+  padding: 28px 32px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px 32px;
+}
+.wb-beloftes h3 {
+  font-size: 1.05rem;
+  margin: 0 0 4px;
+}
+.wb-beloftes p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.hs-onder {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 28px;
+}
+
+/* ---------- 106: zo werkt het, vier stappen ---------- */
+.st-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+.st-kop h2 {
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  line-height: 1.14;
+  margin: 14px 0 0;
+  max-width: 15em;
+}
+.st-kop > p {
+  max-width: 26em;
+  margin: 0;
+}
+.st {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
+  position: relative;
+}
+.st::before {
+  content: "";
+  position: absolute;
+  left: 22px;
+  /* tot het midden van het laatste bolletje (4 kolommen, 32 px ertussen) */
+  right: calc((100% - 96px) / 4 - 22px);
+  top: 21px;
+  height: 2px;
+  background: var(--line);
+}
+.st li {
+  position: relative;
+}
+.st-n {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--gold);
+  color: var(--ink);
+  font-family: var(--font-kop);
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+.st-wanneer {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+.st h3 {
+  font-size: 1.2rem;
+  margin: 6px 0;
+}
+.st p {
+  margin: 0;
+  font-size: 0.98rem;
+}
+.st-onder {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+}
+.st-onder p {
+  margin: 0;
+  font-size: 1.02rem;
+}
+.st-onder p b {
+  color: var(--ink);
+}
+
+/* ---------- tablet ---------- */
+@media (max-width: 1100px) {
+  .wb-beloftes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 860px) {
+  .wb-fotos {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+  .st-kop {
+    display: block;
+  }
+  .st-kop > p {
+    margin-top: 12px;
+  }
+  .st {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .st::before {
+    left: 21px;
+    right: auto;
+    top: 22px;
+    bottom: 22px;
+    width: 2px;
+    height: auto;
+  }
+  .st li {
+    padding: 0 0 26px 62px;
+    min-height: 44px;
+  }
+  .st li:last-child {
+    padding-bottom: 0;
+  }
+  .st-n {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 0;
+  }
+}
+/* tablet: de drie foto's naast elkaar blijven, maar kleiner (561-860 px) */
+@media (min-width: 561px) and (max-width: 860px) {
+  .wb-fotos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .wb-fotos figcaption {
+    font-size: 0.92rem;
+  }
+}
+
+/* ---------- gsm ---------- */
+@media (max-width: 560px) {
+  .wb-fotos img {
+    aspect-ratio: 16 / 10;
+  }
+  .wb-beloftes {
+    grid-template-columns: 1fr;
+    padding: 8px 20px 18px;
+    gap: 0;
+  }
+  .wb-beloftes li {
+    border-top: 1px solid var(--line);
+    padding: 16px 0;
+  }
+  .wb-beloftes li:first-child {
+    border-top: 0;
+  }
+  .wb-beloftes li:last-child {
+    padding-bottom: 0;
+  }
+  .hs-onder .btn,
+  .st-onder .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
 }

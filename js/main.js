@@ -3424,9 +3424,10 @@ function rtKwVoorKeuze(maten, k) {
   // ---------- seizoen: van mei tot september koelen, anders verwarmen ----------
   var month = new Date().getMonth();
   var mode = month >= 4 && month <= 8 ? "cool" : "warm";
+  // de zin onder de kop (Rims keuze van 8-11-2026, vraag 104): in beide seizoenen dezelfde, zonder reclameklank
   var SUB = {
-    cool: "Een airco die koelt in de zomer en verwarmt in de winter. Op werkdagen belt Rim u binnen 24\u00a0uur zelf terug en bespreekt hij wat bij uw woning past.",
-    warm: "Behaaglijk warm deze winter, met een warmtepomp: een airco die ook verwarmt. Op werkdagen belt Rim u binnen 24\u00a0uur zelf terug en bespreekt hij wat bij uw woning past.",
+    cool: "Voor een nieuwe airco, onderhoud of een herstelling. Op werkdagen belt Rim u binnen 24\u00a0uur zelf terug en bespreekt hij wat bij uw woning past.",
+    warm: "Voor een nieuwe airco, onderhoud of een herstelling. Op werkdagen belt Rim u binnen 24\u00a0uur zelf terug en bespreekt hij wat bij uw woning past.",
   };
   var tempEl = document.getElementById("v4-temp");
   var lblEl = document.getElementById("v4-thlbl");
