@@ -51,7 +51,7 @@ Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via What
 
 ## Realisaties
 
-Sinds 9-11-2026 (Rims keuze 114, voorstel C uit `voorbeeld/layouts-2026-11-08/paginas/`) staan de foto's **per plek**, in zeven groepen (`div.rl-groep` met een eigen `ul.rl-raster`): hoog aan de muur (`#plek-wand`), laag bij de vloer (`#plek-vloer`), buiten tegen de gevel (`#plek-gevel`), op een plat dak (`#plek-dak`), op het terras of de grond (`#plek-grond`), in een omkasting (`#plek-omkasting`) en achter de kap (`#aansluitingen`). Bovenaan staan springknoppen (`.rl-spring`) naar elke groep. Geen "In de kijker" en geen merkknoppen meer. Elke foto staat er één keer in (78, gelijk met de teller op Home).
+Sinds 9-11-2026 (Rims keuze 114, voorstel C uit `voorbeeld/layouts-2026-11-08/paginas/`) staan de foto's **per plek**, in zes groepen (`div.rl-groep` met een eigen `ul.rl-raster`): hoog aan de muur (`#plek-wand`), laag bij de vloer (`#plek-vloer`), buiten tegen de gevel (`#plek-gevel`), op een plat dak (`#plek-dak`), op het terras of de grond (`#plek-grond`) en achter de kap (`#aansluitingen`). Bovenaan staan springknoppen (`.rl-spring`) naar elke groep. Geen "In de kijker" en geen merkknoppen meer. Elke foto staat er één keer in (74, gelijk met de teller op Home).
 
 - **Tegels**: de uitsnede `rm-...webp` met het toestel in het midden; onder de foto `p.rl-onder` met het merk klein (`.rl-mk`) en de korte beschrijving. Een tik opent de foto groot in de viewer van de toestelpagina's (`window.rtZoomViewer`), met vorige/volgende binnen de groep, de uitleg en "Zo'n toestel bij mij? Offerte aanvragen".
 - **Toon alle**: per groep eerst 4 foto's (tablet 6), daaronder "Toon alle N foto's" / "Toon minder". De link "Zo sluiten we aan" op Home (`#aansluitingen`) zet de groep "Achter de kap" open.
@@ -73,7 +73,7 @@ Sinds 9-11-2026 (Rims keuze 114, voorstel C uit `voorbeeld/layouts-2026-11-08/pa
    - `alt`: een korte beschrijving van de foto;
    - `data-groot` enkel als de tegel de kleine versie `r-...` toont; zonder kleine versie zet je de foto zelf in `src`, met haar eigen `width` en `height`;
    - `data-toestel="#toestel-..."` (mag): dan staat in de grote weergave "Bekijk dit toestel".
-4. Pas op Home de teller aan (`data-count`, "foto's van eigen plaatsingen"): het aantal tegels, nu 78.
+4. Pas op Home de teller aan (`data-count`, "foto's van eigen plaatsingen"): het aantal tegels, nu 74.
 
 ## Toestellen
 

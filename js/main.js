@@ -3711,7 +3711,7 @@ function rtKwVoorKeuze(maten, k) {
 // =====================================================================
 // REALISATIES: FOTO'S PER PLEK (Rim, 9-11-2026, vraag 114: voorstel C "per plek")
 // De foto's staan in groepen (<div class="rl-groep">, zie de uitleg in index.html): hoog aan de muur,
-// bij de vloer, tegen de gevel, op een plat dak, op het terras, in een omkasting en achter de kap.
+// bij de vloer, tegen de gevel, op een plat dak, op het terras en achter de kap.
 // Per groep eerst 4 foto's; "Toon alle ..." toont de rest. Een tik op een foto opent ze groot in
 // dezelfde viewer als de toestelpagina's (window.rtZoomViewer): inzoomen, vorige/volgende binnen de
 // groep, de uitleg onderaan en "Zo'n toestel bij mij? Offerte aanvragen".

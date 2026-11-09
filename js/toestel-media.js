@@ -706,7 +706,7 @@ var RT_MEDIA ={
       {
         "src": "assets/img/t-mitsubishi-electric-sfz-m-inbouwvloermodel-2.webp",
         "label": "Binnenunit",
-        "alt": "Mitsubishi Electric SFZ-M inbouwvloermodel binnenunit, zonder omkasting"
+        "alt": "Mitsubishi Electric SFZ-M inbouwvloermodel binnenunit"
       },
       {
         "src": "assets/img/t-mitsubishi-electric-sfz-m-inbouwvloermodel-3.webp",
