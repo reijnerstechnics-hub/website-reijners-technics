@@ -51,30 +51,29 @@ Lukt het versturen niet, dan krijgt de bezoeker een link om de aanvraag via What
 
 ## Realisaties
 
-Sinds 28-10-2026 (Rims keuzes) is *Realisaties* (`#realisaties`) één fotoraster met een filter per merk, in de rustige stijl van Diensten en Contact. Elke foto staat er maar één keer in (71 foto's). Op gsm 2 kolommen, op tablet en computer 3.
+Sinds 9-11-2026 (Rims keuze 114, voorstel C uit `voorbeeld/layouts-2026-11-08/paginas/`) staan de foto's **per plek**, in zeven groepen (`div.rl-groep` met een eigen `ul.rl-raster`): hoog aan de muur (`#plek-wand`), laag bij de vloer (`#plek-vloer`), buiten tegen de gevel (`#plek-gevel`), op een plat dak (`#plek-dak`), op het terras of de grond (`#plek-grond`), in een omkasting (`#plek-omkasting`) en achter de kap (`#aansluitingen`). Bovenaan staan springknoppen (`.rl-spring`) naar elke groep. Geen "In de kijker" en geen merkknoppen meer. Elke foto staat er één keer in (78, gelijk met de teller op Home).
 
-- **Filterknoppen** bovenaan (`.rl-filter`, met `aria-pressed`): Alle / Daikin / LG / Mitsubishi Electric / MHI / Toshiba / Nuova. Elke knop telt zelf zijn foto's; een merk zonder foto's (nu Toshiba) blijft verborgen tot er een foto bij komt. Foto's zonder herkenbaar merk staan enkel onder *Alle*.
-- **Tegels**: in het raster enkel de foto met een klein merklabel. Een tik opent de foto groot in dezelfde viewer als de toestelpagina's (`zoomViewer` / `window.rtZoomViewer` in `js/main.js`): inzoomen, vegen of pijltjes naar de volgende foto binnen de gekozen filter, "3 / 24", en onderaan de uitleg (en soms "Bekijk dit toestel").
-- **Volgorde** = de volgorde in `index.html`: de mooiste foto's eerst (binnenunits in een mooi interieur, nette buitenunits), daarna de omkastingen en achteraan de technische foto's (aansluiten, eerste opstart). De tegel "Ook achter de kap netjes" op Home linkt naar `#aansluitingen`: dat is de eerste technische foto (de open LG Multi F-buitenunit); die link zet de filter eerst terug op *Alle*.
-- De werking staat in het blok *REALISATIES: FOTORASTER* in `js/main.js`, de opmaak achteraan in `css/style.css` onder "realisaties: één fotoraster met een filter per merk".
+- **Tegels**: de uitsnede `rm-...webp` met het toestel in het midden; onder de foto `p.rl-onder` met het merk klein (`.rl-mk`) en de korte beschrijving. Een tik opent de foto groot in de viewer van de toestelpagina's (`window.rtZoomViewer`), met vorige/volgende binnen de groep, de uitleg en "Zo'n toestel bij mij? Offerte aanvragen".
+- **Toon alle**: per groep eerst 4 foto's (tablet 6), daaronder "Toon alle N foto's" / "Toon minder". De link "Zo sluiten we aan" op Home (`#aansluitingen`) zet de groep "Achter de kap" open.
+- De werking staat in het blok *REALISATIES: FOTO'S PER PLEK* in `js/main.js`, de opmaak achteraan in `css/style.css` onder "REALISATIES PER PLEK".
 
 **Een nieuwe foto toevoegen**
 
 1. Zet de foto als webp in `assets/img/`, liefst liggend 4:3 (bv. `g-n94.webp`, 1200 × 900). Geen foto's met Gree of Olimpia Splendid, geen foto van Rim en Fabio samen (zie `CLAUDE.md`).
 2. Voor een grote foto (meer dan ± 40 kB) maak je een kleine versie voor de tegel, `r-<naam>.webp` van 600 × 450, bijvoorbeeld met ffmpeg:
    `ffmpeg -i g-n94.webp -vf scale=600:450:flags=lanczos -c:v libwebp -quality 75 -compression_level 6 r-g-n94.webp`
-3. Voeg in `index.html`, in `<ul class="rl-raster">`, één regel toe op de plaats waar de foto moet komen:
+3. Voeg in `index.html`, in de `<ul class="rl-raster">` van de juiste groep (plek), één regel toe op de plaats waar de foto moet komen (kijk naar een bestaande tegel voor de vorm, met `p.rl-onder`):
 
 ```html
 <li class="rl-tegel" data-merk="daikin"><button type="button" class="rl-open" data-groot="assets/img/g-n94.webp" data-uitleg="Daikin-wandmodel boven de deur, met de leiding in een wit kanaal."><img src="assets/img/r-g-n94.webp" alt="Daikin-wandmodel boven de deur" width="600" height="450" loading="lazy" decoding="async"><span class="rl-merk" aria-hidden="true">Daikin</span></button></li>
 ```
 
-   - `data-merk`: `daikin`, `lg`, `me` (Mitsubishi Electric), `mhi`, `nuova` of `toshiba`; leeg (`data-merk=""`, en dan zonder `<span class="rl-merk">`) als er geen merk te zien is;
+   - `data-merk`: `daikin`, `lg`, `me` (Mitsubishi Electric), `mhi`, `nuova` of `toshiba`; leeg (`data-merk=""`, en dan zonder merk in `p.rl-onder`) als er geen merk te zien is;
    - `data-uitleg`: wat er op de foto te zien is, enkel wat echt klopt (geen gemeente of toestelnaam die je niet zeker weet);
    - `alt`: een korte beschrijving van de foto;
    - `data-groot` enkel als de tegel de kleine versie `r-...` toont; zonder kleine versie zet je de foto zelf in `src`, met haar eigen `width` en `height`;
    - `data-toestel="#toestel-..."` (mag): dan staat in de grote weergave "Bekijk dit toestel".
-4. Pas op Home de teller aan: `<b data-count="71">71</b>` ("foto's van eigen plaatsingen") is het aantal tegels.
+4. Pas op Home de teller aan (`data-count`, "foto's van eigen plaatsingen"): het aantal tegels, nu 78.
 
 ## Toestellen
 

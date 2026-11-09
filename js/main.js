@@ -999,7 +999,7 @@ window.rtGoToOffer = function (d, model) {
   var iconClose = chatToggle.querySelector(".chat-icon-close");
 
   var RULES =
-    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) in Dilsen-Stokkem (werkgebied: de regio rond Dilsen-Stokkem, onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Noem nooit een prijs voor een toestel of een plaatsing: die bespreekt Rim na het gratis plaatsbezoek, in de offerte. Onderhoud kost 100 tot 150 euro, exclusief btw, afhankelijk van de situatie en het aantal toestellen. Herstelling heeft geen vaste prijs: die hangt af van wat er moet gebeuren en Rim zegt vooraf wat het kost. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Rim belt zelf op werkdagen binnen 24\u00a0uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
+    "Je bent de chatassistent van Reijners Technics, een installateur van airco's en warmtepompen (airco's die ook verwarmen; geen warmtepompen voor radiatoren of vloerverwarming) gevestigd in Dilsen-Stokkem (vaak aan het werk in onder meer Maaseik, Bree, Genk, Lanaken, Bilzen, Tongeren, Hasselt en Peer). Zeg nooit dat een gemeente te ver is of buiten het werkgebied valt: ook van verder mag de klant een offerte aanvragen, en Rim bekijkt elke aanvraag zelf. Reijners Technics installeert, onderhoudt en herstelt airco's en warmtepompen van de merken Daikin, Mitsubishi Electric, LG, Toshiba, Nuova en Mitsubishi Heavy Industries. Onderhoud en herstelling doet Reijners Technics ook voor andere merken, zoals Samsung of Fujitsu. Noem nooit een prijs voor een toestel of een plaatsing: die bespreekt Rim na het gratis plaatsbezoek, in de offerte. Onderhoud kost 100 tot 150 euro, exclusief btw, afhankelijk van de situatie en het aantal toestellen. Herstelling heeft geen vaste prijs: die hangt af van wat er moet gebeuren en Rim zegt vooraf wat het kost. Verwijs voor een offerte, onderhoud of herstelling altijd eerst naar het aanvraagformulier op de website (de knop Offerte aanvragen): twee korte stappen, en Rim belt zelf op werkdagen binnen 24\u00a0uur terug. Enkel als de bezoeker liever rechtstreeks contact wil: WhatsApp of telefoon op +32 491 11 33 13, of e-mail reijnerstechnics@gmail.com. Antwoord kort (maximaal een paar zinnen), vriendelijk en concreet in het Nederlands. Verzin geen feiten die je niet zeker weet, zoals exacte prijzen, garantietermijnen of levertijden - verwijs daarvoor door naar rechtstreeks contact. Blijf bij het onderwerp airco's, warmtepompen, installatie, onderhoud en energieverbruik.";
 
   var turns = [];
   var sampleFn = null;
@@ -2652,7 +2652,7 @@ function rtKwVoorKeuze(maten, k) {
     };
     return zoomBox;
   }
-  // ook voor het fotoraster op Realisaties (blok REALISATIES: FOTORASTER)
+  // ook voor de foto's op Realisaties (blok REALISATIES: FOTO'S PER PLEK)
   window.rtZoomViewer = zoomViewer;
 
   function galerij(media, foto, img, model, naamVol) {
@@ -3709,231 +3709,107 @@ function rtKwVoorKeuze(maten, k) {
 })();
 
 // =====================================================================
-// REALISATIES: FOTORASTER MET EEN FILTER PER MERK (Rims keuzes van 28-10-2026)
-// Alle foto's als tegels (<li class="rl-tegel" data-merk="...">, zie de uitleg in
-// index.html). De knoppen bovenaan tonen enkel de foto's van dat merk; "Alle" toont
-// alles, ook de foto's zonder herkenbaar merk. Een tik op een foto opent ze groot in
-// dezelfde viewer als de toestelpagina's (window.rtZoomViewer): inzoomen, vegen naar
-// de volgende foto binnen de filter, de uitleg onderaan en "3 / 24".
+// REALISATIES: FOTO'S PER PLEK (Rim, 9-11-2026, vraag 114: voorstel C "per plek")
+// De foto's staan in groepen (<div class="rl-groep">, zie de uitleg in index.html): hoog aan de muur,
+// bij de vloer, tegen de gevel, op een plat dak, op het terras, in een omkasting en achter de kap.
+// Per groep eerst 4 foto's; "Toon alle ..." toont de rest. Een tik op een foto opent ze groot in
+// dezelfde viewer als de toestelpagina's (window.rtZoomViewer): inzoomen, vorige/volgende binnen de
+// groep, de uitleg onderaan en "Zo'n toestel bij mij? Offerte aanvragen".
 // =====================================================================
 (function () {
-  var raster = document.getElementById("rl-raster");
-  if (!raster) return;
-  var alleTegels = Array.prototype.slice.call(raster.querySelectorAll(".rl-tegel"));
-  // De eerste 6 foto's staan groot in de kijker bovenaan (blok IN DE KIJKER hieronder). Rim (29-10-2026): geen dubbele
-  // foto's, dus die 6 komen niet nog eens in het raster. Zonder JavaScript blijven ze gewoon in het raster staan.
-  var kijkerEl = document.getElementById("rl-kijker");
-  var kijkerTegels = kijkerEl ? alleTegels.slice(0, 6) : [];
-  kijkerTegels.forEach(function (t) {
-    t.parentNode.removeChild(t);
-  });
-  var tegels = alleTegels.slice(kijkerTegels.length);
-  var knoppen = Array.prototype.slice.call(document.querySelectorAll(".rl-filter"));
-  var status = document.getElementById("rl-status");
+  var groepen = Array.prototype.slice.call(document.querySelectorAll(".rl-groep"));
+  if (!groepen.length) return;
   var NAMEN = { daikin: "Daikin", lg: "LG", me: "Mitsubishi Electric", mhi: "MHI", nuova: "Nuova", toshiba: "Toshiba" };
-  var merk = "";
-  // eerst een twintigtal foto's (op gsm 12), de rest via "Toon meer foto's" (Rims keuze van 29-10-2026)
-  var meerKnop = document.getElementById("rl-meer");
-  function stap() {
-    return window.innerWidth <= 700 ? 12 : 20;
+  // eerst één of twee volle rijen: 4 op gsm (2 x 2) en computer (4 naast elkaar), 6 op tablet (2 x 3)
+  function eerst() {
+    return window.matchMedia("(min-width: 701px) and (max-width: 1000px)").matches ? 6 : 4;
   }
-  var tonen = stap();
-  function past(t) {
-    return !merk || t.dataset.merk === merk;
+
+  function tegelsVan(g) {
+    return Array.prototype.slice.call(g.querySelectorAll(".rl-tegel"));
   }
-  function toonTot() {
-    var n = 0;
-    tegels.forEach(function (t) {
-      if (!past(t)) return;
-      n++;
-      t.classList.toggle("rl-later", n > tonen);
+  // open = alle foto's van de groep tonen; dicht = enkel de eerste 4
+  function zetOpen(g, open) {
+    var tegels = tegelsVan(g),
+      n = eerst();
+    tegels.forEach(function (t, i) {
+      t.classList.toggle("rl-later", !open && i >= n);
     });
-    if (meerKnop) {
-      var rest = n - tonen;
-      meerKnop.hidden = rest <= 0;
-      var tel = meerKnop.querySelector(".rl-meer-n");
-      if (tel) tel.textContent = "(" + Math.max(rest, 0) + ")";
+    var wrap = g.querySelector(".rl-meer-wrap");
+    if (wrap) wrap.hidden = tegels.length <= n;
+    var b = g.querySelector(".rl-meer");
+    if (b) {
+      b.setAttribute("aria-expanded", open ? "true" : "false");
+      b.textContent = open ? "Toon minder" : "Toon alle " + tegels.length + " foto's";
     }
   }
-  if (meerKnop)
-    meerKnop.addEventListener("click", function () {
-      var eerste = tegels.filter(function (t) {
-        return past(t) && t.classList.contains("rl-later");
-      })[0];
-      tonen += stap();
-      toonTot();
-      // de focus naar de eerste nieuwe foto, zodat toetsenbord en schermlezer verder kunnen
-      if (eerste) eerste.querySelector(".rl-open").focus({ preventScroll: true });
-    });
 
-  // aantal foto's per knop; een merk zonder foto's krijgt geen knop. De 6 foto's van de kijker tellen mee:
-  // ze staan op dezelfde pagina, en zo zegt "Alle" hetzelfde aantal als Home (controle 5-11-2026: "78" op Home,
-  // "Alle 72" hier).
-  function aantal(m) {
-    return tegels.concat(kijkerTegels).filter(function (t) {
-      return !m || t.dataset.merk === m;
-    }).length;
-  }
-  knoppen.forEach(function (k) {
-    var m = k.dataset.merk;
-    var n = aantal(m);
-    var tel = k.querySelector(".rl-n");
-    if (tel) tel.textContent = n;
-    k.hidden = !n;
-  });
+  groepen.forEach(function (g) {
+    var tegels = tegelsVan(g);
+    if (tegels.length > 4) {
+      var wrap = document.createElement("div");
+      wrap.className = "rl-meer-wrap";
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn rl-meer";
+      b.addEventListener("click", function () {
+        var open = b.getAttribute("aria-expanded") !== "true";
+        zetOpen(g, open);
+        // de focus naar de eerste nieuwe foto, zodat toetsenbord en schermlezer verder kunnen
+        if (open && tegels[eerst()]) tegels[eerst()].querySelector(".rl-open").focus({ preventScroll: true });
+      });
+      wrap.appendChild(b);
+      g.appendChild(wrap);
+    }
+    zetOpen(g, false);
 
-  function kies(m) {
-    merk = m || "";
-    knoppen.forEach(function (k) {
-      k.setAttribute("aria-pressed", k.dataset.merk === merk ? "true" : "false");
-    });
-    var n = 0;
-    tegels.forEach(function (t) {
-      var ok = past(t);
-      t.hidden = !ok;
-      if (ok) n++;
-    });
-    tonen = stap();
-    toonTot();
-    // met een merk gekozen is het merklabel op elke tegel overbodig: rustiger zonder
-    raster.classList.toggle("rl-een-merk", !!merk);
-    n = aantal(merk); // zelfde telling als de knop (met de kijker)
-    if (status) status.textContent = n + (n === 1 ? " foto" : " foto's") + (merk ? " van " + NAMEN[merk] : "");
-  }
-  knoppen.forEach(function (k) {
-    k.addEventListener("click", function () {
-      kies(k.dataset.merk);
+    // groot bekijken: vorige/volgende binnen de groep (ook de foto's die nog niet open staan)
+    g.addEventListener("click", function (e) {
+      var knop = e.target.closest(".rl-open");
+      if (!knop || !window.rtZoomViewer) return;
+      var lijst = tegels.map(function (t) {
+        var b = t.querySelector(".rl-open");
+        var img = b.querySelector("img");
+        return {
+          src: b.dataset.groot || img.getAttribute("src"),
+          alt: img.alt,
+          label: NAMEN[t.dataset.merk] || "",
+          uitleg: b.dataset.uitleg || img.alt,
+          link: b.dataset.toestel || "",
+          offerte: true,
+        };
+      });
+      window.rtZoomViewer().open(lijst, tegels.indexOf(knop.closest(".rl-tegel")), knop);
     });
   });
 
-  // De tegel "Ook achter de kap netjes" op Home linkt naar #aansluitingen (een foto in het
-  // raster): dan eerst de filter terug op "Alle", anders is die foto misschien verborgen.
+  // gsm, tablet of computer gewisseld (draaien): de groepen die dicht staan opnieuw schikken
+  var draai = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(draai);
+    draai = setTimeout(function () {
+      groepen.forEach(function (g) {
+        var b = g.querySelector(".rl-meer");
+        if (!b || b.getAttribute("aria-expanded") !== "true") zetOpen(g, false);
+      });
+    }, 200);
+  });
+
+  // De tegel "Ook achter de kap netjes" op Home linkt naar #aansluitingen = de groep "Achter de kap":
+  // die groep dan meteen helemaal open.
+  function openAansluitingen() {
+    var g = document.getElementById("aansluitingen");
+    if (g && g.classList.contains("rl-groep")) zetOpen(g, true);
+  }
   document.addEventListener(
     "click",
     function (e) {
-      if (e.target.closest && e.target.closest('a[href="#aansluitingen"]')) {
-        kies("");
-        tonen = tegels.length; // die foto staat achteraan: alles tonen
-        toonTot();
-      }
+      if (e.target.closest && e.target.closest('a[href="#aansluitingen"]')) openAansluitingen();
     },
     true
   );
-
-  // groot bekijken: de lijst = de foto's die nu zichtbaar zijn (binnen de filter)
-  raster.addEventListener("click", function (e) {
-    var knop = e.target.closest(".rl-open");
-    if (!knop || !window.rtZoomViewer) return;
-    var zichtbaar = tegels.filter(function (t) {
-      return !t.hidden;
-    });
-    var lijst = zichtbaar.map(function (t) {
-      var b = t.querySelector(".rl-open");
-      var img = b.querySelector("img");
-      return {
-        src: b.dataset.groot || img.getAttribute("src"),
-        alt: img.alt,
-        label: NAMEN[t.dataset.merk] || "",
-        uitleg: b.dataset.uitleg || img.alt,
-        link: b.dataset.toestel || "",
-        offerte: true,
-      };
-    });
-    window.rtZoomViewer().open(lijst, zichtbaar.indexOf(knop.closest(".rl-tegel")), knop);
+  if (location.hash === "#aansluitingen") openAansluitingen();
+  window.addEventListener("hashchange", function () {
+    if (location.hash === "#aansluitingen") openAansluitingen();
   });
-
-  kies("");
-
-  // IN DE KIJKER (Rims keuze van 29-10-2026): de eerste 6 foto's van het raster, groot, met uitleg en de offerteknop
-  var kijker = kijkerEl;
-  if (!kijker || !kijkerTegels.length) return;
-  var vak = kijker.querySelector(".rl-kijker-foto");
-  var uitgelicht = kijkerTegels.map(function (t, i) {
-    var b = t.querySelector(".rl-open"),
-      img = b.querySelector("img");
-    var el = document.createElement("img");
-    el.alt = img.alt;
-    el.width = 1200;
-    el.height = 900;
-    // de kijker toont de uitsnede met het toestel in het midden (rm-....webp, Rim 5-11-2026); de grote weergave de volledige foto
-    var groot = b.dataset.groot || img.getAttribute("src");
-    el.dataset.src = /\/rm-/.test(img.getAttribute("src")) ? img.getAttribute("src") : groot;
-    if (!i) {
-      el.src = el.dataset.src;
-      el.className = "on";
-    } else el.loading = "lazy";
-    vak.appendChild(el);
-    var uitleg = b.dataset.uitleg || img.alt;
-    return {
-      el: el,
-      merk: NAMEN[t.dataset.merk] || "",
-      // de kop: het eerste stuk van de uitleg ("LG-wandmodel in roze uitvoering")
-      titel: uitleg.split(". ")[0].split(", ")[0].replace(/\.$/, ""),
-      foto: { src: groot, alt: img.alt, label: NAMEN[t.dataset.merk] || "", uitleg: uitleg, link: b.dataset.toestel || "", offerte: true },
-    };
-  });
-  var nu = 0;
-  function toonKijker(k) {
-    uitgelicht[nu].el.classList.remove("on");
-    nu = (k + uitgelicht.length) % uitgelicht.length;
-    var f = uitgelicht[nu];
-    if (!f.el.getAttribute("src")) f.el.src = f.el.dataset.src;
-    f.el.classList.add("on");
-    kijker.querySelector(".rl-kijker-merk").textContent = "In de kijker" + (f.merk ? " · " + f.merk : "");
-    kijker.querySelector(".rl-kijker-titel").textContent = f.titel;
-    kijker.querySelector(".rl-kijker-tel").textContent = nu + 1 + " / " + uitgelicht.length;
-    // de volgende alvast laden
-    var v = uitgelicht[(nu + 1) % uitgelicht.length].el;
-    if (!v.getAttribute("src")) v.src = v.dataset.src;
-  }
-  kijker.querySelector(".rl-kijker-p").addEventListener("click", function () {
-    toonKijker(nu - 1);
-    wacht();
-  });
-  kijker.querySelector(".rl-kijker-n").addEventListener("click", function () {
-    toonKijker(nu + 1);
-    wacht();
-  });
-  vak.addEventListener("click", function () {
-    if (window.rtZoomViewer)
-      window.rtZoomViewer().open(
-        uitgelicht.map(function (f) {
-          return f.foto;
-        }),
-        nu,
-        vak
-      );
-  });
-  // vanzelf wisselen: enkel als de kijker in beeld is, niet als de muis of de focus erop staat,
-  // en niet als de bezoeker minder beweging wil
-  var stil = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var inBeeld = false,
-    erop = false,
-    klok = null;
-  function wacht() {
-    clearInterval(klok);
-    klok = null;
-    if (!stil && inBeeld && !erop)
-      klok = setInterval(function () {
-        toonKijker(nu + 1);
-      }, 6000);
-  }
-  ["mouseenter", "focusin"].forEach(function (ev) {
-    kijker.addEventListener(ev, function () {
-      erop = true;
-      wacht();
-    });
-  });
-  ["mouseleave", "focusout"].forEach(function (ev) {
-    kijker.addEventListener(ev, function () {
-      erop = false;
-      wacht();
-    });
-  });
-  if ("IntersectionObserver" in window)
-    new IntersectionObserver(function (e) {
-      inBeeld = e[0].isIntersecting;
-      wacht();
-    }).observe(kijker);
-  toonKijker(0);
 })();

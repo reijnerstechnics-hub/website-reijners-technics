@@ -9365,71 +9365,12 @@ img.td-zoomable:focus-visible {
   }
 }
 
-/* ---------- realisaties: één fotoraster met een filter per merk (Rims keuzes van 28-10-2026) ---------- */
-/* Rustig zoals Diensten en Contact: witte vlakken, veel ruimte, de foto's doen het werk. In het raster enkel de
-   foto (4:3) met een klein merklabel; de uitleg verschijnt pas in de grote weergave (.td-zoom-onder).
-   Gsm 2 kolommen, tablet en computer 3. De filterknoppen zijn echte knoppen (aria-pressed), minstens 44 px hoog. */
+/* ---------- realisaties: het fotoraster (Rims keuzes van 28-10-2026) ---------- */
+/* Rustig zoals Diensten en Contact: witte vlakken, veel ruimte, de foto's doen het werk; de uitleg verschijnt in de
+   grote weergave (.td-zoom-onder). Sinds 9-11-2026 staan de foto's in groepen per plek: zie het blok
+   REALISATIES PER PLEK achteraan (de merkknoppen en "In de kijker" zijn weg). */
 .rl-sec {
   padding-bottom: 72px;
-}
-.rl-kop {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 24px;
-  margin-bottom: 24px;
-}
-.rl-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.rl-filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 44px;
-  padding: 0 17px;
-  border: 1.5px solid var(--line);
-  border-radius: 999px;
-  background: #fff;
-  box-shadow: 0 1px 2px rgba(15, 29, 46, 0.06); /* zelfde schaduw als --sh-1, zodat de witte knop loskomt van de achtergrond */
-  color: var(--ink);
-  font-family: var(--font-tekst);
-  font-size: 0.95rem;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.rl-filter[hidden] {
-  display: none;
-}
-.rl-filter:hover {
-  border-color: var(--sky);
-}
-.rl-filter:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 2px;
-}
-.rl-filter[aria-pressed="true"] {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: #fff;
-}
-.rl-n {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.rl-filter[aria-pressed="true"] .rl-n {
-  color: #c9d6e2;
-}
-.rl-tip {
-  margin: 0;
-  color: var(--body);
-  font-size: 0.93rem;
 }
 .rl-raster {
   list-style: none;
@@ -9471,23 +9412,6 @@ img.td-zoomable:focus-visible {
 .rl-open:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
-}
-.rl-merk {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--ink);
-  font-family: var(--font-tekst);
-  font-size: 0.76rem;
-  font-weight: 700;
-  line-height: 1.4;
-  box-shadow: 0 1px 3px rgba(15, 29, 46, 0.18);
-}
-.rl-een-merk .rl-merk {
-  display: none;
 }
 .rl-sec .v4-insta {
   margin-top: 44px;
@@ -9541,21 +9465,6 @@ img.td-zoomable:focus-visible {
   .rl-sec {
     padding-bottom: 56px;
   }
-  .rl-kop {
-    margin-bottom: 18px;
-  }
-  .rl-filters {
-    gap: 6px;
-  }
-  /* zo passen de zes knoppen vanaf 360 px breed op twee rijen */
-  .rl-filter {
-    padding: 0 11px;
-    font-size: 0.88rem;
-    gap: 4px;
-  }
-  .rl-tip {
-    font-size: 0.88rem;
-  }
   /* de links in de zin onderaan: een tikvlak van 44 px hoog, zonder de regels uit elkaar te duwen */
   .rl-sec .v4-meer a {
     padding: 11px 0;
@@ -9566,12 +9475,6 @@ img.td-zoomable:focus-visible {
   }
   .rl-open {
     border-radius: 12px;
-  }
-  .rl-merk {
-    left: 7px;
-    bottom: 7px;
-    padding: 2px 8px;
-    font-size: 0.7rem;
   }
   .td-zoom-onder {
     padding: 10px 14px 0;
@@ -9799,10 +9702,6 @@ img.td-zoomable:focus-visible {
 .rl-meer[hidden] {
   display: none;
 }
-.rl-meer-n {
-  font-weight: 500;
-  opacity: 0.75;
-}
 .td-zoom-offerte {
   display: flex;
   flex-wrap: wrap;
@@ -9837,93 +9736,7 @@ img.td-zoomable:focus-visible {
   }
 }
 
-/* ---------- realisaties: "In de kijker" bovenaan (Rims keuze van 29-10-2026, voorstel C) ----------
-   Eén grote foto (4:3, volledig in beeld) met uitleg en de offerteknop; daaronder alle foto's in 4:3, zodat er van
-   geen enkele foto iets wegvalt. Geen merklabels op de kleine foto's: het merk staat in de kijker en in de grote weergave. */
-.rl-kijker {
-  display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-  margin: 0 0 32px;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: var(--sh-2);
-}
-.rl-kijker-foto {
-  position: relative;
-  display: block;
-  aspect-ratio: 4 / 3;
-  padding: 0;
-  border: 0;
-  background: var(--surface-alt);
-  cursor: zoom-in;
-}
-.rl-kijker-foto:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: -3px;
-}
-.rl-kijker-foto img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 50%;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-.rl-kijker-foto img.on {
-  opacity: 1;
-}
-.rl-kijker-tekst {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-  padding: 32px;
-}
-.rl-kijker-tekst .v3-kicker {
-  margin: 0;
-}
-.rl-kijker-titel {
-  margin: 0;
-  font-size: 1.35rem;
-  line-height: 1.25;
-  min-height: 2.5em; /* twee regels, zodat de knop niet verspringt bij een kortere kop */
-}
-.rl-kijker-tekst p {
-  margin: 0;
-  color: var(--body);
-  line-height: 1.6;
-}
-.rl-kijker-offerte {
-  align-self: flex-start;
-}
-.rl-kijker-nav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
-}
-.rl-kijker-nav button {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1.5px solid var(--line);
-  background: #fff;
-  color: var(--ink);
-  font-size: 1.4rem;
-  line-height: 1;
-  cursor: pointer;
-}
-.rl-kijker-nav button:hover {
-  border-color: var(--ink);
-}
-.rl-kijker-nav span {
-  color: var(--muted);
-  font-size: 0.9rem;
-  font-variant-numeric: tabular-nums;
-}
+/* de tegels: 4:3, met het toestel in het midden (uitsnede rm-....webp) */
 .rl-open {
   aspect-ratio: 4 / 3;
   border-radius: 12px;
@@ -9931,36 +9744,9 @@ img.td-zoomable:focus-visible {
 .rl-open img {
   object-position: 50% 50%;
 }
-.rl-merk {
-  display: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .rl-kijker-foto img {
-    transition: none;
-  }
-}
-@media (max-width: 860px) {
-  .rl-kijker {
-    grid-template-columns: minmax(0, 1fr); /* niet breder dan het scherm, ook met een lange knoptekst */
-    margin-bottom: 24px;
-  }
-  .rl-kijker-tekst {
-    padding: 20px;
-    gap: 10px;
-  }
-  .rl-kijker-titel {
-    font-size: 1.2rem;
-  }
-}
 @media (max-width: 700px) {
   .rl-open {
     border-radius: 8px;
-  }
-  .rl-kijker-offerte {
-    align-self: stretch;
-    justify-content: center;
-    text-align: center;
-    white-space: normal;
   }
 }
 
@@ -10370,7 +10156,6 @@ footer.v2-footer .wrap {
 .td-box,
 .td-specs dl,
 .td-prijs,
-.rl-kijker,
 .td-mini,
 .zoek-leeg {
   border-radius: var(--r);
@@ -10404,13 +10189,7 @@ footer.v2-footer .wrap {
 .td-keys span {
   border-radius: 8px;
 }
-.rl-filter {
-  border-radius: 10px;
-}
 .rl-open {
-  border-radius: 10px;
-}
-.rl-kijker-nav button {
   border-radius: 10px;
 }
 
@@ -12175,5 +11954,114 @@ header.site {
     width: 100%;
     justify-content: center;
     text-align: center;
+  }
+}
+
+/* ---------- REALISATIES PER PLEK (Rim, 9-11-2026, vraag 114) ---------- */
+/* Voorstel C uit voorbeeld/layouts-2026-11-08/paginas/: de foto's in groepen volgens de plek van het toestel
+   (.rl-groep), met springknoppen bovenaan (.rl-spring). Onder elke foto het merk klein en een korte beschrijving
+   (.rl-onder). Per groep eerst 4 foto's (gsm 2 x 2), "Toon alle ..." toont de rest (js/main.js). */
+.rl-spring {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+.rl-spring a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid rgba(27, 47, 68, 0.35);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.rl-spring a:hover {
+  border-color: var(--ink);
+}
+.rl-spring a:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.rl-spring-n {
+  font-weight: 400;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.rl-groep {
+  padding: 34px 0 8px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 84px;
+}
+.rl-groep:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+.rl-groep h2 {
+  margin: 0 0 4px;
+  font-size: clamp(1.3rem, 2.3vw, 1.6rem);
+}
+.rl-groep > p {
+  max-width: 44em;
+  margin: 0 0 16px;
+  color: var(--body);
+}
+.rl-raster {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px 16px;
+}
+.rl-onder {
+  margin: 8px 0 0;
+  color: var(--body);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+.rl-mk {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--gold-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.rl-groep .rl-meer-wrap {
+  justify-content: flex-start;
+  margin-top: 16px;
+}
+.rl-groep .rl-meer-wrap[hidden] {
+  display: none;
+}
+.rl-sec .v4-insta {
+  margin-top: 40px;
+}
+@media (max-width: 1000px) {
+  .rl-raster {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .rl-raster {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 10px;
+  }
+  .rl-groep {
+    padding-top: 28px;
+  }
+  .rl-spring {
+    gap: 6px;
+  }
+  .rl-spring a {
+    gap: 5px;
+    padding: 0 11px;
+    font-size: 0.88rem;
+  }
+  .rl-onder {
+    font-size: 0.86rem;
   }
 }

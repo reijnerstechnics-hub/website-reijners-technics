@@ -494,7 +494,7 @@
     var naam = document.getElementById("pc-naam").value.trim(),
       tel = document.getElementById("pc-tel").value.trim(),
       gem = document.getElementById("pc-gem").value.trim();
-    // zoals in het formulier op Home: ook de gemeente, zodat Rim weet of het in zijn regio is
+    // zoals in het formulier op Home: ook de gemeente, zodat Rim weet waar het is
     if (!naam || !tel || !gem) {
       // enkel wat ontbreekt (rtOntbreektZin staat in js/main.js)
       var ontbreekt = [!naam && "naam", !tel && "telefoonnummer", !gem && "gemeente"].filter(Boolean);
