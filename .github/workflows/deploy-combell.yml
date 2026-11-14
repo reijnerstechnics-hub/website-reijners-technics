@@ -1,0 +1,37 @@
+
+name: Test Combell SSH
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-combell:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: SSH-sleutel instellen
+        env:
+          SSH_KEY: ${{ secrets.COMBELL_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/combell_key
+          chmod 600 ~/.ssh/combell_key
+
+      - name: Combell server controleren
+        run: |
+          ssh-keyscan -t rsa ssh.reijnerstechnics.be > /tmp/combell_hostkey
+          ssh-keygen -lf /tmp/combell_hostkey -E sha256
+          echo "Controleer de fingerprint voordat je doorgaat"
+
+      - name: Verbinding testen
+        run: |
+          ssh -i ~/.ssh/combell_key \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=/tmp/combell_hostkey \
+            reijnerstechnicsbe@ssh.reijnerstechnics.be \
+            'printf "GitHub Actions verbonden met Combell\n"'
