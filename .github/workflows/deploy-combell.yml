@@ -35,3 +35,14 @@ jobs:
             -o UserKnownHostsFile=/tmp/combell_hostkey \
             reijnerstechnicsbe@ssh.reijnerstechnics.be \
             'printf "GitHub Actions verbonden met Combell\n"'
+      
+      - name: Testbestand publiceren naar Combell
+        run: |
+          printf '<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><title>GitHub Test</title></head><body><h1>GitHub en Combell zijn verbonden!</h1></body></html>\n' > github-test.html
+
+          scp -i ~/.ssh/combell_key \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=/tmp/combell_hostkey \
+            github-test.html \
+            reijnerstechnicsbe@ssh.reijnerstechnics.be:/data/sites/web/reijnerstechnicsbe/www/github-test.html
+
