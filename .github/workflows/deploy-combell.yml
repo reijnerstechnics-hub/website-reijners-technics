@@ -1,5 +1,5 @@
 
-name: Test Combell SSH
+name: Deploy Reijners Technics to Combell
 
 on:
   workflow_dispatch:
@@ -7,42 +7,65 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: combell-deployment
+  cancel-in-progress: false
+
 jobs:
-  test-combell:
+  deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
 
     steps:
-      - name: SSH-sleutel instellen
+      - name: Websitecode ophalen
+        uses: actions/checkout@v4
+
+      - name: SSH instellen en server controleren
         env:
           SSH_KEY: ${{ secrets.COMBELL_SSH_KEY }}
         run: |
+          set -e
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           printf '%s\n' "$SSH_KEY" > ~/.ssh/combell_key
           chmod 600 ~/.ssh/combell_key
 
-      - name: Combell server controleren
-        run: |
-          ssh-keyscan -t rsa ssh.reijnerstechnics.be > /tmp/combell_hostkey
-          ssh-keygen -lf /tmp/combell_hostkey -E sha256
-          echo "Controleer de fingerprint voordat je doorgaat"
+          ssh-keyscan -T 15 -t rsa \
+            ssh.reijnerstechnics.be > ~/.ssh/known_hosts
 
-      - name: Verbinding testen
-        run: |
-          ssh -i ~/.ssh/combell_key \
-            -o StrictHostKeyChecking=yes \
-            -o UserKnownHostsFile=/tmp/combell_hostkey \
-            reijnerstechnicsbe@ssh.reijnerstechnics.be \
-            'printf "GitHub Actions verbonden met Combell\n"'
-      
-      - name: Testbestand publiceren naar Combell
-        run: |
-          printf '<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><title>GitHub Test</title></head><body><h1>GitHub en Combell zijn verbonden!</h1></body></html>\n' > github-test.html
+          ACTUAL=$(ssh-keygen -lf ~/.ssh/known_hosts \
+            -E sha256 | awk '{print $2}')
 
-          scp -i ~/.ssh/combell_key \
-            -o StrictHostKeyChecking=yes \
-            -o UserKnownHostsFile=/tmp/combell_hostkey \
-            github-test.html \
-            reijnerstechnicsbe@ssh.reijnerstechnics.be:/data/sites/web/reijnerstechnicsbe/www/github-test.html
+          EXPECTED="SHA256:zR5nBZtK9P83508lKX/iAqhdI4+4HKv/6C/ga2M3S5U"
 
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "SSH-hostfingerprint komt niet overeen!"
+            exit 1
+          fi
+
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Publicatiebestanden voorbereiden
+        run: |
+          set -e
+          mkdir -p publish
+
+          cp index.html 404.html publish/
+          cp favicon.ico robots.txt publish/
+          cp sitemap.xml site.webmanifest publish/
+
+          cp -a css js assets publish/
+
+          test -s publish/index.html
+
+      - name: Bestanden naar Combell uploaden
+        run: |
+          set -e
+          SSH_OPTS="-i $HOME/.ssh/combell_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+
+          scp $SSH_OPTS -r publish/. \
+            reijnerstechnicsbe@ssh.reijnerstechnics.be:/data/sites/web/reijnerstechnicsbe/www/
+
+      - name: Deployment afgerond
+        run: |
+          echo "Websitebestanden verzonden naar Combell."
