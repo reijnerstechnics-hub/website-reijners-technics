@@ -35,6 +35,7 @@ jobs:
 
           ACTUAL=$(ssh-keygen -lf ~/.ssh/known_hosts \
             -E sha256 | awk '{print $2}')
+            echo "Gevonden fingerprint: $ACTUAL"
 
           EXPECTED="SHA256:zR5nBZtK9P83508lKX/iAqhdI4+4HKv/6C/ga2M3S5U"
 
