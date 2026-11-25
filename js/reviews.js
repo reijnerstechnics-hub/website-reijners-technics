@@ -63,6 +63,41 @@
     kop.appendChild(sterren(+r.sterren || 0));
     a.appendChild(kop);
     if (r.tekst && r.tekst.trim()) a.appendChild(el("p", "rvw-tekst", r.tekst.trim()));
+    // foto's die de klant bij zijn review plaatste: klein in de kaart, een tik opent ze groot
+    var fotos = (r.fotos || []).filter(function (f) {
+      return f && f.groot;
+    });
+    if (fotos.length) {
+      var rij = el("div", "rvw-fotos");
+      var groot = fotos.map(function (f, n) {
+        return {
+          src: f.groot,
+          alt: "Foto " + (n + 1) + " bij de review van " + naam,
+          label: "Foto bij de review van " + naam,
+        };
+      });
+      fotos.forEach(function (f, n) {
+        var knop = el("button", "rvw-foto");
+        knop.type = "button";
+        knop.setAttribute("aria-label", "Foto " + (n + 1) + " bij de review van " + naam + " groot bekijken");
+        var img = document.createElement("img");
+        img.src = f.klein || f.groot;
+        img.alt = "";
+        img.loading = "lazy";
+        img.decoding = "async";
+        if (f.b && f.h) {
+          img.width = f.b;
+          img.height = f.h;
+        }
+        knop.appendChild(img);
+        knop.addEventListener("click", function () {
+          if (window.rtZoomViewer) window.rtZoomViewer().open(groot, n, knop);
+          else window.open(f.groot, "_blank", "noopener");
+        });
+        rij.appendChild(knop);
+      });
+      a.appendChild(rij);
+    }
     if (r.antwoord && r.antwoord.trim()) {
       var ant = el("div", "rvw-antwoord");
       ant.appendChild(el("b", null, "Antwoord van Rim"));

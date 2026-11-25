@@ -12215,6 +12215,37 @@ header.site {
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
+.rvw-fotos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+.rvw-foto {
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-alt);
+  cursor: zoom-in;
+  line-height: 0;
+}
+.rvw-foto img {
+  display: block;
+  width: auto;
+  height: 180px;
+  max-width: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+.rvw-foto:hover img {
+  transform: scale(1.04);
+}
+.rvw-foto:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
 .rvw-antwoord {
   margin-top: 14px;
   padding: 12px 14px;

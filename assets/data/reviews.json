@@ -9,7 +9,10 @@
       "sterren": 5,
       "datum": "2026-11-25",
       "tekst": "Mooi geplaatst in het midden van het raam zoals gevraagd, wel jammer van het dak. Al bij al top werk en vriendelijke kerel.",
-      "antwoord": ""
+      "antwoord": "",
+      "fotos": [
+        { "groot": "assets/img/rev-daan-1.webp", "klein": "assets/img/rev-daan-1-k.webp", "b": 480, "h": 640 }
+      ]
     }
   ]
 }

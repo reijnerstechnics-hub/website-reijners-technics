@@ -151,7 +151,7 @@ De foto's blijven in de browser: niets gaat naar een server tot de klant zelf de
 
 De pagina `#reviews` (menu: Reviews) toont de reviews van het Google-bedrijfsprofiel van Reijners Technics.
 
-- **Inhoud:** enkel `assets/data/reviews.json` (`score`, `aantal`, `bijgewerkt` en per review `naam`, `sterren`, `datum` als JJJJ-MM-DD, `tekst`, `antwoord`). `js/reviews.js` tekent daaruit de score, de sterren en de kaarten (12 per keer, daarna "Toon meer reviews"; bij minder dan 3 reviews één smalle kolom). Reviews letterlijk overnemen: nooit verzinnen, inkorten of herschrijven. De prijsaanduiding die Google soms bij een review toont, komt niet op de site (geen prijzen).
+- **Inhoud:** enkel `assets/data/reviews.json` (`score`, `aantal`, `bijgewerkt` en per review `naam`, `sterren`, `datum` als JJJJ-MM-DD, `tekst`, `antwoord` en `fotos`: de foto's die de klant bij zijn review plaatste, als `assets/img/rev-<naam>-<n>.webp` (1200 breed) met een kleine `-k.webp`; een tik opent ze in de fotoviewer). `js/reviews.js` tekent daaruit de score, de sterren en de kaarten (12 per keer, daarna "Toon meer reviews"; bij minder dan 3 reviews één smalle kolom). Reviews letterlijk overnemen: nooit verzinnen, inkorten of herschrijven. De prijsaanduiding die Google soms bij een review toont, komt niet op de site (geen prijzen).
 - **Knoppen:** "Schrijf een review op Google" (`https://search.google.com/local/writereview?placeid=ChIJCdgXrd-Ito8ReUS_xt11DDs`) en "Bekijk ons profiel op Google". Het kenmerk van het profiel (place id) is `ChIJCdgXrd-Ito8ReUS_xt11DDs`.
 - **Automatisch bijwerken (Rims keuze van 25-11-2026: de volledige koppeling):** via de Google Business Profile API, die alle reviews van het eigen profiel geeft. Google moet de toegang eerst goedkeuren (aanvraag "Application for Basic API Access"; voorwaarden: profiel minstens 60 dagen geverifieerd en actief, een website bij het profiel, een project in Google Cloud). Na de goedkeuring komt er een dagelijkse taak op GitHub die `assets/data/reviews.json` bijwerkt. Tot dan wordt het bestand met de hand bijgewerkt vanaf het profiel op Google.
 - Het bestand staat onder `assets/`, zodat de upload naar Combell (`.github/workflows/deploy-combell.yml`, kopieert `css`, `js` en `assets`) het meeneemt.
@@ -161,7 +161,7 @@ De pagina `#reviews` (menu: Reviews) toont de reviews van het Google-bedrijfspro
 - `robots.txt` en `sitemap.xml` (enkel het echte adres: de #-adressen zijn voor Google geen pagina's), `site.webmanifest` en de iconen in `assets/img/` (`favicon-32.png`, `icoon-192.png`, `icoon-512.png`, `apple-touch-icon.png`) plus `favicon.ico`.
 - In de `<head>` van `index.html`: de canonical, Open Graph en Twitter-cards (deelfoto `assets/img/deelfoto-reijners-technics.jpg`, 1200 × 630) en de structured data (JSON-LD, HVACBusiness + WebSite) met enkel gegevens uit `CLAUDE.md`. Nakijken na het online zetten: https://search.google.com/test/rich-results.
 - `404.html` toont Vercel zelf bij een onbestaand adres. `vercel.json` zet drie veilige headers.
-- **Eigen domein:** vervang `https://website-reijners-technics.vercel.app` in `index.html` (head, commentaar EIGEN DOMEIN), `sitemap.xml` en `robots.txt`.
+- **Eigen domein:** sinds 25-11-2026 is `https://reijnerstechnics.be` het echte adres voor Google: het staat in `index.html` (head, commentaar EIGEN DOMEIN), `sitemap.xml` en `robots.txt`. Het vercel.app-adres toont dezelfde site en wijst via de canonical naar reijnerstechnics.be.
 
 ## Online zetten
 
