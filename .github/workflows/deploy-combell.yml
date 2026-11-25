@@ -1,8 +1,22 @@
 
 name: Deploy Reijners Technics to Combell
 
+# Zet de site op reijnerstechnics.be (Combell). Starten met de hand: Actions > deze taak > Run workflow.
+# Gewoon starten = enkel de bestanden die veranderd zijn sinds de vorige upload (snel, geen 900 foto's).
+# De server onthoudt de laatst geüploade versie in het bestandje .laatste-upload.
+# "volledig" aanvinken = alles opnieuw uploaden, zoals vroeger (duurt ongeveer 8 minuten).
+
 on:
   workflow_dispatch:
+    inputs:
+      volledig:
+        description: "Alles opnieuw uploaden, ook alle foto's (traag)"
+        type: boolean
+        default: false
+      vanaf:
+        description: "Enkel de eerste keer: de versie (commit) die nu op de server staat"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -10,6 +24,11 @@ permissions:
 concurrency:
   group: combell-deployment
   cancel-in-progress: false
+
+env:
+  DOEL: reijnerstechnicsbe@ssh.reijnerstechnics.be
+  WWW: /data/sites/web/reijnerstechnicsbe/www
+  PADEN: index.html 404.html favicon.ico robots.txt sitemap.xml site.webmanifest css js assets
 
 jobs:
   deploy:
@@ -19,6 +38,8 @@ jobs:
     steps:
       - name: Websitecode ophalen
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: SSH instellen en server controleren
         env:
@@ -46,35 +67,91 @@ jobs:
 
           chmod 600 ~/.ssh/known_hosts
 
-      - name: Publicatiebestanden voorbereiden
-        run: |
-          set -e
-          mkdir -p publish
-
-          cp index.html 404.html publish/
-          cp favicon.ico robots.txt publish/
-          cp sitemap.xml site.webmanifest publish/
-
-          cp -a css js assets publish/
-
-          test -s publish/index.html
-
-      - name: Bestanden naar Combell uploaden
+      - name: Bepalen wat er veranderd is
+        id: wat
+        env:
+          VOLLEDIG: ${{ inputs.volledig }}
+          VANAF: ${{ inputs.vanaf }}
         run: |
           set -e
           SSH_OPTS="-i $HOME/.ssh/combell_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
 
-          # Eerst de opmaak, scripts en foto's, dan pas de pagina's zelf: zo verwijst een nieuwe pagina
-          # nooit naar oude opmaak terwijl de upload nog loopt (25-11-2026).
-          mkdir -p laatst
-          mv publish/index.html publish/404.html laatst/
+          test -s index.html
 
-          scp $SSH_OPTS -r publish/. \
-            reijnerstechnicsbe@ssh.reijnerstechnics.be:/data/sites/web/reijnerstechnicsbe/www/
+          # welke versie staat er nu op de server?
+          VORIGE=$(ssh -n $SSH_OPTS "$DOEL" "cat $WWW/.laatste-upload 2>/dev/null" || true)
+          VORIGE=$(printf '%s' "$VORIGE" | tr -cd '0-9a-f')
+          if [ -z "$VORIGE" ]; then
+            VORIGE=$(printf '%s' "$VANAF" | tr -cd '0-9a-f')
+          fi
 
-          scp $SSH_OPTS laatst/index.html laatst/404.html \
-            reijnerstechnicsbe@ssh.reijnerstechnics.be:/data/sites/web/reijnerstechnicsbe/www/
+          SOORT=alles
+          if [ "$VOLLEDIG" != "true" ] && [ ${#VORIGE} -ge 7 ] \
+            && git cat-file -e "$VORIGE^{commit}" 2>/dev/null \
+            && git merge-base --is-ancestor "$VORIGE" HEAD; then
+            SOORT=wijzigingen
+            git diff --name-only --diff-filter=ACMR "$VORIGE" HEAD -- $PADEN > gewijzigd.txt
+            git diff --name-only --diff-filter=D "$VORIGE" HEAD -- $PADEN > weg.txt
+            echo "Vorige upload: $VORIGE"
+          else
+            : > gewijzigd.txt
+            : > weg.txt
+            echo "Geen bruikbare vorige upload gevonden (of 'volledig' gekozen): alles wordt geüpload."
+          fi
 
-      - name: Deployment afgerond
+          echo "soort=$SOORT" >> "$GITHUB_OUTPUT"
+          echo "Gewijzigd of nieuw: $(wc -l < gewijzigd.txt) bestanden"
+          cat gewijzigd.txt
+          echo "Verwijderd: $(wc -l < weg.txt) bestanden"
+          cat weg.txt
+
+      - name: Enkel de wijzigingen uploaden
+        if: steps.wat.outputs.soort == 'wijzigingen'
         run: |
-          echo "Websitebestanden verzonden naar Combell."
+          set -e
+          set -o pipefail
+          SSH_OPTS="-i $HOME/.ssh/combell_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+
+          # Eerst de opmaak, scripts en foto's, dan pas de pagina's zelf: zo verwijst een nieuwe pagina
+          # nooit naar oude opmaak terwijl de upload nog loopt.
+          grep -v -x -e index.html -e 404.html gewijzigd.txt > eerst.txt || true
+          grep -x -e index.html -e 404.html gewijzigd.txt > laatst.txt || true
+
+          if [ -s eerst.txt ]; then
+            tar -czf - -T eerst.txt | ssh $SSH_OPTS "$DOEL" "tar -xzf - --no-same-owner -C $WWW"
+          fi
+          if [ -s laatst.txt ]; then
+            tar -czf - -T laatst.txt | ssh $SSH_OPTS "$DOEL" "tar -xzf - --no-same-owner -C $WWW"
+          fi
+
+          # bestanden die uit de site gehaald zijn, ook op de server weghalen (enkel gewone namen binnen de site)
+          while IFS= read -r f; do
+            case "$f" in
+              ""|/*|*..*|*[!A-Za-z0-9._/-]*) echo "Overgeslagen: $f"; continue ;;
+            esac
+            ssh -n $SSH_OPTS "$DOEL" "rm -f -- '$WWW/$f'"
+            echo "Weggehaald: $f"
+          done < weg.txt
+
+      - name: Alles uploaden
+        if: steps.wat.outputs.soort == 'alles'
+        run: |
+          set -e
+          SSH_OPTS="-i $HOME/.ssh/combell_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+
+          mkdir -p publish laatst
+          cp favicon.ico robots.txt publish/
+          cp sitemap.xml site.webmanifest publish/
+          cp -a css js assets publish/
+          cp index.html 404.html laatst/
+
+          # Eerst de opmaak, scripts en foto's, dan pas de pagina's zelf.
+          scp $SSH_OPTS -r publish/. "$DOEL:$WWW/"
+          scp $SSH_OPTS laatst/index.html laatst/404.html "$DOEL:$WWW/"
+
+      - name: Onthouden welke versie er nu staat
+        run: |
+          set -e
+          SSH_OPTS="-i $HOME/.ssh/combell_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+          git rev-parse HEAD | ssh $SSH_OPTS "$DOEL" "cat > $WWW/.laatste-upload"
+          echo "Websitebestanden verzonden naar Combell: $(git rev-parse --short HEAD)"
