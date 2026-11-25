@@ -41,8 +41,8 @@
       var deel = Math.max(0, Math.min(1, vol - i));
       var s = el("span", "rvw-ster");
       s.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path class="leeg" d="' + pad + '"/></svg>' +
-        '<svg class="vol" viewBox="0 0 24 24" aria-hidden="true" style="clip-path: inset(0 ' + (100 - deel * 100) + '% 0 0)"><path d="' + pad + '"/></svg>';
+        '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path class="leeg" d="' + pad + '"/></svg>' +
+        '<svg class="vol" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="clip-path: inset(0 ' + (100 - deel * 100) + '% 0 0)"><path d="' + pad + '"/></svg>';
       wrap.appendChild(s);
     }
     return wrap;

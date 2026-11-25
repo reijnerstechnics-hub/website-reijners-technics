@@ -34,7 +34,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;800&family=PT+Sans:wght@400;700&display=swap">
-<link rel="stylesheet" href="css/style.css">
+<!-- VERSIE: verhoog ?v=... hier en bij de scripts onderaan bij elke wijziging die online gaat. Anders toont de browser
+     van een terugkerende bezoeker nog de oude opmaak bij de nieuwe pagina (Rim zag daardoor reuzegrote sterren, 25-11-2026). -->
+<link rel="stylesheet" href="css/style.css?v=20261125b">
 <!-- Structured data (JSON-LD): vertelt Google wat voor bedrijf dit is, waar het zit en wat het doet.
      Enkel gegevens die kloppen: geen prijzen of reviews. Openingsuren: op werkdagen van 8 tot 18 uur (Rim, 28-10-2026). Nakijken: Google Rich Results Test. -->
 <script type="application/ld+json">
@@ -2507,16 +2509,16 @@
 <!-- mini-balk (laptop): verschijnt na de kop -->
 <div class="v4-mini" id="v4-mini" aria-hidden="true"><span class="live" aria-hidden="true"></span><span class="txt">Klaar in 2 minuten &middot; Rim belt u op werkdagen binnen 24&nbsp;uur terug</span><a class="btn btn-gold" href="#calculator" tabindex="-1">Offerte aanvragen <span class="ar">&rarr;</span></a></div>
 
-<script src="js/prijzen.js"></script>
-<script src="js/toestel-media.js"></script>
-<script src="js/main.js"></script>
-<script src="js/prijscalculator.js"></script>
-<script src="js/beweging.js"></script>
-<script src="js/reviews.js"></script>
+<script src="js/prijzen.js?v=20261125b"></script>
+<script src="js/toestel-media.js?v=20261125b"></script>
+<script src="js/main.js?v=20261125b"></script>
+<script src="js/prijscalculator.js?v=20261125b"></script>
+<script src="js/beweging.js?v=20261125b"></script>
+<script src="js/reviews.js?v=20261125b"></script>
 <!-- js/zicht.js ("Plan uw plaatsing", geparkeerd tot december 2026) laadt niet meer bij elke bezoeker (controle 5-11-2026,
      punt 11). js/woonkamer.js haalt het zelf op als het de uitknipfunctie nodig heeft. In december weer aanzetten:
      zet hier opnieuw <script src="js/zicht.js"></script> (vóór js/woonkamer.js) en bouw de kaart in js/main.js
      (blok "Zie dit toestel in een woonkamer") terug om naar window.rtZicht.open. -->
-<script src="js/woonkamer.js"></script>
+<script src="js/woonkamer.js?v=20261125b"></script>
 </body>
 </html>

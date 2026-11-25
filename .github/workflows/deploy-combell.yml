@@ -64,7 +64,15 @@ jobs:
           set -e
           SSH_OPTS="-i $HOME/.ssh/combell_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
 
+          # Eerst de opmaak, scripts en foto's, dan pas de pagina's zelf: zo verwijst een nieuwe pagina
+          # nooit naar oude opmaak terwijl de upload nog loopt (25-11-2026).
+          mkdir -p laatst
+          mv publish/index.html publish/404.html laatst/
+
           scp $SSH_OPTS -r publish/. \
+            reijnerstechnicsbe@ssh.reijnerstechnics.be:/data/sites/web/reijnerstechnicsbe/www/
+
+          scp $SSH_OPTS laatst/index.html laatst/404.html \
             reijnerstechnicsbe@ssh.reijnerstechnics.be:/data/sites/web/reijnerstechnicsbe/www/
 
       - name: Deployment afgerond
