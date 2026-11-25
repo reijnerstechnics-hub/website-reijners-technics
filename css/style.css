@@ -12065,3 +12065,222 @@ header.site {
     font-size: 0.86rem;
   }
 }
+
+/* =====================================================================
+   REVIEWS (pagina #reviews, Rim 25-11-2026): score, knoppen naar Google en de reviews als kaarten.
+   De inhoud komt uit assets/data/reviews.json via js/reviews.js.
+   ===================================================================== */
+.rvw-sec {
+  padding-top: 36px;
+}
+.rvw-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 32px;
+  padding: 24px 28px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--sh-1);
+}
+.rvw-score {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 64px;
+}
+.rvw-cijfer {
+  font-family: var(--font-kop);
+  font-size: 3.2rem;
+  line-height: 1;
+  color: var(--ink);
+}
+.rvw-score-naast {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rvw-aantal {
+  color: var(--body);
+  font-size: 1rem;
+}
+.rvw-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.rvw-acts .btn,
+.rvw-meer-wrap .btn {
+  min-height: 48px;
+}
+.rvw-btn-lijn {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+.rvw-btn-lijn:hover {
+  background: var(--ink);
+  color: #fff;
+}
+.rvw-sterren {
+  display: inline-flex;
+  gap: 2px;
+  flex: none;
+}
+.rvw-ster {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+.rvw-sterren-groot .rvw-ster {
+  width: 26px;
+  height: 26px;
+}
+.rvw-ster svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.rvw-ster .leeg {
+  fill: var(--surface-alt);
+  stroke: var(--gold-dark);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+.rvw-ster .vol path {
+  fill: var(--gold);
+  stroke: var(--gold-dark);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+.rvw-lijst {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+  align-items: start;
+}
+.rvw-lijst.is-weinig {
+  grid-template-columns: minmax(0, 760px);
+}
+.rvw-sec.is-weinig .rvw-top {
+  max-width: 760px;
+}
+.rvw-kaart {
+  padding: 22px 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--sh-1);
+}
+.rvw-kop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rvw-letter {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font-kop);
+  font-size: 1.15rem;
+}
+.rvw-wie {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-right: auto;
+  line-height: 1.3;
+}
+.rvw-naam {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.rvw-datum {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.rvw-tekst {
+  margin: 14px 0 0;
+  color: var(--body);
+  font-size: 1.05rem;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.rvw-antwoord {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+}
+.rvw-antwoord b {
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+.rvw-antwoord p {
+  margin: 4px 0 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.rvw-leeg {
+  margin: 0;
+  color: var(--muted);
+}
+.rvw-meer-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+}
+.rvw-meer-wrap:has([hidden]) {
+  display: none;
+}
+.rvw-bron {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+@media (max-width: 1000px) {
+  .rvw-lijst {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .rvw-top {
+    padding: 20px 18px;
+  }
+  .rvw-cijfer {
+    font-size: 2.7rem;
+  }
+  .rvw-acts {
+    width: 100%;
+    flex-direction: column;
+  }
+  .rvw-acts .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  .rvw-lijst {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rvw-kaart {
+    padding: 18px 16px;
+  }
+  .rvw-kop {
+    flex-wrap: wrap;
+  }
+  .rvw-kop .rvw-sterren {
+    width: 100%;
+    padding-left: 56px;
+    margin-top: -6px;
+  }
+}

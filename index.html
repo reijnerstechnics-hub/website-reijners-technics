@@ -167,6 +167,7 @@
         </div>
       </div>
       <a href="#realisaties" data-page="realisaties">Realisaties</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
       <a href="#contact" data-page="contact">Contact</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span></button>
@@ -2196,6 +2197,44 @@
   </div>
 </section>
 
+<!-- REVIEWS (Rim, 25-11-2026): de reviews van het Google-bedrijfsprofiel. De inhoud komt uit assets/data/reviews.json
+     en wordt getekend door js/reviews.js. Nooit een review verzinnen, inkorten of herschrijven. -->
+<section class="v2-phead" id="reviews" data-page="reviews">
+  <div class="wrap">
+    <div class="v2-crumb"><a href="#home">Home</a> &rsaquo; <b>Reviews</b></div>
+    <h1>Wat klanten over Reijners Technics zeggen</h1>
+    <p>Dit zijn de reviews van ons bedrijfsprofiel op Google, letterlijk overgenomen.</p>
+  </div>
+</section>
+<section class="alt v2-after-phead rvw-sec" data-page="reviews">
+  <div class="wrap">
+    <div class="rvw-top">
+      <div class="rvw-score" id="rvw-score" aria-live="polite"></div>
+      <div class="rvw-acts">
+        <a class="btn btn-gold" href="https://search.google.com/local/writereview?placeid=ChIJCdgXrd-Ito8ReUS_xt11DDs" target="_blank" rel="noopener">Schrijf een review op Google</a>
+        <a class="btn rvw-btn-lijn" href="https://www.google.com/maps/search/?api=1&amp;query=Reijners+Technics&amp;query_place_id=ChIJCdgXrd-Ito8ReUS_xt11DDs" target="_blank" rel="noopener">Bekijk ons profiel op Google</a>
+      </div>
+    </div>
+    <div class="rvw-lijst" id="rvw-lijst"><p class="rvw-leeg">De reviews worden geladen.</p></div>
+    <div class="rvw-meer-wrap"><button type="button" class="btn rvw-btn-lijn" id="rvw-meer" hidden>Toon meer reviews</button></div>
+    <p class="rvw-bron" id="rvw-bron">Bron: Google. Google verifieert reviews niet.</p>
+  </div>
+</section>
+<section class="v2-bandsec" data-page="reviews">
+  <div class="wrap">
+    <div class="v2-band rv">
+      <div>
+        <h2>Ook een airco laten plaatsen?</h2>
+        <p>Rim komt gratis langs voor een plaatsbezoek. Hij belt u op werkdagen binnen 24&nbsp;uur terug.</p>
+      </div>
+      <div class="v2-band-acts">
+        <a class="btn btn-gold" href="#calculator" data-start-dienst="nieuw">Offerte aanvragen &rarr;</a>
+        <a class="btn v2-btn-ghost" href="tel:+32491113313">Bellen</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="v2-phead" id="contact" data-page="contact">
   <div class="wrap">
     <div class="v2-crumb"><a href="#home">Home</a> &rsaquo; <b>Contact</b></div>
@@ -2385,6 +2424,7 @@
           <li><a href="#diensten">Diensten</a></li>
           <li><a href="#toestellen">Toestellen</a></li>
           <li><a href="#realisaties">Realisaties</a></li>
+          <li><a href="#reviews">Reviews</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
       </div>
@@ -2471,6 +2511,7 @@
 <script src="js/main.js"></script>
 <script src="js/prijscalculator.js"></script>
 <script src="js/beweging.js"></script>
+<script src="js/reviews.js"></script>
 <!-- js/zicht.js ("Plan uw plaatsing", geparkeerd tot december 2026) laadt niet meer bij elke bezoeker (controle 5-11-2026,
      punt 11). js/woonkamer.js haalt het zelf op als het de uitknipfunctie nodig heeft. In december weer aanzetten:
      zet hier opnieuw <script src="js/zicht.js"></script> (vóór js/woonkamer.js) en bouw de kaart in js/main.js

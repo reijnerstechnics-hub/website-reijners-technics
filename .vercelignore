@@ -9,3 +9,6 @@ README.md
 AUDIT.md
 voorbeeld/
 *.tmp
+.github/
+.codex/
+AGENTS.md

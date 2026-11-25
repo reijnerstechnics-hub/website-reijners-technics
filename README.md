@@ -147,6 +147,15 @@ Op elke toestelpagina opent de kaart "Plan uw plaatsing bij u thuis" (`.td-kamer
 
 De foto's blijven in de browser: niets gaat naar een server tot de klant zelf deelt. three.js (r128, cdnjs) laadt pas als de klant het 3D-huis opent; het huis (voorgevel, zijgevel, aanbouw met plat dak), de texturen en de buitenunit zijn in code getekend. Zodra het 3D-model van de buitenunit uit Higgsfield klaar is: het GLB-bestand in `assets/3d/` zetten en de naam in `MODEL_3D` bovenaan `js/zicht.js` invullen (`laadModel` vervangt dan de getekende unit).
 
+## Reviews
+
+De pagina `#reviews` (menu: Reviews) toont de reviews van het Google-bedrijfsprofiel van Reijners Technics.
+
+- **Inhoud:** enkel `assets/data/reviews.json` (`score`, `aantal`, `bijgewerkt` en per review `naam`, `sterren`, `datum` als JJJJ-MM-DD, `tekst`, `antwoord`). `js/reviews.js` tekent daaruit de score, de sterren en de kaarten (12 per keer, daarna "Toon meer reviews"; bij minder dan 3 reviews één smalle kolom). Reviews letterlijk overnemen: nooit verzinnen, inkorten of herschrijven. De prijsaanduiding die Google soms bij een review toont, komt niet op de site (geen prijzen).
+- **Knoppen:** "Schrijf een review op Google" (`https://search.google.com/local/writereview?placeid=ChIJCdgXrd-Ito8ReUS_xt11DDs`) en "Bekijk ons profiel op Google". Het kenmerk van het profiel (place id) is `ChIJCdgXrd-Ito8ReUS_xt11DDs`.
+- **Automatisch bijwerken (Rims keuze van 25-11-2026: de volledige koppeling):** via de Google Business Profile API, die alle reviews van het eigen profiel geeft. Google moet de toegang eerst goedkeuren (aanvraag "Application for Basic API Access"; voorwaarden: profiel minstens 60 dagen geverifieerd en actief, een website bij het profiel, een project in Google Cloud). Na de goedkeuring komt er een dagelijkse taak op GitHub die `assets/data/reviews.json` bijwerkt. Tot dan wordt het bestand met de hand bijgewerkt vanaf het profiel op Google.
+- Het bestand staat onder `assets/`, zodat de upload naar Combell (`.github/workflows/deploy-combell.yml`, kopieert `css`, `js` en `assets`) het meeneemt.
+
 ## Voor Google
 
 - `robots.txt` en `sitemap.xml` (enkel het echte adres: de #-adressen zijn voor Google geen pagina's), `site.webmanifest` en de iconen in `assets/img/` (`favicon-32.png`, `icoon-192.png`, `icoon-512.png`, `apple-touch-icon.png`) plus `favicon.ico`.
