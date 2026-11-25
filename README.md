@@ -167,6 +167,12 @@ De pagina `#reviews` (menu: Reviews) toont de reviews van het Google-bedrijfspro
 
 Upload de volledige map naar de webhost, zodat `index.html` in de hoofdmap staat. Laat weg wat enkel voor het werken aan de site dient: `.git`, `.claude`, `CLAUDE.md` en `voorbeeld`. Werkt ook met Netlify, Vercel, Cloudflare Pages of GitHub Pages zonder extra instellingen.
 
+De site staat op twee adressen:
+
+- **Vercel** (`website-reijners-technics.vercel.app`): gaat vanzelf online bij elke push naar `main`.
+- **Combell** (`https://reijnerstechnics.be`, het echte adres): met de hand starten op GitHub, Actions > "Deploy Reijners Technics to Combell" > Run workflow (of `gh workflow run deploy-combell.yml --ref main`). De taak verstuurt enkel de bestanden die veranderd zijn sinds de vorige upload en haalt verwijderde bestanden ook op de server weg; de server onthoudt de versie in `.laatste-upload`. De pagina's (`index.html`, `404.html`) gaan als laatste. "volledig" aanvinken verstuurt alles opnieuw (ongeveer 8 minuten); het veld "vanaf" is enkel voor de allereerste keer.
+- Bij elke wijziging die online gaat: verhoog `?v=...` bij `css/style.css` en de scripts in `index.html` (commentaar VERSIE), anders toont de browser van een terugkerende bezoeker nog de oude opmaak.
+
 ## Team van agents (Claude Code)
 
 `CLAUDE.md` is het projectgeheugen: wat het bedrijf doet, de huisstijl, de toon en de vaste werkwijze (eerst een voorbeeld, pas online na akkoord). In `.claude/agents/` staat het team dat aan de site werkt: de `projectleider` (hoofdagent die de anderen aanstuurt), `ux-adviseur`, `ui-ontwerper`, `seo-specialist`, `toestellenbeheerder`, `tekstschrijver` en `tester`. Open een nieuwe Claude Code-sessie in deze map om ze te gebruiken; vraag gewoon wat je wilt veranderen, of noem een agent bij naam.
